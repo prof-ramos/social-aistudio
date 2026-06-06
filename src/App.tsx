@@ -18,6 +18,7 @@ import { Notifications } from './pages/Notifications';
 import { Messages } from './pages/Messages';
 import { Home, Building2, Briefcase, Archive, MessageSquare } from 'lucide-react';
 import { UserProfile, AuthUser } from './types';
+import { usePresence } from './hooks/usePresence';
 
 export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -74,6 +75,8 @@ export default function App() {
 }
 
 function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: boolean }) {
+  usePresence(profile);
+
   return (
     <div className="h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
       <Navbar profile={profile} isAdminView={isAdminView} />

@@ -14,6 +14,8 @@ export interface UserProfile {
   bio?: string;
   savedPosts?: string[];
   createdAt?: any;
+  isOnline?: boolean;
+  lastOnline?: any;
 }
 
 export type PostCategory = 'POSTOS' | 'CARREIRA' | 'VIDA_EXTERIOR' | 'APOSENTADORIA' | 'GERAL';

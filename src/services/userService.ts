@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { UserProfile } from '../types';
 
@@ -14,6 +14,36 @@ export const userService = {
       return { id: docSnap.id, ...docSnap.data() } as UserProfile;
     }
     return null;
+  },
+
+  /**
+   * Listen to real-time updates for a user profile.
+   */
+  subscribeToProfile: (id: string, onUpdate: (profile: UserProfile | null) => void) => {
+    return onSnapshot(doc(db, USERS_COLLECTION, id), (docSnap) => {
+      if (docSnap.exists()) {
+        onUpdate({ id: docSnap.id, ...docSnap.data() } as UserProfile);
+      } else {
+        onUpdate(null);
+      }
+    }, (error) => {
+      console.error('Error fetching real-time profile data:', error);
+      onUpdate(null);
+    });
+  },
+
+  /**
+   * Update presence status (online/offline).
+   */
+  updatePresence: async (id: string, isOnline: boolean): Promise<void> => {
+    try {
+      await updateDoc(doc(db, USERS_COLLECTION, id), { 
+        isOnline,
+        lastOnline: serverTimestamp()
+      });
+    } catch (e) {
+      console.error('Failed to update presence', e);
+    }
   },
 
   /**

@@ -38,8 +38,16 @@ export function Profile({ profile }: { profile: UserProfile }) {
                  <span className="text-4xl font-bold text-navy uppercase">{user.name.charAt(0)}</span>
                )}
              </div>
+             
+             {/* Online Indicator */}
+             {!isEditing && (
+               <div className={`absolute bottom-2 right-2 w-5 h-5 rounded-full border-4 border-white shadow-sm transition-colors duration-500 z-10 ${user.isOnline ? 'bg-green-500' : 'bg-slate-300'}`} 
+                 title={user.isOnline ? 'Online agora' : 'Offline'}
+               />
+             )}
+
              {isOwnProfile && isEditing && (
-                <div className="absolute inset-0 bg-navy/60 flex flex-col items-center justify-center text-white transition-opacity pointer-events-none">
+                <div className="absolute inset-0 bg-navy/60 flex flex-col items-center justify-center text-white transition-opacity pointer-events-none z-10">
                   <Camera className="w-6 h-6 mb-1" />
                   <span className="text-[10px] uppercase font-bold text-center px-2 tracking-wider">Mudar Foto</span>
                 </div>

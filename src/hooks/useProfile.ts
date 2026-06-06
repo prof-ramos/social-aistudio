@@ -19,30 +19,41 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
 
   useEffect(() => {
     if (!id) return;
-    const fetchUser = async () => {
-      try {
-        const userData = await userService.getUserProfile(id);
-        if (userData) {
-          setUser(userData);
-          setEditForm({
-            bio: userData.bio || '',
-            avatarUrl: userData.avatarUrl || '',
-            currentPost: (userData as any).currentPost || '',
-          });
-          
-          if (userData.savedPosts && userData.savedPosts.length > 0) {
+    setLoading(true);
+    const unsubscribe = userService.subscribeToProfile(id, async (userData) => {
+      if (userData) {
+        setUser(userData);
+        // Only set the edit form values if they haven't been touched yet or aren't currently editing, 
+        // OR simply rely on the first fetch. Here we can update safely if not editing.
+        setEditForm(prev => {
+          if (!isEditing) {
+            return {
+              bio: userData.bio || '',
+              avatarUrl: userData.avatarUrl || '',
+              currentPost: (userData as any).currentPost || '',
+            }
+          }
+          return prev;
+        });
+        
+        if (userData.savedPosts && userData.savedPosts.length > 0) {
+          try {
             const posts = await postService.getPostsByIds(userData.savedPosts);
             setSavedPosts(posts);
+          } catch (e) {
+            console.error(e);
           }
+        } else {
+          setSavedPosts([]);
         }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+      } else {
+        setUser(null);
       }
-    };
-    fetchUser();
-  }, [id]);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [id, isEditing]);
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();

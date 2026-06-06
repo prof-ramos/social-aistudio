@@ -44,7 +44,9 @@ service cloud.firestore {
         && (!('bio' in data) || data.bio is string)
         && (!('avatarUrl' in data) || data.avatarUrl is string)
         && (!('currentPost' in data) || data.currentPost is string)
-        && (!('savedPosts' in data) || data.savedPosts is list);
+        && (!('savedPosts' in data) || data.savedPosts is list)
+        && (!('isOnline' in data) || data.isOnline is bool)
+        && (!('lastOnline' in data) || data.lastOnline is timestamp);
     }
 
     match /users/{userId} {

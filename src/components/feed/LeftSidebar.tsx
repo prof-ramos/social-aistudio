@@ -20,6 +20,10 @@ export function LeftSidebar({ profile }: LeftSidebarProps) {
             ) : (
               profile.name.charAt(0)
             )}
+            {/* Online Indicator */}
+            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-white shadow-sm transition-colors duration-500 z-10 ${profile.isOnline ? 'bg-green-500' : 'bg-slate-300'}`} 
+              title={profile.isOnline ? 'Online agora' : 'Offline'}
+            />
           </Link>
           <div className="mt-12">
             <Link to={`/perfil/${profile.id}`}>
