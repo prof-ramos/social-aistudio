@@ -1,6 +1,6 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
-import { Camera, Save, MapPin, BookOpen, MessageSquare } from 'lucide-react';
+import { Camera, Save, MapPin, BookOpen, MessageSquare, Bookmark } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
 
 export function Profile({ profile }: { profile: UserProfile }) {
@@ -16,6 +16,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
     saving,
     isOwnProfile,
     handleSave,
+    savedPosts,
   } = useProfile(id, profile);
 
   if (loading) return <div className="py-12 text-center text-slate">Carregando perfil...</div>;
@@ -146,6 +147,35 @@ export function Profile({ profile }: { profile: UserProfile }) {
           </div>
         </div>
       </div>
+
+      {isOwnProfile && (
+        <div className="bg-white border border-border-gray shadow-sm p-8 mt-6">
+          <div className="flex items-center gap-2 mb-6 border-b border-border-gray/50 pb-4">
+            <Bookmark className="w-5 h-5 text-navy" />
+            <h2 className="font-serif text-2xl font-bold text-navy">Salvos</h2>
+          </div>
+          
+          {savedPosts.length === 0 ? (
+            <div className="text-center py-8">
+               <Bookmark className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+               <p className="text-navy font-bold">Nenhum post salvo</p>
+               <p className="text-sm text-slate mt-1">Os posts que você salvar aparecerão aqui.</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2">
+              {savedPosts.map(post => (
+                <Link key={post.id} to={`/feed/${post.id}`} className="block border border-border-gray p-4 hover:border-navy hover:shadow-sm transition-all bg-ice/30">
+                  <h3 className="font-bold text-navy mb-2 line-clamp-2">{post.title}</h3>
+                  <div className="flex items-center justify-between mt-auto">
+                     <p className="text-xs text-slate/80">Por {post.authorName || 'Usuário'}</p>
+                     <span className="text-[10px] uppercase font-bold text-sky">{post.category}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

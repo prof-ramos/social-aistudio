@@ -5,6 +5,19 @@ import { Post, PostCategory, UserProfile, PostComment } from '../types';
 const POSTS_COLLECTION = 'posts';
 
 export const postService = {
+  getPostsByIds: async (ids: string[]): Promise<Post[]> => {
+    if (!ids || ids.length === 0) return [];
+    
+    // Process in batches of 10 to respect Firestore constraints if we used 'in'
+    // But since we just do a getDoc loop here for simplicity and safety against limit:
+    const promises = ids.map(id => getDoc(doc(db, POSTS_COLLECTION, id)));
+    const snaps = await Promise.all(promises);
+    
+    return snaps
+      .filter(snap => snap.exists())
+      .map(snap => ({ id: snap.id, ...snap.data() } as Post));
+  },
+
   subscribeToFeed: (onUpdate: (posts: Post[]) => void, onError: (error: Error) => void) => {
     const q = query(collection(db, POSTS_COLLECTION), orderBy('createdAt', 'desc'));
     

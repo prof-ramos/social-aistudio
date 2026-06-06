@@ -21,5 +21,26 @@ export const userService = {
    */
   updateUserProfile: async (id: string, data: Partial<UserProfile>): Promise<void> => {
     await updateDoc(doc(db, USERS_COLLECTION, id), data);
+  },
+
+  /**
+   * Toggle saved post in user profile.
+   */
+  toggleSavedPost: async (userId: string, postId: string): Promise<void> => {
+    const docRef = doc(db, USERS_COLLECTION, userId);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) return;
+    
+    const profile = docSnap.data() as UserProfile;
+    const savedPosts = profile.savedPosts || [];
+    
+    let updatedSavedPosts;
+    if (savedPosts.includes(postId)) {
+      updatedSavedPosts = savedPosts.filter(id => id !== postId);
+    } else {
+      updatedSavedPosts = [...savedPosts, postId];
+    }
+    
+    await updateDoc(docRef, { savedPosts: updatedSavedPosts });
   }
 };

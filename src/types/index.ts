@@ -12,6 +12,7 @@ export interface UserProfile {
   role: UserRole;
   avatarUrl?: string;
   bio?: string;
+  savedPosts?: string[];
   createdAt?: any;
 }
 

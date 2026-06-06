@@ -1,10 +1,11 @@
 import React from 'react';
 import { UserProfile } from '../types';
-import { Pin, ThumbsUp, MessageSquare } from 'lucide-react';
+import { Pin, ThumbsUp, MessageSquare, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PostEditor } from '../components/feed/PostEditor';
 import { ReactionButtons } from '../components/feed/ReactionButtons';
 import { useFeed } from '../hooks/useFeed';
+import { userService } from '../services/userService';
 
 export function Feed({ profile }: { profile: UserProfile }) {
   const {
@@ -18,6 +19,22 @@ export function Feed({ profile }: { profile: UserProfile }) {
     setSearch,
     handleCreatePost
   } = useFeed(profile);
+
+  const toggleSaved = async (postId: string) => {
+    try {
+      await userService.toggleSavedPost(profile.id, postId);
+      // Let the profile update naturally if it's subscribed, or we could mutate local state
+      // For immediate local feedback, if profile is not live-reloading:
+      if (!profile.savedPosts) profile.savedPosts = [];
+      if (profile.savedPosts.includes(postId)) {
+        profile.savedPosts = profile.savedPosts.filter(id => id !== postId);
+      } else {
+        profile.savedPosts.push(postId);
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -79,13 +96,22 @@ export function Feed({ profile }: { profile: UserProfile }) {
                  <div className="w-12 h-12 bg-ice flex items-center justify-center font-bold text-navy shrink-0 uppercase">
                     {post.authorName ? post.authorName.charAt(0) : 'U'}
                  </div>
-                 <div className="flex-1">
-                   <h3 className="font-bold text-lg text-slate">
-                     {post.authorName || 'Usuário'} <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
-                   </h3>
-                   <div className="flex items-center">
-                     <p className="text-[10px] uppercase text-slate/50 font-medium">Postado em #{post.category}</p>
+                 <div className="flex-1 flex justify-between items-start">
+                   <div>
+                     <h3 className="font-bold text-lg text-slate">
+                       {post.authorName || 'Usuário'} <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
+                     </h3>
+                     <div className="flex items-center">
+                       <p className="text-[10px] uppercase text-slate/50 font-medium">Postado em #{post.category}</p>
+                     </div>
                    </div>
+                   <button 
+                     onClick={() => toggleSaved(post.id)}
+                     className={`p-2 transition-colors ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate/30 hover:text-navy'}`}
+                     title="Salvar Post"
+                   >
+                     <Bookmark className="w-5 h-5" fill={profile.savedPosts?.includes(post.id) ? 'currentColor' : 'none'} />
+                   </button>
                  </div>
                </div>
                <Link to={`/feed/${post.id}`}>

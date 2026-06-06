@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserProfile } from '../types';
-import { ArrowLeft, MessageSquare, ThumbsUp, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, MessageSquare, ThumbsUp, AlertTriangle, Bookmark } from 'lucide-react';
 import { usePostDetails } from '../hooks/usePostDetails';
 import { ReactionButtons } from '../components/feed/ReactionButtons';
+import { userService } from '../services/userService';
 
 export default function PostDetails({ profile }: { profile: UserProfile }) {
   const { id } = useParams();
@@ -19,6 +20,21 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
     handleAddComment,
     handleReport
   } = usePostDetails(id, profile);
+
+  const toggleSaved = async () => {
+    if (!post) return;
+    try {
+      await userService.toggleSavedPost(profile.id, post.id);
+      if (!profile.savedPosts) profile.savedPosts = [];
+      if (profile.savedPosts.includes(post.id)) {
+        profile.savedPosts = profile.savedPosts.filter(id => id !== post.id);
+      } else {
+        profile.savedPosts.push(post.id);
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     if (location.hash === '#comment' && !loading && post) {
@@ -66,6 +82,13 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                 <MessageSquare className="w-4 h-4" /> MENSAGEM
               </button>
             )}
+            <button 
+              onClick={toggleSaved}
+              className={`p-2 transition-colors ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate/30 hover:text-navy'}`}
+              title="Salvar Post"
+            >
+              <Bookmark className="w-5 h-5" fill={profile.savedPosts?.includes(post.id) ? 'currentColor' : 'none'} />
+            </button>
           </div>
           <button 
             onClick={() => handleReport('POST', post.id, post.title + ' ' + post.body)}
