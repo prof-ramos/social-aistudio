@@ -1,0 +1,6 @@
+{
+  "name": "Social-ASOF",
+  "description": "Rede social fechada para Oficiais de Chancelaria e associados da ASOF com feed da comunidade, guia de postos, perfis e aprovação seletiva.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

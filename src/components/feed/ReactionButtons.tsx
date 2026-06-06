@@ -1,0 +1,65 @@
+import React from 'react';
+import { ThumbsUp, Lightbulb } from 'lucide-react';
+import { postService } from '../../services/postService';
+import { motion, AnimatePresence } from 'motion/react';
+
+interface ReactionButtonsProps {
+  postId: string;
+  reactions?: Record<string, string[]>;
+  currentUserId: string;
+}
+
+const EMOJIS = [
+  { emoji: '👍', label: 'Curtir', Icon: ThumbsUp },
+  { emoji: '💡', label: 'Útil', Icon: Lightbulb },
+];
+
+export function ReactionButtons({ postId, reactions = {}, currentUserId }: ReactionButtonsProps) {
+  const handleReact = async (e: React.MouseEvent, emoji: string) => {
+    e.preventDefault(); // In case it's inside a Link or similar
+    e.stopPropagation();
+    try {
+      await postService.toggleReaction(postId, emoji, currentUserId);
+    } catch (err) {
+      console.error('Failed to toggle reaction', err);
+    }
+  };
+
+  return (
+    <div className="flex gap-4">
+      {EMOJIS.map(({ emoji, label, Icon }) => {
+        const reacts = reactions[emoji] || [];
+        const hasReacted = reacts.includes(currentUserId);
+        
+        return (
+          <button
+            key={emoji}
+            onClick={(e) => handleReact(e, emoji)}
+            className={`text-xs font-semibold flex items-center gap-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
+              hasReacted ? 'text-sky' : 'text-navy hover:text-sky'
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5" /> 
+            <span className="hidden sm:inline uppercase">{label}</span>
+            <span className="flex items-center overflow-hidden">
+              (
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.span
+                  key={reacts.length}
+                  initial={{ y: -20, opacity: 0, scale: 0.5 }}
+                  animate={{ y: 0, opacity: 1, scale: 1 }}
+                  exit={{ y: 20, opacity: 0, scale: 0.5 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                  className="inline-block relative text-center min-w-[8px]"
+                >
+                  {reacts.length}
+                </motion.span>
+              </AnimatePresence>
+              )
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
