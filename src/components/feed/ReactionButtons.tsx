@@ -35,12 +35,12 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
           <button
             key={emoji}
             onClick={(e) => handleReact(e, emoji)}
-            className={`text-xs font-semibold flex items-center gap-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
-              hasReacted ? 'text-sky' : 'text-navy hover:text-sky'
+            className={`text-xs font-bold flex items-center gap-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
+              hasReacted ? 'text-sky' : 'text-slate/50 hover:text-navy'
             }`}
           >
-            <Icon className="w-3.5 h-3.5" /> 
-            <span className="hidden sm:inline uppercase">{label}</span>
+            <Icon className="w-4 h-4" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} /> 
+            <span className="hidden sm:inline uppercase tracking-wider">{label}</span>
             <span className="flex items-center overflow-hidden">
               (
               <AnimatePresence mode="popLayout" initial={false}>

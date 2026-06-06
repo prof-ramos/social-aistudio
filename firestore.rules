@@ -43,7 +43,8 @@ service cloud.firestore {
         && data.createdAt is timestamp
         && (!('bio' in data) || data.bio is string)
         && (!('avatarUrl' in data) || data.avatarUrl is string)
-        && (!('currentPost' in data) || data.currentPost is string);
+        && (!('currentPost' in data) || data.currentPost is string)
+        && (!('savedPosts' in data) || data.savedPosts is list);
     }
 
     match /users/{userId} {
@@ -117,16 +118,43 @@ service cloud.firestore {
         && data.body is string && data.body.size() > 0
         && data.category in ["POSTOS", "CARREIRA", "VIDA_EXTERIOR", "APOSENTADORIA", "GERAL"]
         && data.pinned is bool
-        && data.authorId == request.auth.uid
-        && data.createdAt is timestamp;
+        && data.createdAt is timestamp
+        && (!('reactions' in data) || data.reactions is map)
+        && (!('authorName' in data) || data.authorName is string)
+        && (!('authorRole' in data) || data.authorRole is string);
     }
 
     match /posts/{docId} {
       allow read: if isMember();
-      allow create: if isMember() && isValidPost(incoming()) && incoming().createdAt == request.time;
-      allow update: if isMember() && incoming().authorId == request.auth.uid && isValidPost(incoming()) && incoming().authorId == existing().authorId && incoming().createdAt == existing().createdAt;
+      allow create: if isMember() && isValidPost(incoming()) && incoming().authorId == request.auth.uid && incoming().createdAt == request.time;
+      allow update: if isMember() && (
+        (incoming().authorId == request.auth.uid && isValidPost(incoming()) && incoming().authorId == existing().authorId && incoming().createdAt == existing().createdAt)
+        ||
+        (
+          !('title' in incoming().diff(existing()).affectedKeys()) &&
+          !('body' in incoming().diff(existing()).affectedKeys()) &&
+          !('authorId' in incoming().diff(existing()).affectedKeys()) &&
+          !('createdAt' in incoming().diff(existing()).affectedKeys()) &&
+          (!('reactions' in incoming()) || incoming().reactions is map)
+        )
+      );
       allow delete: if isMember() && existing().authorId == request.auth.uid;
       allow delete: if isAdmin();
+      
+      // Comments Subcollection
+      match /comments/{commentId} {
+        allow read: if isMember();
+        allow create: if isMember() && incoming().createdAt == request.time && incoming().authorId == request.auth.uid;
+        allow update: if isMember() && existing().authorId == request.auth.uid && incoming().authorId == existing().authorId && incoming().createdAt == existing().createdAt;
+        allow delete: if isMember() && existing().authorId == request.auth.uid;
+        allow delete: if isAdmin();
+      }
+    }
+
+    // reports Validations
+    match /reports/{docId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isMember() && incoming().createdAt == request.time;
     }
 
     // notifications Validations

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, List, ListOrdered, Code, Quote, AlertCircle } from 'lucide-react';
@@ -14,6 +14,18 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
   const [category, setCategory] = useState('');
   const [error, setError] = useState('');
   const DRAFT_KEY = 'social-asof-draft-post';
+  const debounceTimeout = useRef<any>(null);
+
+  const saveDraft = (t: string, c: string, b: string) => {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ t, c, b }));
+  };
+
+  const debouncedSaveDraft = (t: string, c: string, b: string) => {
+    if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+    debounceTimeout.current = setTimeout(() => {
+      saveDraft(t, c, b);
+    }, 1000);
+  };
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -24,7 +36,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
       },
     },
     onUpdate: ({ editor }) => {
-      saveDraft(title, category, editor.getHTML());
+      debouncedSaveDraft(title, category, editor.getHTML());
       if (error) setError('');
     }
   });
@@ -45,22 +57,18 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
     }
   }, [editor]);
 
-  const saveDraft = (t: string, c: string, b: string) => {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({ t, c, b }));
-  };
-
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
     if (error) setError('');
-    saveDraft(newTitle, category, editor?.getHTML() || '');
+    debouncedSaveDraft(newTitle, category, editor?.getHTML() || '');
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newCat = e.target.value;
     setCategory(newCat);
     if (error) setError('');
-    saveDraft(title, newCat, editor?.getHTML() || '');
+    debouncedSaveDraft(title, newCat, editor?.getHTML() || '');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,11 +113,11 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
   return (
     <form onSubmit={handleSubmit} className="bg-ice border border-border-gray shadow-sm p-5 sm:p-8 mb-8 font-sans">
       {error && (
-        <div role="alert" className="mb-6 flex items-start gap-3 p-4 bg-red-50 border border-red-200 text-red-700 shadow-sm animate-in fade-in zoom-in-95 duration-200">
-          <AlertCircle className="w-5 h-5 shrink-0 text-red-600 mt-0.5" aria-hidden="true" />
+        <div role="alert" className="mb-6 flex items-start gap-3 p-4 bg-danger/5 border border-danger/20 text-danger shadow-sm animate-in fade-in zoom-in-95 duration-200">
+          <AlertCircle className="w-5 h-5 shrink-0 text-danger mt-0.5" aria-hidden="true" />
           <div className="flex-1">
-            <h3 className="text-sm font-bold uppercase tracking-wider text-red-800">Atenção</h3>
-            <p className="text-sm mt-1 text-red-700">{error}</p>
+            <h3 className="text-sm font-bold uppercase tracking-wider text-danger">Atenção</h3>
+            <p className="text-sm mt-1 text-danger/90">{error}</p>
           </div>
         </div>
       )}
@@ -121,7 +129,6 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
         className="w-full text-lg sm:text-xl font-bold text-navy focus:ring-2 focus:ring-navy focus:outline-none mb-6 placeholder:text-slate/40 px-4 py-3 border border-border-gray bg-white"
         value={title}
         onChange={handleTitleChange}
-        required
       />
 
       <div className="border border-border-gray mb-6 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-navy transition-shadow">
@@ -203,7 +210,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
             <button 
               type="button" 
               onClick={handleDiscardDraft} 
-              className="px-5 py-2.5 min-h-[44px] flex-1 sm:flex-none text-xs font-bold text-red-600 border border-transparent hover:bg-red-50 transition-colors focus:ring-2 focus:ring-red-600 focus:outline-none"
+              className="px-5 py-2.5 min-h-[44px] flex-1 sm:flex-none text-xs font-bold text-danger border border-transparent hover:bg-danger/10 transition-colors focus:ring-2 focus:ring-danger focus:outline-none"
             >
               DESCARTAR
             </button>

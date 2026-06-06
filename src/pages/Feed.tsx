@@ -3,7 +3,10 @@ import { UserProfile } from '../types';
 import { Pin, ThumbsUp, MessageSquare, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PostEditor } from '../components/feed/PostEditor';
-import { ReactionButtons } from '../components/feed/ReactionButtons';
+import { PostCard } from '../components/feed/PostCard';
+import { PostoHighlightCard } from '../components/feed/PostoHighlightCard';
+import { AdminAlertCard } from '../components/feed/AdminAlertCard';
+import { LeftSidebar } from '../components/feed/LeftSidebar';
 import { useFeed } from '../hooks/useFeed';
 import { userService } from '../services/userService';
 
@@ -23,8 +26,6 @@ export function Feed({ profile }: { profile: UserProfile }) {
   const toggleSaved = async (postId: string) => {
     try {
       await userService.toggleSavedPost(profile.id, postId);
-      // Let the profile update naturally if it's subscribed, or we could mutate local state
-      // For immediate local feedback, if profile is not live-reloading:
       if (!profile.savedPosts) profile.savedPosts = [];
       if (profile.savedPosts.includes(postId)) {
         profile.savedPosts = profile.savedPosts.filter(id => id !== postId);
@@ -37,10 +38,10 @@ export function Feed({ profile }: { profile: UserProfile }) {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <div className="flex items-end justify-between">
         <h1 className="text-4xl text-navy font-serif">Feed da Comunidade</h1>
-        <button onClick={() => setShowEditor(!showEditor)} className="bg-navy text-white px-6 py-3 font-medium cursor-pointer">
+        <button onClick={() => setShowEditor(!showEditor)} className="bg-navy text-white px-6 py-3 font-medium cursor-pointer transition-colors hover:bg-slate">
           NOVO POST
         </button>
       </div>
@@ -75,9 +76,15 @@ export function Feed({ profile }: { profile: UserProfile }) {
         </select>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row items-start gap-8">
+        
+        {/* Left Sidebar Arena */}
+        <div className="hidden lg:block">
+          <LeftSidebar profile={profile} />
+        </div>
+
         {/* Feed List */}
-        <div className="flex-1 space-y-6">
+        <div className="flex-1 space-y-8 min-w-0">
           {filteredPosts.length === 0 ? (
             <div className="py-16 px-6 text-center text-slate bg-white border border-dashed border-border-gray flex flex-col items-center justify-center">
               <MessageSquare className="w-12 h-12 mb-4 opacity-20 text-navy" />
@@ -86,84 +93,22 @@ export function Feed({ profile }: { profile: UserProfile }) {
             </div>
           ) : (
             filteredPosts.map(post => (
-              <div key={post.id} className={`bg-white border p-6 relative transition-colors ${post.pinned ? 'border-sky shadow-sm bg-sky/5' : 'border-border-gray'}`}>
-                 {post.pinned && (
-                 <div className="absolute top-0 right-0 bg-sky text-navy px-3 py-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
-                   <Pin className="w-3 h-3" /> Fixado
-                 </div>
-               )}
-               <div className="flex gap-4 mb-4">
-                 <div className="w-12 h-12 bg-ice flex items-center justify-center font-bold text-navy shrink-0 uppercase">
-                    {post.authorName ? post.authorName.charAt(0) : 'U'}
-                 </div>
-                 <div className="flex-1 flex justify-between items-start">
-                   <div>
-                     <h3 className="font-bold text-lg text-slate">
-                       {post.authorName || 'Usuário'} <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
-                     </h3>
-                     <div className="flex items-center">
-                       <p className="text-[10px] uppercase text-slate/50 font-medium">Postado em #{post.category}</p>
-                     </div>
-                   </div>
-                   <button 
-                     onClick={() => toggleSaved(post.id)}
-                     className={`p-2 transition-colors ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate/30 hover:text-navy'}`}
-                     title="Salvar Post"
-                   >
-                     <Bookmark className="w-5 h-5" fill={profile.savedPosts?.includes(post.id) ? 'currentColor' : 'none'} />
-                   </button>
-                 </div>
-               </div>
-               <Link to={`/feed/${post.id}`}>
-                 <h4 className="font-bold text-navy mb-2 hover:text-sky transition-colors">{post.title}</h4>
-               </Link>
-               <div 
-                 className="text-sm leading-relaxed mb-4 text-slate line-clamp-3 prose prose-slate prose-sm"
-                 dangerouslySetInnerHTML={{ __html: post.body }}
-               />
-               
-               <div className="flex gap-4 border-t border-border-gray pt-4">
-                 <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
-                 <Link to={`/feed/${post.id}#comment`} className="text-xs font-semibold text-slate/50 flex items-center gap-1.5 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
-                   <MessageSquare className="w-3.5 h-3.5" /> RESPONDER
-                 </Link>
-               </div>
-            </div>
+              <PostCard 
+                key={post.id} 
+                post={post} 
+                profile={profile} 
+                onToggleSaved={toggleSaved} 
+              />
           )))}
         </div>
         
         {/* Right Sidebar Area */}
-        <div className="w-full md:w-80 flex-none flex flex-col gap-6">
+        <div className="w-full lg:w-[280px] xl:w-[300px] flex-none flex flex-col gap-8 sticky top-24">
           {/* Posto Highlight Card */}
-          <div className="bg-white border border-border-gray shadow-sm border-l-4 border-l-navy p-6">
-            <div className="flex justify-between items-start mb-4">
-              <h2 className="font-serif text-xl text-navy">Posto: Genebra</h2>
-              <span className="bg-red-50 text-red-700 border border-red-300 px-3 py-1 text-[10px] font-bold tracking-wider">DESATUALIZADO</span>
-            </div>
-            <div className="space-y-4 text-xs">
-              <div className="p-3 bg-ice border border-border-gray">
-                <p className="uppercase font-bold text-[9px] text-slate/60 mb-1">Segurança</p>
-                <p className="italic">"Extremamente seguro, mas exige atenção redobrada em áreas turísticas durante o verão."</p>
-                <p className="mt-2 font-semibold text-[10px] text-navy">— Relatado por: Ricardo P. (2019-2021)</p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-[10px]">
-                <div className="p-2 border border-slate/10"><strong>Saúde:</strong> Excelente</div>
-                <div className="p-2 border border-slate/10"><strong>Educação:</strong> Bilíngue</div>
-                <div className="p-2 border border-slate/10"><strong>Custo Vida:</strong> Muito Alto</div>
-                <div className="p-2 border border-slate/10"><strong>Moradia:</strong> Escassa</div>
-              </div>
-              <button className="w-full min-h-[44px] border border-navy text-navy font-medium py-2.5 px-3 rounded-md mt-2 transition-colors hover:bg-ice focus:ring-2 focus:ring-navy focus:outline-none">ATUALIZAR FICHA</button>
-            </div>
-          </div>
+          <PostoHighlightCard />
 
           {profile.role === 'ADMIN' && (
-            <div className="bg-navy p-6 text-white shadow-sm">
-              <h3 className="font-serif text-lg mb-2">Área Administrativa</h3>
-              <p className="text-xs opacity-80 mb-4">Existem novas solicitações de acesso pendentes de aprovação.</p>
-              <button onClick={() => window.location.href = '/admin/membros'} className="w-full min-h-[44px] bg-sky text-navy py-2.5 font-bold text-xs hover:bg-white transition-colors focus:ring-2 focus:ring-white focus:outline-none">
-                GERENCIAR MEMBROS
-              </button>
-            </div>
+            <AdminAlertCard />
           )}
         </div>
       </div>
