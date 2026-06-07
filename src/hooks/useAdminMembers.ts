@@ -14,8 +14,6 @@ export function useAdminMembers() {
   }, []);
 
   const handleApprove = async (req: any) => {
-    if (!window.confirm(`Aprovar ${req.name}?`)) return;
-
     try {
       await adminService.updateRequestStatus(req.id, 'APPROVED');
       addToast('Solicitação aprovada. O associado poderá se registrar.', 'success');
@@ -25,12 +23,9 @@ export function useAdminMembers() {
     }
   };
 
-  const handleReject = async (id: string) => {
-    const reason = window.prompt("Justificativa da rejeição:");
-    if (reason === null) return;
-
+  const handleReject = async (id: string, reason?: string) => {
     try {
-      await adminService.rejectRequestWithReason(id, reason);
+      await adminService.rejectRequestWithReason(id, reason || 'Rejeitado pelo administrador');
       addToast('Solicitação rejeitada.', 'success');
     } catch (e) {
       console.error(e);

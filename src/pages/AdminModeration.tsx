@@ -79,7 +79,7 @@ export default function AdminModeration() {
                     </td>
                     <td className="p-4">
                       {resolvingId === rep.id ? (
-                        <form onSubmit={(e) => handleResolve(rep.id, e)} className="bg-ice p-3 rounded-md border border-border-gray space-y-3 min-w-[250px]">
+                        <form onSubmit={(e) => handleResolve(rep.id, e)} className="bg-ice p-3 rounded-none border border-border-gray space-y-3 min-w-[250px]">
                           <div>
                             <label className="block text-xs font-bold text-slate mb-1">Ação</label>
                             <select

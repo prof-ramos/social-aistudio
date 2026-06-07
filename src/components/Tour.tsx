@@ -59,22 +59,22 @@ export function Tour() {
       }}
       options={{
         zIndex: 10000,
-        primaryColor: '#002C5A',
-        textColor: '#2D3748',
+        primaryColor: 'var(--app-navy)',
+        textColor: 'var(--app-slate)',
         width: 400,
         showProgress: true,
       }}
       styles={{
         buttonPrimary: {
           borderRadius: 0,
-          backgroundColor: '#002C5A',
+          backgroundColor: 'var(--app-navy)',
         },
         buttonBack: {
           marginRight: 10,
-          color: '#2D3748',
+          color: 'var(--app-slate)',
         },
         buttonSkip: {
-          color: '#2D3748',
+          color: 'var(--app-slate)',
         }
       }}
     />

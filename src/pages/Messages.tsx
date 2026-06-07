@@ -70,7 +70,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
   };
 
   return (
-    <Card variant="elevated" padding="none" className="flex flex-1 min-h-0 overflow-hidden rounded-md relative z-0">
+    <Card variant="elevated" padding="none" className="flex flex-1 min-h-0 overflow-hidden rounded-none relative z-0">
       {/* Sidebar - Chat List */}
       <div className={`w-full md:w-80 flex-none border-r border-border-gray flex flex-col bg-white transition-all ${activeChatId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-5 border-b border-border-gray flex items-center justify-between">

@@ -1,9 +1,13 @@
+/// <reference types="vite/client" />
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Alert } from '../components/ui/Alert';
+import { enableDevBypass } from '../contexts/AuthContext';
+
+const IS_DEV = import.meta.env.DEV;
 
 export function Login() {
   const navigate = useNavigate();
@@ -27,6 +31,11 @@ export function Login() {
     }
   };
 
+  const handleDevBypass = () => {
+    enableDevBypass();
+    window.location.reload();
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-ice py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-md w-full relative">
@@ -48,7 +57,7 @@ export function Login() {
                 id="email"
                 type="email" 
                 required
-                className="w-full h-11 border border-border-gray rounded-md px-3 text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-colors"
+                className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-colors"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
               />
@@ -62,7 +71,7 @@ export function Login() {
                 id="password"
                 type="password" 
                 required
-                className="w-full h-11 border border-border-gray rounded-md px-3 text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-colors"
+                className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-colors"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
               />
@@ -81,6 +90,17 @@ export function Login() {
           </form>
 
           <div className="mt-8 pt-6 border-t border-border-gray flex flex-col gap-3">
+             {IS_DEV && (
+               <Button
+                 type="button"
+                 variant="ghost"
+                 size="md"
+                 fullWidth
+                 onClick={handleDevBypass}
+               >
+                 [DEV] Login Rápido (Admin)
+               </Button>
+             )}
              <Link to="/solicitar-acesso" className="text-sm font-medium text-navy hover:underline text-center">
                Não tem uma conta? Solicitar acesso
              </Link>

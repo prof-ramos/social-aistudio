@@ -2,6 +2,7 @@ export { Alert } from './Alert';
 export { Breadcrumb } from './Breadcrumb';
 export { Button } from './Button';
 export { Card } from './Card';
+export { ConfirmDialog } from './ConfirmDialog';
 export { PageTitle } from './PageTitle';
 export { Skeleton } from './Skeleton';
 export { StatusBadge } from './StatusBadge';

@@ -76,7 +76,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               <h3 className="font-bold text-navy mb-4">Novo Relato de Experiência</h3>
               <div className="mb-4">
                 <label htmlFor="field-type" className="block text-sm font-medium text-slate mb-1">Tópico</label>
-                <select id="field-type" className="w-full h-11 border border-border-gray rounded-md bg-white px-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldType} onChange={e=>setNewFieldType(e.target.value)}>
+                <select id="field-type" className="w-full h-11 border border-border-gray rounded-none bg-white px-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldType} onChange={e=>setNewFieldType(e.target.value)}>
                    <option value="GERAL">Geral</option>
                    <option value="SEGURANCA">Segurança</option>
                    <option value="CUSTO_VIDA">Custo de Vida</option>
@@ -88,7 +88,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               </div>
               <div className="mb-4">
                 <label htmlFor="field-body" className="block text-sm font-medium text-slate mb-1">Sua percepção</label>
-                <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-md p-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
+                <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
                 <p className="text-xs text-slate mt-1 opacity-80">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
               </div>
               <div className="flex justify-end gap-3">

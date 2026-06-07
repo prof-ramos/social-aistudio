@@ -3,9 +3,11 @@ import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { useAdminMembers } from '../hooks/useAdminMembers';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { Button } from '../components/ui/Button';
+import { useConfirm } from '../hooks/useConfirm.tsx';
 
 export function AdminMembers() {
   const { requests, handleApprove, handleReject } = useAdminMembers();
+  const { confirm, dialog } = useConfirm();
 
   return (
     <div>
@@ -62,7 +64,16 @@ export function AdminMembers() {
                     {req.status === 'PENDING' && (
                       <div className="flex gap-2">
                         <Button
-                          onClick={() => handleApprove(req)}
+                          onClick={async () => {
+                            const { confirmed } = await confirm({
+                              title: 'Aprovar solicitação',
+                              message: `Deseja aprovar o acesso para ${req.name}? O usuário poderá se registrar no sistema.`,
+                              confirmLabel: 'Aprovar',
+                              cancelLabel: 'Cancelar',
+                              variant: 'info',
+                            });
+                            if (confirmed) handleApprove(req);
+                          }}
                           variant="ghost"
                           size="sm"
                           className="min-h-[44px] min-w-[44px] text-success hover:bg-success/10 hover:text-success border border-success/20"
@@ -71,7 +82,19 @@ export function AdminMembers() {
                           <Check className="w-4 h-4" />
                         </Button>
                         <Button
-                          onClick={() => handleReject(req.id)}
+                          onClick={async () => {
+                            const { confirmed, inputValue } = await confirm({
+                              title: 'Rejeitar solicitação',
+                              message: `Deseja rejeitar o acesso para ${req.name}? Esta ação não pode ser desfeita.`,
+                              confirmLabel: 'Rejeitar',
+                              cancelLabel: 'Cancelar',
+                              variant: 'danger',
+                              inputLabel: 'Justificativa da rejeição',
+                              inputPlaceholder: 'Informe o motivo da rejeição...',
+                              inputRequired: true,
+                            });
+                            if (confirmed) handleReject(req.id, inputValue);
+                          }}
                           variant="ghost"
                           size="sm"
                           className="min-h-[44px] min-w-[44px] text-danger hover:bg-danger/10 hover:text-danger border border-danger/20"
@@ -88,6 +111,7 @@ export function AdminMembers() {
           </table>
         </div>
       </div>
+      {dialog}
     </div>
   );
 }
