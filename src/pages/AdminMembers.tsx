@@ -25,7 +25,15 @@ export function AdminMembers() {
             </thead>
             <tbody>
               {requests.length === 0 && (
-                <tr><td colSpan={6} className="py-8 px-6 text-center text-slate">Nenhuma solicitação encontrada.</td></tr>
+                <tr><td colSpan={6}>
+                  <div className="py-12 px-6 flex flex-col items-center text-center">
+                    <div className="w-16 h-16 rounded-full bg-ice flex items-center justify-center mb-4">
+                      <Check className="w-6 h-6 text-success opacity-50" />
+                    </div>
+                    <p className="text-sm font-medium text-navy mb-1">Nenhuma solicitação pendente</p>
+                    <p className="text-xs text-slate max-w-sm">Todas as solicitações de acesso foram processadas. Novas solicitações aparecerão aqui automaticamente.</p>
+                  </div>
+                </td></tr>
               )}
               {requests.map(req => (
                 <tr key={req.id} className="border-b border-border-gray hover:bg-slate-50 transition-colors">

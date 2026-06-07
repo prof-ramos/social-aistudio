@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ThumbsUp, Heart, Lightbulb } from 'lucide-react';
 import { postService } from '../../services/postService';
 import { motion, AnimatePresence } from 'motion/react';
@@ -16,20 +16,46 @@ const EMOJIS = [
 ];
 
 export function ReactionButtons({ postId, reactions = {}, currentUserId }: ReactionButtonsProps) {
-  const handleReact = async (e: React.MouseEvent, emoji: string) => {
+  const [localReactions, setLocalReactions] = useState(reactions);
+
+  useEffect(() => {
+    setLocalReactions(reactions);
+  }, [reactions]);
+
+  const handleReact = useCallback(async (e: React.MouseEvent, emoji: string) => {
     e.preventDefault();
     e.stopPropagation();
+
+    const prevReactions = { ...localReactions };
+    const userReacts = prevReactions[emoji] || [];
+    const hasReacted = userReacts.includes(currentUserId);
+
+    // Optimistic update
+    setLocalReactions(prev => {
+      const next = { ...prev };
+      const list = [...(next[emoji] || [])];
+      if (hasReacted) {
+        next[emoji] = list.filter(id => id !== currentUserId);
+      } else {
+        next[emoji] = [...list, currentUserId];
+      }
+      if (next[emoji].length === 0) delete next[emoji];
+      return next;
+    });
+
     try {
       await postService.toggleReaction(postId, emoji, currentUserId);
     } catch (err) {
       console.error('Failed to toggle reaction', err);
+      // Revert on error
+      setLocalReactions(prevReactions);
     }
-  };
+  }, [localReactions, currentUserId, postId]);
 
   return (
     <div className="flex gap-4">
       {EMOJIS.map(({ emoji, label, Icon }) => {
-        const reacts = reactions[emoji] || [];
+        const reacts = localReactions[emoji] || [];
         const hasReacted = reacts.includes(currentUserId);
 
         return (
