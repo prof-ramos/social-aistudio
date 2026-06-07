@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { Alert } from '../components/ui/Alert';
 
 export function Login() {
   const navigate = useNavigate();
@@ -33,10 +36,10 @@ export function Login() {
           <p className="text-slate/80 text-sm">Apenas associados da ASOF.</p>
         </div>
         
-        <div className="bg-white border border-border-gray p-8 shadow-sm">
+        <Card variant="elevated" padding="lg">
           <h2 className="text-xl font-bold text-navy mb-6">Acesse a plataforma</h2>
-          
-          {error && <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 border border-red-200">{error}</div>}
+
+          {error && <Alert variant="error" className="mb-4">{error}</Alert>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -65,13 +68,16 @@ export function Login() {
               />
             </div>
             
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="w-full bg-navy hover:bg-navy-dark text-white h-12 flex items-center justify-center transition-colors shadow-md mt-6 font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              fullWidth
+              isLoading={loading}
+              className="mt-6"
             >
               {loading ? 'Entrando...' : 'Entrar'}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-8 pt-6 border-t border-border-gray flex flex-col gap-3">
@@ -82,7 +88,7 @@ export function Login() {
                Esqueci minha senha
              </Link>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );

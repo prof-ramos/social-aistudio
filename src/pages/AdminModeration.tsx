@@ -140,9 +140,9 @@ export default function AdminModeration() {
                         <p className="line-clamp-2 max-w-xs">{rep.preview}</p>
                       </td>
                       <td className="p-4">
-                        {rep.status === 'RESOLVED_KEPT' && <span className="inline-flex items-center gap-1 text-slate bg-slate/10 px-2 py-1 rounded text-xs font-bold"><Check className="w-3 h-3" /> Mantido</span>}
-                        {rep.status === 'RESOLVED_WARNED' && <span className="inline-flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-1 rounded text-xs font-bold"><AlertTriangle className="w-3 h-3" /> Advertido</span>}
-                        {rep.status === 'RESOLVED_REMOVED' && <span className="inline-flex items-center gap-1 text-red-600 bg-red-50 px-2 py-1 rounded text-xs font-bold"><Trash2 className="w-3 h-3" /> Removido</span>}
+                        {rep.status === 'RESOLVED_KEPT' && <span className="inline-flex items-center gap-1 text-slate bg-slate/10 px-2 py-1 rounded-sm text-xs font-bold"><Check className="w-3 h-3" /> Mantido</span>}
+                        {rep.status === 'RESOLVED_WARNED' && <span className="inline-flex items-center gap-1 text-warning bg-warning/10 px-2 py-1 rounded-sm text-xs font-bold"><AlertTriangle className="w-3 h-3" /> Advertido</span>}
+                        {rep.status === 'RESOLVED_REMOVED' && <span className="inline-flex items-center gap-1 text-danger bg-danger/10 px-2 py-1 rounded-sm text-xs font-bold"><Trash2 className="w-3 h-3" /> Removido</span>}
                       </td>
                       <td className="p-4 max-w-xs">
                         <p className="line-clamp-2">{rep.notes}</p>

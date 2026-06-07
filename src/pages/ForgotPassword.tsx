@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { Mail, ArrowLeft } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { Alert } from '../components/ui/Alert';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -27,7 +30,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-ice py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-md w-full bg-white p-8 border border-border-gray shadow-sm">
+      <Card variant="elevated" padding="lg" className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="font-serif text-3xl font-bold text-navy">Social-ASOF</h1>
           <p className="text-slate mt-2 text-sm">Recuperação de Acesso</p>
@@ -35,7 +38,7 @@ export default function ForgotPassword() {
 
         {success ? (
           <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-green-50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-200">
+            <div className="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-4 border border-success/20">
                <Mail className="w-8 h-8" />
             </div>
             <h2 className="text-lg font-bold text-navy">E-mail enviado!</h2>
@@ -55,9 +58,7 @@ export default function ForgotPassword() {
             </p>
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-sm font-medium">
-                {error}
-              </div>
+              <Alert variant="error">{error}</Alert>
             )}
 
             <div>
@@ -72,19 +73,22 @@ export default function ForgotPassword() {
               />
             </div>
             
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="w-full h-12 bg-navy text-white font-medium hover:bg-navy-dark transition-colors shadow-md disabled:opacity-50 mt-2 focus:ring-2 focus:ring-navy focus:outline-none"
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              fullWidth
+              isLoading={loading}
+              className="mt-2"
             >
               {loading ? 'Enviando...' : 'Enviar link de recuperação'}
-            </button>
+            </Button>
             <div className="pt-4 mt-6 border-t border-border-gray text-center text-sm">
                <Link to="/login" className="text-slate hover:text-navy transition-colors font-medium">Lembrei minha senha</Link>
             </div>
           </form>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

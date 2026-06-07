@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { memberRequestService } from '../services/memberRequestService';
+import { Button } from '../components/ui/Button';
+import { Card } from '../components/ui/Card';
+import { Alert } from '../components/ui/Alert';
 
 export function RegisterRequest() {
   const [formData, setFormData] = useState({
@@ -36,11 +39,11 @@ export function RegisterRequest() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-ice py-12 px-4 font-sans">
-        <div className="max-w-md w-full bg-white border border-border-gray p-8 text-center shadow-sm">
+        <Card variant="elevated" padding="lg" className="max-w-md w-full text-center">
           <h2 className="text-2xl font-bold text-navy mb-4 font-serif">Solicitação Recebida</h2>
           <p className="text-slate mb-8">Sua solicitação foi recebida com sucesso. A ASOF avaliará os dados e entrará em contato em breve.</p>
-          <Link to="/login" className="px-6 py-3 bg-navy text-white hover:bg-navy-dark transition-colors inline-block font-medium">Voltar ao Login</Link>
-        </div>
+          <Link to="/login" className="inline-block px-6 py-3 bg-navy text-white hover:bg-navy-dark transition-colors font-medium">Voltar ao Login</Link>
+        </Card>
       </div>
     );
   }
@@ -50,9 +53,9 @@ export function RegisterRequest() {
       <div className="text-center mb-8">
         <h1 className="font-serif text-4xl font-bold text-navy mb-2">Social-ASOF</h1>
       </div>
-      <div className="max-w-xl w-full bg-white border border-border-gray p-8 shadow-sm">
+      <Card variant="elevated" padding="lg" className="max-w-xl w-full">
         <h2 className="text-xl font-bold text-navy mb-6">Solicitar Acesso</h2>
-        {error && <div className="mb-4 text-sm text-red-600 bg-red-50 p-3 border border-red-200">{error}</div>}
+        {error && <Alert variant="error" className="mb-4">{error}</Alert>}
         <form onSubmit={handleSubmit} className="space-y-5">
            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
              <div>
@@ -83,14 +86,21 @@ export function RegisterRequest() {
                <input id="reg-posto" type="text" className="w-full h-11 border border-border-gray rounded-md px-3 focus:ring-1 focus:ring-navy focus:outline-none transition-colors" value={formData.currentPost} onChange={e => setFormData({...formData, currentPost: e.target.value})} />
              </div>
            </div>
-           <button type="submit" disabled={loading} className="w-full bg-navy hover:bg-navy-dark text-white h-12 flex items-center justify-center transition-colors shadow-md mt-4 font-medium">
+           <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              fullWidth
+              isLoading={loading}
+              className="mt-4"
+            >
               {loading ? 'Enviando...' : 'Enviar Solicitação'}
-           </button>
+            </Button>
         </form>
         <div className="mt-6 text-center">
           <Link to="/login" className="text-sm font-medium text-slate hover:underline">Voltar ao Login</Link>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

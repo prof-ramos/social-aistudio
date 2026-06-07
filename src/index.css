@@ -12,6 +12,9 @@
   --app-slate: #374151;
   --app-border-gray: #D1D5DB;
   --app-danger: #DC2626;
+  --app-success: #16A34A;
+  --app-warning: #D97706;
+  --app-info: #0284C7;
   --app-white: #ffffff;
 }
 
@@ -25,6 +28,9 @@
   --app-slate: #82B4D6;
   --app-border-gray: #1e293b;
   --app-danger: #ef4444;
+  --app-success: #22c55e;
+  --app-warning: #f59e0b;
+  --app-info: #38bdf8;
   --app-white: #111827;
 }
 
@@ -38,7 +44,10 @@
   --color-slate: var(--app-slate);
   --color-border-gray: var(--app-border-gray);
   --color-danger: var(--app-danger);
-  --color-white: var(--app-white); /* override default white */
+  --color-success: var(--app-success);
+  --color-warning: var(--app-warning);
+  --color-info: var(--app-info);
+  --color-white: var(--app-white);
 
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, serif;

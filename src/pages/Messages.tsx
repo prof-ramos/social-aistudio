@@ -117,7 +117,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
       </div>
 
       {/* Main - Chat Area */}
-      <div className={`flex-1 flex flex-col bg-[#F8FAFC] relative ${!activeChatId ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`flex-1 flex flex-col bg-ice relative ${!activeChatId ? 'hidden md:flex' : 'flex'}`}>
         {!activeChatId ? (
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="text-center max-w-sm">
@@ -169,7 +169,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                       className={`max-w-[85%] sm:max-w-[70%] px-4 py-2.5 text-[15px] shadow-sm relative ${
                         isMe 
                           ? 'bg-navy text-white rounded-t-2xl rounded-l-2xl rounded-br-sm' 
-                          : 'bg-white border border-border-gray/50 text-slate-800 rounded-t-2xl rounded-r-2xl rounded-bl-sm'
+                          : 'bg-white border border-border-gray/50 text-slate rounded-t-2xl rounded-r-2xl rounded-bl-sm'
                       }`}
                     >
                       <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.body}</p>
@@ -199,7 +199,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                 <button
                   type="submit"
                   disabled={!newMessage.trim() || sending}
-                  className="w-12 h-12 rounded-full bg-navy text-white hover:bg-opacity-90 disabled:opacity-50 disabled:bg-slate-300 disabled:text-slate-500 transition-colors flex items-center justify-center shrink-0"
+                  className="w-12 h-12 rounded-full bg-navy text-white hover:bg-opacity-90 disabled:opacity-50 disabled:bg-border-gray disabled:text-slate transition-colors flex items-center justify-center shrink-0"
                 >
                   <Send className="w-5 h-5 ml-0.5" />
                 </button>

@@ -1,5 +1,7 @@
 import { Check, X } from 'lucide-react';
 import { useAdminMembers } from '../hooks/useAdminMembers';
+import { StatusBadge } from '../components/ui/StatusBadge';
+import { Button } from '../components/ui/Button';
 
 export function AdminMembers() {
   const { requests, handleApprove, handleReject } = useAdminMembers();
@@ -36,25 +38,37 @@ export function AdminMembers() {
                     <p className="text-xs opacity-70">{req.cpf}</p>
                   </td>
                   <td className="py-4 px-6">
-                    <span className="text-xs font-semibold px-2 py-1 rounded-sm bg-sky/20 text-navy">
+                    <StatusBadge status={req.category === 'MEMBRO_ATIVO' ? 'info' : 'neutral'}>
                       {req.category === 'MEMBRO_ATIVO' ? 'ATIVA' : 'APOSENTADO'}
-                    </span>
+                    </StatusBadge>
                   </td>
                   <td className="py-4 px-6 text-sm text-slate">{req.currentPost || '-'}</td>
                   <td className="py-4 px-6">
-                    {req.status === 'PENDING' && <span className="text-sm font-medium text-amber-600">Pendente</span>}
-                    {req.status === 'APPROVED' && <span className="text-sm font-medium text-green-600">Aprovado</span>}
-                    {req.status === 'REJECTED' && <span className="text-sm font-medium text-red-600">Rejeitado</span>}
+                    {req.status === 'PENDING' && <StatusBadge status="warning">Pendente</StatusBadge>}
+                    {req.status === 'APPROVED' && <StatusBadge status="success">Aprovado</StatusBadge>}
+                    {req.status === 'REJECTED' && <StatusBadge status="error">Rejeitado</StatusBadge>}
                   </td>
                   <td className="py-4 px-6">
                     {req.status === 'PENDING' && (
                       <div className="flex gap-2">
-                        <button onClick={() => handleApprove(req)} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center bg-green-50 text-green-700 hover:bg-green-100 rounded-sm border border-green-200 transition-colors focus:ring-2 focus:ring-green-700 focus:outline-none" title="Aprovar">
+                        <Button
+                          onClick={() => handleApprove(req)}
+                          variant="ghost"
+                          size="sm"
+                          className="min-h-[44px] min-w-[44px] text-success hover:bg-success/10 hover:text-success border border-success/20"
+                          title="Aprovar"
+                        >
                           <Check className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleReject(req.id)} className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center bg-red-50 text-red-700 hover:bg-red-100 rounded-sm border border-red-200 transition-colors focus:ring-2 focus:ring-red-700 focus:outline-none" title="Rejeitar">
+                        </Button>
+                        <Button
+                          onClick={() => handleReject(req.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="min-h-[44px] min-w-[44px] text-danger hover:bg-danger/10 hover:text-danger border border-danger/20"
+                          title="Rejeitar"
+                        >
                           <X className="w-4 h-4" />
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </td>

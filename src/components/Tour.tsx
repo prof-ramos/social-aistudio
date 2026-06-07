@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Joyride, CallBackProps, STATUS, Step } from 'react-joyride';
+import { Joyride, STATUS, Step } from 'react-joyride';
 
 export function Tour() {
   const [run, setRun] = useState(false);
@@ -15,7 +15,7 @@ export function Tour() {
     return () => clearTimeout(timeout);
   }, []);
 
-  const handleJoyrideCallback = (data: CallBackProps) => {
+  const handleJoyrideEvent = (data: any) => {
     const { status } = data;
     const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
 
@@ -30,7 +30,6 @@ export function Tour() {
       target: '.tour-sidebar-nav',
       content: 'Navegue pelas rotas principais: Feed, Postos, Mensagens e seu Perfil por aqui.',
       placement: 'right',
-      disableBeacon: true,
     },
     {
       target: '.tour-new-post',
@@ -50,9 +49,7 @@ export function Tour() {
       run={run}
       continuous
       scrollToFirstStep
-      showProgress
-      showSkipButton
-      callback={handleJoyrideCallback}
+      onEvent={handleJoyrideEvent}
       locale={{
         back: 'Voltar',
         close: 'Fechar',
@@ -60,14 +57,15 @@ export function Tour() {
         next: 'Próximo',
         skip: 'Pular'
       }}
+      options={{
+        zIndex: 10000,
+        primaryColor: '#002C5A',
+        textColor: '#2D3748',
+        width: 400,
+        showProgress: true,
+      }}
       styles={{
-        options: {
-          zIndex: 10000,
-          primaryColor: '#002C5A', // navy
-          textColor: '#2D3748', // slate
-          width: 400,
-        },
-        buttonNext: {
+        buttonPrimary: {
           borderRadius: 0,
           backgroundColor: '#002C5A',
         },

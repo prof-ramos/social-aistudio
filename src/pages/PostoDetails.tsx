@@ -110,7 +110,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                   <span className="bg-sky text-navy text-xs font-bold px-2 py-1 uppercase">{field.fieldType}</span>
                   <button 
                     onClick={() => handleReport('POSTO_FIELD', field.id, field.body)}
-                    className="text-slate/30 hover:text-red-500 transition-colors p-2 focus:ring-2 focus:ring-red-500 focus:outline-none min-h-[44px]"
+                    className="text-slate/30 hover:text-danger transition-colors p-2 focus:ring-2 focus:ring-red-500 focus:outline-none min-h-[44px]"
                     title="Denunciar Relato"
                   >
                     <AlertTriangle className="w-4 h-4" />

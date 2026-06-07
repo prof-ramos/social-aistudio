@@ -31,7 +31,7 @@ export function Notifications({ profile }: { profile: UserProfile }) {
             {notifications.map(n => (
               <div key={n.id} className={`p-5 flex gap-4 transition-colors ${n.read ? 'opacity-70' : 'bg-ice/30'}`}>
                 <div className="w-10 h-10 shrink-0 bg-ice border border-border-gray flex items-center justify-center text-navy rounded-full">
-                  {n.type === 'APPROVAL' ? <Check className="w-5 h-5 text-green-600" /> : n.type === 'MENTION_POST' || n.type === 'MENTION_COMMENT' ? <span className="font-bold text-lg text-sky">@</span> : <Info className="w-5 h-5" />}
+                  {n.type === 'APPROVAL' ? <Check className="w-5 h-5 text-success" /> : n.type === 'MENTION_POST' || n.type === 'MENTION_COMMENT' ? <span className="font-bold text-lg text-sky">@</span> : <Info className="w-5 h-5" />}
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-slate mb-1">{n.message}</p>

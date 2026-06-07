@@ -113,7 +113,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
           </div>
           <button 
             onClick={() => handleReport('POST', post.id, post.title + ' ' + post.body)}
-            className="text-slate/40 hover:text-red-500 transition-colors p-2"
+            className="text-slate/40 hover:text-danger transition-colors p-2"
             title="Denunciar Publicação"
           >
             <AlertTriangle className="w-4 h-4" />
@@ -179,7 +179,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                    </button>
                    <button 
                      onClick={() => handleReport('COMMENT', c.id, c.body)}
-                     className="text-slate/30 hover:text-red-500 transition-colors p-1"
+                     className="text-slate/30 hover:text-danger transition-colors p-1"
                      title="Denunciar Comentário"
                    >
                      <AlertTriangle className="w-3.5 h-3.5" />

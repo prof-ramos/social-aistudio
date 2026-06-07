@@ -8,6 +8,8 @@ import { PostoHighlightCard } from '../components/feed/PostoHighlightCard';
 import { AdminAlertCard } from '../components/feed/AdminAlertCard';
 import { LeftSidebar } from '../components/feed/LeftSidebar';
 import { MemberSuggestionsCard } from '../components/feed/MemberSuggestionsCard';
+import { Button } from '../components/ui/Button';
+import { PageTitle } from '../components/ui/PageTitle';
 import { useFeed, FeedFilter } from '../hooks/useFeed';
 import { userService } from '../services/userService';
 
@@ -68,10 +70,15 @@ export function Feed({ profile }: { profile: UserProfile }) {
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-end justify-between">
-        <h1 className="text-4xl text-navy font-serif">Feed da Comunidade</h1>
-        <button onClick={() => setShowEditor(!showEditor)} className="bg-navy text-white px-6 py-3 font-medium cursor-pointer transition-colors hover:bg-slate tour-new-post">
+        <PageTitle>Feed da Comunidade</PageTitle>
+        <Button
+          onClick={() => setShowEditor(!showEditor)}
+          variant="primary"
+          size="md"
+          className="tour-new-post uppercase tracking-wider text-xs font-bold"
+        >
           NOVO POST
-        </button>
+        </Button>
       </div>
 
         {showEditor && (
