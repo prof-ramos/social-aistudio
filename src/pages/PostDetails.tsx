@@ -48,7 +48,28 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
     }
   }, [location.hash, loading, post]);
 
-  if (loading) return <div className="p-12 text-center text-slate">Carregando publicação...</div>;
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-8 pb-12 w-full animate-pulse">
+        <div className="w-24 h-6 bg-slate/10" />
+        <div className="bg-white border border-border-gray p-8 shadow-sm">
+          <div className="flex gap-4 mb-6">
+            <div className="w-12 h-12 bg-slate/10 shrink-0" />
+            <div className="flex-1">
+              <div className="w-48 h-5 bg-slate/10 mb-2" />
+              <div className="w-24 h-3 bg-slate/10" />
+            </div>
+          </div>
+          <div className="w-3/4 h-8 bg-slate/10 mb-4" />
+          <div className="space-y-3 mb-8">
+            <div className="w-full h-4 bg-slate/10" />
+            <div className="w-full h-4 bg-slate/10" />
+            <div className="w-5/6 h-4 bg-slate/10" />
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!post) return <div className="p-12 text-center text-slate">Publicação não encontrada.</div>;
 
   return (

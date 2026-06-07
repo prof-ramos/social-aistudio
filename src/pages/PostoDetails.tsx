@@ -20,7 +20,30 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
     handleReport
   } = usePostoDetails(slug, profile.id);
 
-  if (loading) return <div className="py-12 text-center text-slate">Carregando ficha...</div>;
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto animate-pulse">
+        <div className="w-40 h-5 bg-slate/10 mb-6" />
+        <div className="bg-white border border-border-gray shadow-sm p-8 mb-8">
+          <div className="w-64 h-10 bg-slate/10 mb-3" />
+          <div className="w-48 h-6 bg-slate/10" />
+        </div>
+        <div className="flex justify-between items-center mb-6">
+          <div className="w-48 h-8 bg-slate/10" />
+          <div className="w-40 h-10 bg-slate/10" />
+        </div>
+        <div className="space-y-6">
+          {[1, 2].map(i => (
+            <div key={i} className="bg-white border border-border-gray p-6">
+              <div className="w-24 h-6 bg-slate/10 mb-4" />
+              <div className="w-full h-4 bg-slate/10 mb-2" />
+              <div className="w-3/4 h-4 bg-slate/10" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   if (!posto) return <div className="py-12 text-center text-slate">Posto não encontrado.</div>;
 
   return (

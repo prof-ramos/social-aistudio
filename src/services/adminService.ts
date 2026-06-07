@@ -22,7 +22,7 @@ export const adminService = {
     const q = query(collection(db, MEMBER_REQUESTS_COLLECTION), orderBy('createdAt', 'desc'));
     return onSnapshot(q, (snap) => {
       onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data()})));
-    });
+    }, (err) => console.error('Error fetching all requests:', err));
   },
 
   updateRequestStatus: async (requestId: string, status: 'APPROVED' | 'REJECTED') => {
@@ -51,7 +51,7 @@ export const adminService = {
     const q = query(collection(db, REPORTS_COLLECTION), orderBy('createdAt', 'desc'));
     return onSnapshot(q, (snap) => {
       onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    });
+    }, (err) => console.error('Error fetching reports:', err));
   },
 
   updateReportStatus: async (reportId: string, status: string) => {

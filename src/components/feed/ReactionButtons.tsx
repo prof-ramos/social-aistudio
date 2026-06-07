@@ -1,5 +1,5 @@
 import React from 'react';
-import { ThumbsUp, Lightbulb } from 'lucide-react';
+import { ThumbsUp, Heart, Lightbulb } from 'lucide-react';
 import { postService } from '../../services/postService';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -11,7 +11,8 @@ interface ReactionButtonsProps {
 
 const EMOJIS = [
   { emoji: '👍', label: 'Curtir', Icon: ThumbsUp },
-  { emoji: '💡', label: 'Útil', Icon: Lightbulb },
+  { emoji: '❤️', label: 'Apoiar', Icon: Heart },
+  { emoji: '💡', label: 'Informar', Icon: Lightbulb },
 ];
 
 export function ReactionButtons({ postId, reactions = {}, currentUserId }: ReactionButtonsProps) {

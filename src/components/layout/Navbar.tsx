@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, User, LogOut, Bell, Shield, Search, MessageSquare, Map, Compass, Home } from 'lucide-react';
+import { Menu, User, LogOut, Bell, Shield, Search, MessageSquare, Map, Compass, Home, Moon, Sun } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { UserProfile } from '../../types';
 import React, { useState, useEffect } from 'react';
@@ -14,6 +14,22 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [pendingRequests, setPendingRequests] = useState(0);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const isDark = localStorage.getItem('asof-dark-mode') === 'true';
+    setIsDarkMode(isDark);
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    localStorage.setItem('asof-dark-mode', String(newDarkMode));
+    document.documentElement.classList.toggle('dark', newDarkMode);
+  };
 
   useEffect(() => {
     const unsubNotif = notificationService.subscribeToUnreadNotifications(
@@ -84,6 +100,14 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
       {/* Desktop Actions */}
       <div className="hidden md:flex items-center gap-2 lg:gap-4">
         {/* Navigation Items with Icons */}
+        <button
+          onClick={toggleDarkMode}
+          className="relative p-2 transition-colors rounded-none flex items-center h-16 border-b-2 border-transparent text-slate hover:text-navy hover:bg-ice/50"
+          title={isDarkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
+        >
+          {isDarkMode ? <Sun className="w-5 h-5" strokeWidth={1.5} /> : <Moon className="w-5 h-5" strokeWidth={1.5} />}
+        </button>
+
         <Link 
           to="/notificacoes" 
           className={`relative p-2 transition-colors rounded-none flex items-center h-16 border-b-2 ${location.pathname.startsWith('/notificacoes') ? 'border-navy text-navy font-bold' : 'border-transparent text-slate hover:text-navy hover:bg-ice/50'}`}
@@ -170,6 +194,10 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
              <Link to="/postos" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3"><Compass className="w-5 h-5"/> Postos</Link>
              <Link to="/notificacoes" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3"><Bell className="w-5 h-5"/> Notificações</Link>
              <Link to={`/perfil/${profile.id}`} onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3"><User className="w-5 h-5"/> Meu Perfil</Link>
+             <button onClick={toggleDarkMode} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 text-left">
+               {isDarkMode ? <Sun className="w-5 h-5"/> : <Moon className="w-5 h-5"/>} 
+               {isDarkMode ? 'Modo Claro' : 'Modo Escuro'}
+             </button>
              {profile.role === 'ADMIN' && (
                 <>
                   <Link to="/admin/membros" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3"><Shield className="w-5 h-5"/> Painel Admin - Membros</Link>

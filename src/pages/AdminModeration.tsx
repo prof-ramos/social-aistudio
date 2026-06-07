@@ -17,7 +17,24 @@ export default function AdminModeration() {
     handleResolve
   } = useAdminModeration();
 
-  if (loading) return <div className="p-8 text-center text-slate">Carregando painel de moderação...</div>;
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto space-y-8 pb-12 w-full animate-pulse">
+        <div>
+          <div className="w-48 h-8 bg-slate/10 mb-3" />
+          <div className="w-96 h-5 bg-slate/10" />
+        </div>
+        <div className="bg-white border border-border-gray shadow-sm h-[600px] p-6">
+          <div className="w-full h-10 bg-slate/10 mb-4" />
+          <div className="space-y-2">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="w-full h-16 bg-slate/10" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-12 w-full">

@@ -15,7 +15,7 @@ export const chatService = {
     return onSnapshot(q, (snap) => {
       const chats = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatSession));
       onUpdate(chats);
-    });
+    }, (err) => console.error('Error fetching user chats:', err));
   },
 
   subscribeToChatMessages: (chatId: string, onUpdate: (messages: ChatMessage[]) => void) => {
@@ -26,7 +26,7 @@ export const chatService = {
     
     return onSnapshot(q, (snap) => {
       onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage)));
-    });
+    }, (err) => console.error('Error fetching chat messages:', err));
   },
 
   getOrCreateChat: async (userId1: string, userId2: string, name1: string, name2: string) => {

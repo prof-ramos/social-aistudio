@@ -12,6 +12,7 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
     bio: '',
     avatarUrl: '',
     currentPost: '',
+    interests: '',
   });
   const [saving, setSaving] = useState(false);
 
@@ -31,6 +32,7 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
               bio: userData.bio || '',
               avatarUrl: userData.avatarUrl || '',
               currentPost: (userData as any).currentPost || '',
+              interests: (userData as any).interests || '',
             }
           }
           return prev;
@@ -63,7 +65,7 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
       await userService.updateUserProfile(id, {
         bio: editForm.bio,
         avatarUrl: editForm.avatarUrl,
-        ...({ currentPost: editForm.currentPost } as any),
+        ...({ currentPost: editForm.currentPost, interests: editForm.interests } as any),
       });
       setUser({ ...user, ...editForm });
       setIsEditing(false);

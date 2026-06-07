@@ -13,6 +13,7 @@ export interface UserProfile {
   avatarUrl?: string;
   bio?: string;
   savedPosts?: string[];
+  postos?: string[];
   createdAt?: any;
   isOnline?: boolean;
   lastOnline?: any;
@@ -31,6 +32,7 @@ export interface Post {
   pinned: boolean;
   createdAt: any;
   reactions?: Record<string, string[]>;
+  commentCount?: number;
 }
 
 export interface ChatMessage {

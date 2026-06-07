@@ -54,6 +54,15 @@ export const userService = {
   },
 
   /**
+   * Get all users (useful for mentions matching)
+   */
+  getAllUsers: async (): Promise<UserProfile[]> => {
+    const { collection, getDocs } = await import('firebase/firestore');
+    const snapshot = await getDocs(collection(db, USERS_COLLECTION));
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as UserProfile));
+  },
+
+  /**
    * Toggle saved post in user profile.
    */
   toggleSavedPost: async (userId: string, postId: string): Promise<void> => {

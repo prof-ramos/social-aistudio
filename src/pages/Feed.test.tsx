@@ -23,8 +23,19 @@ describe('Feed', () => {
 
   const useFeedMock = useFeed as any;
 
+  beforeAll(() => {
+    // Mock IntersectionObserver
+    class MockIntersectionObserver {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    }
+    window.IntersectionObserver = MockIntersectionObserver as any;
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
+    (userService.getAllUsers as any).mockResolvedValue([]);
   });
 
   it('renders "Nenhum post encontrado" when the filtered posts are empty', () => {
@@ -37,7 +48,11 @@ describe('Feed', () => {
       setFilterCategory: vi.fn(),
       search: 'stringaleatoria',
       setSearch: vi.fn(),
-      handleCreatePost: vi.fn()
+      handleCreatePost: vi.fn(),
+      activeFilter: 'RECENTES',
+      setActiveFilter: vi.fn(),
+      loadMore: vi.fn(),
+      hasMore: false
     });
 
     renderWithRouter(<Feed profile={profile} />);
@@ -68,7 +83,11 @@ describe('Feed', () => {
       setFilterCategory: vi.fn(),
       search: '',
       setSearch: vi.fn(),
-      handleCreatePost: vi.fn()
+      handleCreatePost: vi.fn(),
+      activeFilter: 'RECENTES',
+      setActiveFilter: vi.fn(),
+      loadMore: vi.fn(),
+      hasMore: false
     });
 
     renderWithRouter(<Feed profile={profile} />);

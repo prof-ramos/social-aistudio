@@ -17,6 +17,7 @@ import { Profile } from './pages/Profile';
 import { Notifications } from './pages/Notifications';
 import { Messages } from './pages/Messages';
 import { Home, Building2, Briefcase, Archive, MessageSquare } from 'lucide-react';
+import { Tour } from './components/Tour';
 import { UserProfile, AuthUser } from './types';
 import { usePresence } from './hooks/usePresence';
 
@@ -39,7 +40,52 @@ export default function App() {
   }, []);
 
   if (loading) {
-    return <div className="h-screen w-full flex items-center justify-center bg-ice"><p className="text-navy font-sans">Carregando Social-ASOF...</p></div>;
+    return (
+      <div className="h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
+        {/* Navbar Skeleton */}
+        <header className="h-[73px] bg-navy flex items-center justify-between px-6 border-b border-white/10 shrink-0">
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-8 bg-white/10 animate-pulse rounded-none" />
+            <div className="w-32 h-6 bg-white/10 animate-pulse" />
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="w-6 h-6 bg-white/10 animate-pulse rounded-none" />
+            <div className="w-6 h-6 bg-white/10 animate-pulse rounded-none" />
+            <div className="w-8 h-8 bg-white/10 animate-pulse rounded-full" />
+          </div>
+        </header>
+        
+        <main className="flex flex-1 overflow-hidden">
+          {/* Sidebar Skeleton */}
+          <aside className="w-64 bg-white border-r border-border-gray hidden md:flex flex-col py-8 px-6 flex-none shrink-0">
+            <div className="mb-8">
+              <div className="w-20 h-3 bg-slate/10 animate-pulse mb-6" />
+              <div className="space-y-4">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-4 h-4 bg-slate/10 animate-pulse" />
+                    <div className="flex-1 h-4 bg-slate/10 animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+          
+          {/* Content Skeleton */}
+          <section className="flex-1 p-16 overflow-y-auto bg-ice">
+            <div className="max-w-3xl mx-auto space-y-8">
+              <div className="w-48 h-8 bg-slate/10 animate-pulse" />
+              <div className="w-full h-40 bg-white border border-border-gray shadow-sm animate-pulse" />
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="w-full h-48 bg-white border border-border-gray shadow-sm animate-pulse" />
+                ))}
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -79,11 +125,12 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
 
   return (
     <div className="h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
+      <Tour />
       <Navbar profile={profile} isAdminView={isAdminView} />
       <main className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 bg-white border-r border-border-gray text-navy hidden md:flex flex-col py-8 px-6 flex-none z-10 shadow-sm relative">
-          <div className="mb-8">
+          <div className="mb-8 tour-sidebar-nav">
             <p className="text-[10px] uppercase font-bold tracking-widest text-slate/50 mb-4 px-4">Navegação</p>
             <ul className="space-y-1 text-sm font-medium">
               <li>
@@ -102,12 +149,18 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
                 </Link>
               </li>
               <li>
-                <div className="flex items-center gap-3 text-slate/40 py-3 px-4 rounded-none cursor-not-allowed">
+                <div 
+                  className="flex items-center gap-3 text-slate/40 py-3 px-4 rounded-none cursor-not-allowed"
+                  title="Em breve: Acompanhe informações, editais e regras sobre carreira e promoção."
+                >
                   <Briefcase className="w-4 h-4" /> Carreira e Promoção
                 </div>
               </li>
               <li>
-                <div className="flex items-center gap-3 text-slate/40 py-3 px-4 rounded-none cursor-not-allowed">
+                <div 
+                  className="flex items-center gap-3 text-slate/40 py-3 px-4 rounded-none cursor-not-allowed"
+                  title="Em breve: Visualize guias, simuladores e notícias sobre os processos de aposentadoria."
+                >
                   <Archive className="w-4 h-4" /> Aposentadoria
                 </div>
               </li>

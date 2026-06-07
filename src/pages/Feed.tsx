@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { UserProfile } from '../types';
 import { Pin, ThumbsUp, MessageSquare, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -7,7 +7,8 @@ import { PostCard } from '../components/feed/PostCard';
 import { PostoHighlightCard } from '../components/feed/PostoHighlightCard';
 import { AdminAlertCard } from '../components/feed/AdminAlertCard';
 import { LeftSidebar } from '../components/feed/LeftSidebar';
-import { useFeed } from '../hooks/useFeed';
+import { MemberSuggestionsCard } from '../components/feed/MemberSuggestionsCard';
+import { useFeed, FeedFilter } from '../hooks/useFeed';
 import { userService } from '../services/userService';
 
 export function Feed({ profile }: { profile: UserProfile }) {
@@ -20,8 +21,35 @@ export function Feed({ profile }: { profile: UserProfile }) {
     setFilterCategory,
     search,
     setSearch,
-    handleCreatePost
+    handleCreatePost,
+    activeFilter,
+    setActiveFilter,
+    loadMore,
+    hasMore
   } = useFeed(profile);
+
+  const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (observerTarget.current) {
+      observer.observe(observerTarget.current);
+    }
+
+    return () => {
+      if (observerTarget.current) {
+        observer.unobserve(observerTarget.current);
+      }
+    };
+  }, [hasMore, loadMore]);
 
   const toggleSaved = async (postId: string) => {
     try {
@@ -41,7 +69,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
     <div className="flex flex-col gap-8">
       <div className="flex items-end justify-between">
         <h1 className="text-4xl text-navy font-serif">Feed da Comunidade</h1>
-        <button onClick={() => setShowEditor(!showEditor)} className="bg-navy text-white px-6 py-3 font-medium cursor-pointer transition-colors hover:bg-slate">
+        <button onClick={() => setShowEditor(!showEditor)} className="bg-navy text-white px-6 py-3 font-medium cursor-pointer transition-colors hover:bg-slate tour-new-post">
           NOVO POST
         </button>
       </div>
@@ -76,6 +104,18 @@ export function Feed({ profile }: { profile: UserProfile }) {
         </select>
       </div>
 
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
+        {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
+           <button 
+             key={filterKey}
+             onClick={() => setActiveFilter(filterKey)}
+             className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors whitespace-nowrap ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-ice'}`}
+           >
+             {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
+           </button>
+        ))}
+      </div>
+
       <div className="flex flex-col lg:flex-row items-start gap-8">
         
         {/* Left Sidebar Arena */}
@@ -84,7 +124,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
         </div>
 
         {/* Feed List */}
-        <div className="flex-1 space-y-8 min-w-0">
+        <div className="flex-1 space-y-8 min-w-0 tour-feed-main">
           {filteredPosts.length === 0 ? (
             <div className="py-16 px-6 text-center text-slate bg-white border border-dashed border-border-gray flex flex-col items-center justify-center">
               <MessageSquare className="w-12 h-12 mb-4 opacity-20 text-navy" />
@@ -100,12 +140,23 @@ export function Feed({ profile }: { profile: UserProfile }) {
                 onToggleSaved={toggleSaved} 
               />
           )))}
+          
+          {hasMore && filteredPosts.length > 0 && (
+            <div ref={observerTarget} className="py-8 flex justify-center">
+              <div className="w-8 h-8 rounded-full border-2 border-navy border-t-transparent animate-spin"></div>
+            </div>
+          )}
+          {!hasMore && filteredPosts.length > 0 && (
+            <p className="text-center text-slate py-8 text-sm uppercase tracking-widest font-bold">Você atingiu o fim do feed</p>
+          )}
         </div>
         
         {/* Right Sidebar Area */}
         <div className="w-full lg:w-[280px] xl:w-[300px] flex-none flex flex-col gap-8 sticky top-24">
           {/* Posto Highlight Card */}
           <PostoHighlightCard />
+
+          <MemberSuggestionsCard profile={profile} />
 
           {profile.role === 'ADMIN' && (
             <AdminAlertCard />

@@ -47,6 +47,8 @@ export const postoService = {
     const fieldsQ = query(collection(db, 'postoFields'), where('postoId', '==', postoId));
     return onSnapshot(fieldsQ, (fSnap) => {
       onUpdate(fSnap.docs.map(doc => ({ id: doc.id, ...doc.data()})));
+    }, (err) => {
+      console.error('Error fetching posto fields:', err);
     });
   },
 
