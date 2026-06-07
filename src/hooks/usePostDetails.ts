@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { postService } from '../services/postService';
 import { reportService } from '../services/reportService';
 import { UserProfile } from '../types';
+import { useToast } from '../components/ui/Toast';
 
 export function usePostDetails(id: string | undefined, profile: UserProfile) {
+  const { addToast } = useToast();
   const [post, setPost] = useState<any>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [newCommentBody, setNewCommentBody] = useState('');
@@ -30,7 +32,7 @@ export function usePostDetails(id: string | undefined, profile: UserProfile) {
     };
   }, [id]);
 
-  const handleAddComment = async (e: React.FormEvent) => {
+  const handleAddComment = async (e: FormEvent) => {
     e.preventDefault();
     if (!newCommentBody.trim() || !id) return;
     setIsPosting(true);
@@ -49,10 +51,10 @@ export function usePostDetails(id: string | undefined, profile: UserProfile) {
     if (!reason || !reason.trim()) return;
     try {
       await reportService.createReport(type, contentId, preview, profile.id, reason);
-      alert('Denúncia enviada com sucesso para a moderação.');
+      addToast("Denúncia enviada com sucesso para a moderação.", "success");
     } catch (e) {
       console.error(e);
-      alert('Erro ao enviar denúncia.');
+      addToast("Erro ao enviar denúncia.", "error");
     }
   };
 

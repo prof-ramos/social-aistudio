@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { adminService } from '../services/adminService';
+import { useToast } from '../components/ui/Toast';
 
 // Extract this interface to types if needed, but for now keeping it self-contained
 export interface Report {
@@ -16,6 +17,7 @@ export interface Report {
 }
 
 export function useAdminModeration() {
+  const { addToast } = useToast();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [resolvingId, setResolvingId] = useState<string | null>(null);
@@ -31,10 +33,10 @@ export function useAdminModeration() {
     return () => unsub();
   }, []);
 
-  const handleResolve = async (id: string, e: React.FormEvent) => {
+  const handleResolve = async (id: string, e: FormEvent) => {
     e.preventDefault();
     if (!notes.trim()) {
-      alert("É necessário inserir uma nota de moderação.");
+      addToast('É necessário inserir uma nota de moderação.', 'warning');
       return;
     }
     
@@ -46,7 +48,7 @@ export function useAdminModeration() {
       setNotes('');
     } catch (e) {
       console.error(e);
-      alert('Erro ao resolver denúncia.');
+      addToast('Erro ao resolver denúncia.', 'error');
     } finally {
       setLoading(false);
     }

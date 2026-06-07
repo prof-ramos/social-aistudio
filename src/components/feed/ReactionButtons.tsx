@@ -17,7 +17,7 @@ const EMOJIS = [
 
 export function ReactionButtons({ postId, reactions = {}, currentUserId }: ReactionButtonsProps) {
   const handleReact = async (e: React.MouseEvent, emoji: string) => {
-    e.preventDefault(); // In case it's inside a Link or similar
+    e.preventDefault();
     e.stopPropagation();
     try {
       await postService.toggleReaction(postId, emoji, currentUserId);
@@ -31,18 +31,20 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
       {EMOJIS.map(({ emoji, label, Icon }) => {
         const reacts = reactions[emoji] || [];
         const hasReacted = reacts.includes(currentUserId);
-        
+
         return (
           <button
             key={emoji}
             onClick={(e) => handleReact(e, emoji)}
+            aria-label={`${reacts.length} ${label.toLowerCase()}`}
+            aria-pressed={hasReacted}
             className={`text-xs font-bold flex items-center gap-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
               hasReacted ? 'text-sky' : 'text-slate/50 hover:text-navy'
             }`}
           >
-            <Icon className="w-4 h-4" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} /> 
-            <span className="hidden sm:inline uppercase tracking-wider">{label}</span>
-            <span className="flex items-center overflow-hidden">
+            <Icon className="w-4 h-4" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} />
+            <span className="hidden sm:inline uppercase tracking-wider" aria-hidden="true">{label}</span>
+            <span className="flex items-center overflow-hidden" aria-hidden="true">
               (
               <AnimatePresence mode="popLayout" initial={false}>
                 <motion.span

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../services/adminService';
+import { useToast } from '../components/ui/Toast';
 
 export function useAdminMembers() {
   const [requests, setRequests] = useState<any[]>([]);
+  const { addToast } = useToast();
 
   useEffect(() => {
-    // Only pending requests usually, but let's grab all for admin view
     const unsub = adminService.subscribeToAllRequests((reqs) => {
       setRequests(reqs);
     });
@@ -14,13 +15,13 @@ export function useAdminMembers() {
 
   const handleApprove = async (req: any) => {
     if (!window.confirm(`Aprovar ${req.name}?`)) return;
-    
+
     try {
       await adminService.updateRequestStatus(req.id, 'APPROVED');
-      alert('Solicitação aprovada. O associado poderá se registrar com este e-mail.');
+      addToast('Solicitação aprovada. O associado poderá se registrar.', 'success');
     } catch (e) {
       console.error(e);
-      alert('Erro ao aprovar.');
+      addToast('Erro ao aprovar solicitação.', 'error');
     }
   };
 
@@ -30,9 +31,10 @@ export function useAdminMembers() {
 
     try {
       await adminService.rejectRequestWithReason(id, reason);
+      addToast('Solicitação rejeitada.', 'success');
     } catch (e) {
       console.error(e);
-      alert('Erro ao rejeitar.');
+      addToast('Erro ao rejeitar solicitação.', 'error');
     }
   };
 

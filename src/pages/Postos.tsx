@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Search, MapPin } from 'lucide-react';
 import { usePostos } from '../hooks/usePostos';
+import { Card, PageTitle } from '../components/ui';
 
 export function Postos() {
   const {
@@ -16,18 +17,18 @@ export function Postos() {
     <div className="flex flex-col h-full max-w-5xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h1 className="text-4xl text-navy font-serif mb-2">Guia de Postos</h1>
+          <PageTitle className="mb-2">Guia de Postos</PageTitle>
           <p className="text-slate text-sm font-medium opacity-80">Fichas e relatos alimentados pelos Oficiais de Chancelaria</p>
         </div>
-        
+
         <div className="flex flex-col md:flex-row w-full md:w-auto gap-4">
           <div className="relative w-full md:w-80">
              <Search className="w-5 h-5 absolute left-3 top-3.5 text-navy opacity-50" />
              <label htmlFor="search-postos" className="sr-only">Buscar por nome, país ou região</label>
-             <input 
+             <input
                id="search-postos"
-               type="text" 
-               placeholder="Buscar por nome, país ou região..." 
+               type="text"
+               placeholder="Buscar por nome, país ou região..."
                className="w-full h-12 border border-border-gray bg-white pl-10 pr-4 text-slate text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all placeholder:text-slate/50"
                value={search}
                onChange={e => setSearch(e.target.value)}
@@ -53,7 +54,7 @@ export function Postos() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max pb-8">
         {filtered.map(posto => (
           <Link key={posto.id} to={`/postos/${posto.slug}`} className="block group">
-            <div className="bg-white border border-border-gray p-6 h-full transition-transform hover:-translate-y-1 hover:shadow-lg duration-200 flex flex-col">
+            <Card variant="elevated" padding="md" className="h-full transition-transform hover:-translate-y-1 hover:shadow-lg duration-200 flex flex-col">
               <div className="flex items-start justify-between mb-6">
                 <div className="w-12 h-12 bg-ice border border-border-gray/50 flex items-center justify-center text-navy group-hover:bg-navy group-hover:text-white transition-colors">
                   <MapPin className="w-6 h-6" />
@@ -61,22 +62,22 @@ export function Postos() {
               </div>
               <h3 className="font-serif text-2xl text-navy mb-1 leading-tight">{posto.name}</h3>
               <p className="text-xs uppercase tracking-widest text-sky font-bold mb-4">{posto.country} • {posto.region}</p>
-              
+
               <div className="mt-auto pt-4 border-t border-border-gray/50 text-xs text-navy font-bold flex items-center justify-between group-hover:text-sky transition-colors">
                 <span>ACESSAR FICHA COMPLETA</span>
                 <span className="font-serif text-lg leading-none">→</span>
               </div>
-            </div>
+            </Card>
           </Link>
         ))}
       </div>
-      
+
       {filtered.length === 0 && (
-         <div className="text-center py-16 text-slate bg-white border border-border-gray">
+         <Card variant="default" padding="none" className="text-center py-16 text-slate">
            <MapPin className="w-12 h-12 mx-auto mb-4 opacity-20 text-navy" />
            <p className="font-serif text-xl text-navy mb-1">Nenhum posto encontrado</p>
            <p className="text-sm opacity-80">Não encontramos resultados para "{search}". Tente buscar por outro termo.</p>
-         </div>
+         </Card>
       )}
     </div>
   );

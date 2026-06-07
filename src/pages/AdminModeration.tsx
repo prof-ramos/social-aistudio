@@ -1,7 +1,10 @@
 import React from 'react';
-import { ShieldAlert, Check, X, AlertTriangle, Trash2, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ShieldAlert, Check, AlertTriangle, Trash2, ArrowRight } from 'lucide-react';
 import { useAdminModeration } from '../hooks/useAdminModeration';
+import { Card } from '../components/ui/Card';
+import { PageTitle } from '../components/ui/PageTitle';
+import { Button } from '../components/ui/Button';
+import { StatusBadge } from '../components/ui/StatusBadge';
 
 export default function AdminModeration() {
   const {
@@ -24,14 +27,14 @@ export default function AdminModeration() {
           <div className="w-48 h-8 bg-slate/10 mb-3" />
           <div className="w-96 h-5 bg-slate/10" />
         </div>
-        <div className="bg-white border border-border-gray shadow-sm h-[600px] p-6">
+        <Card variant="elevated" padding="lg" className="h-[calc(100vh-12rem)]">
           <div className="w-full h-10 bg-slate/10 mb-4" />
           <div className="space-y-2">
             {[1, 2, 3, 4].map(i => (
               <div key={i} className="w-full h-16 bg-slate/10" />
             ))}
           </div>
-        </div>
+        </Card>
       </div>
     );
   }
@@ -39,11 +42,11 @@ export default function AdminModeration() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-12 w-full">
       <div>
-        <h1 className="font-serif text-3xl font-bold text-navy mb-2">Moderação</h1>
+        <PageTitle as="h1" size="xl">Moderação</PageTitle>
         <p className="text-slate">Gerencie denúncias de conteúdo publicadas na plataforma.</p>
       </div>
 
-      <div className="bg-white border border-border-gray shadow-sm h-[600px] flex flex-col">
+      <Card variant="elevated" className="h-[calc(100vh-12rem)] flex flex-col">
         {pendingReports.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-slate">
             <ShieldAlert className="w-12 h-12 mb-4 opacity-50" />
@@ -54,9 +57,9 @@ export default function AdminModeration() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-ice border-b border-border-gray text-xs font-bold uppercase tracking-wider text-slate">
-                  <th className="p-4">Conteúdo</th>
-                  <th className="p-4">Motivo / Denunciante</th>
-                  <th className="p-4">Ação</th>
+                  <th scope="col" className="p-4">Conteúdo</th>
+                  <th scope="col" className="p-4">Motivo / Denunciante</th>
+                  <th scope="col" className="p-4">Ação</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-gray">
@@ -77,7 +80,7 @@ export default function AdminModeration() {
                         <form onSubmit={(e) => handleResolve(rep.id, e)} className="bg-ice p-3 rounded-md border border-border-gray space-y-3 min-w-[250px]">
                           <div>
                             <label className="block text-xs font-bold text-slate mb-1">Ação</label>
-                            <select 
+                            <select
                               className="w-full h-9 border border-border-gray rounded text-sm px-2 focus:ring-1 focus:ring-navy focus:outline-none"
                               value={action}
                               onChange={e => setAction(e.target.value as any)}
@@ -89,7 +92,7 @@ export default function AdminModeration() {
                           </div>
                           <div>
                             <label className="block text-xs font-bold text-slate mb-1">Nota Interna (Obrigatório)</label>
-                            <textarea 
+                            <textarea
                               required
                               className="w-full min-h-[60px] border border-border-gray rounded text-sm p-2 focus:ring-1 focus:ring-navy focus:outline-none resize-none"
                               value={notes}
@@ -98,17 +101,19 @@ export default function AdminModeration() {
                             ></textarea>
                           </div>
                           <div className="flex gap-2">
-                             <button type="button" onClick={() => setResolvingId(null)} className="flex-1 py-1.5 text-xs font-bold text-slate hover:bg-white border border-transparent transition-colors rounded">Cancelar</button>
-                             <button type="submit" className="flex-1 py-1.5 text-xs font-bold bg-navy text-white hover:bg-navy-dark transition-colors rounded flex items-center justify-center gap-1">Confirmar <ArrowRight className="w-3 h-3" /></button>
+                             <Button type="button" variant="ghost" size="sm" fullWidth onClick={() => setResolvingId(null)} className="min-h-[44px]">Cancelar</Button>
+                             <Button type="submit" variant="primary" size="sm" fullWidth className="min-h-[44px]">Confirmar <ArrowRight className="w-3 h-3" /></Button>
                           </div>
                         </form>
                       ) : (
-                        <button 
+                        <Button
+                          variant="primary"
+                          size="sm"
                           onClick={() => { setResolvingId(rep.id); setNotes(''); setAction('RESOLVED_KEPT'); }}
-                          className="px-4 py-2 bg-navy text-white text-xs font-bold rounded-md hover:bg-navy-dark transition-colors focus:ring-2 focus:ring-navy focus:outline-none"
+                          className="min-h-[44px]"
                         >
                           Resolver
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>
@@ -117,42 +122,40 @@ export default function AdminModeration() {
             </table>
           </div>
         )}
-      </div>
+      </Card>
 
       {resolvedReports.length > 0 && (
         <div>
-          <h2 className="font-serif text-xl font-bold text-navy mb-4">Histórico de Moderação</h2>
-          <div className="bg-white border border-border-gray shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-ice border-b border-border-gray text-xs font-bold uppercase tracking-wider text-slate">
-                    <th className="p-4">Conteúdo</th>
-                    <th className="p-4">Resolução</th>
-                    <th className="p-4">Nota Interna</th>
+          <PageTitle as="h2" size="lg">Histórico de Moderação</PageTitle>
+          <Card variant="elevated" className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-ice border-b border-border-gray text-xs font-bold uppercase tracking-wider text-slate">
+                  <th scope="col" className="p-4">Conteúdo</th>
+                  <th scope="col" className="p-4">Resolução</th>
+                  <th scope="col" className="p-4">Nota Interna</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border-gray text-sm text-slate">
+                {resolvedReports.map(rep => (
+                  <tr key={rep.id}>
+                    <td className="p-4">
+                      <span className="text-[10px] font-bold text-sky uppercase">{rep.type}</span>
+                      <p className="line-clamp-2 max-w-xs">{rep.preview}</p>
+                    </td>
+                    <td className="p-4">
+                      {rep.status === 'RESOLVED_KEPT' && <StatusBadge status="neutral"><Check className="w-3 h-3" /> Mantido</StatusBadge>}
+                      {rep.status === 'RESOLVED_WARNED' && <StatusBadge status="warning"><AlertTriangle className="w-3 h-3" /> Advertido</StatusBadge>}
+                      {rep.status === 'RESOLVED_REMOVED' && <StatusBadge status="error"><Trash2 className="w-3 h-3" /> Removido</StatusBadge>}
+                    </td>
+                    <td className="p-4 max-w-xs">
+                      <p className="line-clamp-2">{rep.notes}</p>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-border-gray text-sm text-slate">
-                  {resolvedReports.map(rep => (
-                    <tr key={rep.id}>
-                      <td className="p-4">
-                        <span className="text-[10px] font-bold text-sky uppercase">{rep.type}</span>
-                        <p className="line-clamp-2 max-w-xs">{rep.preview}</p>
-                      </td>
-                      <td className="p-4">
-                        {rep.status === 'RESOLVED_KEPT' && <span className="inline-flex items-center gap-1 text-slate bg-slate/10 px-2 py-1 rounded-sm text-xs font-bold"><Check className="w-3 h-3" /> Mantido</span>}
-                        {rep.status === 'RESOLVED_WARNED' && <span className="inline-flex items-center gap-1 text-warning bg-warning/10 px-2 py-1 rounded-sm text-xs font-bold"><AlertTriangle className="w-3 h-3" /> Advertido</span>}
-                        {rep.status === 'RESOLVED_REMOVED' && <span className="inline-flex items-center gap-1 text-danger bg-danger/10 px-2 py-1 rounded-sm text-xs font-bold"><Trash2 className="w-3 h-3" /> Removido</span>}
-                      </td>
-                      <td className="p-4 max-w-xs">
-                        <p className="line-clamp-2">{rep.notes}</p>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                ))}
+              </tbody>
+            </table>
+          </Card>
         </div>
       )}
     </div>

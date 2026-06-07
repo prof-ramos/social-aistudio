@@ -3,6 +3,7 @@ import { UserProfile, ChatSession, ChatMessage } from '../types';
 import { chatService } from '../services/chatService';
 import { ChevronLeft, Send, MessageSquare } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
+import { Button, Card, PageTitle } from '../components/ui';
 
 export function Messages({ profile }: { profile: UserProfile }) {
   const [chats, setChats] = useState<ChatSession[]>([]);
@@ -16,13 +17,13 @@ export function Messages({ profile }: { profile: UserProfile }) {
   useEffect(() => {
     const unsub = chatService.subscribeToUserChats(profile.id, (fetchedChats) => {
       setChats(fetchedChats);
-      
+
       const state = location.state as { targetUserId?: string, targetUserName?: string } | null;
       if (state?.targetUserId && state.targetUserId !== profile.id) {
         const existingChat = fetchedChats.find(c => c.participants.includes(state.targetUserId!));
         if (existingChat) {
           setActiveChatId(existingChat.id);
-          window.history.replaceState({}, document.title) 
+          window.history.replaceState({}, document.title)
         } else {
           chatService.getOrCreateChat(profile.id, state.targetUserId, profile.name, state.targetUserName || 'Usuário').then(id => {
             setActiveChatId(id);
@@ -69,11 +70,11 @@ export function Messages({ profile }: { profile: UserProfile }) {
   };
 
   return (
-    <div className="flex bg-white border border-border-gray shadow-sm h-[calc(100vh-8rem)] min-h-[500px] overflow-hidden rounded-md relative z-0">
+    <Card variant="elevated" padding="none" className="flex flex-1 min-h-0 overflow-hidden rounded-md relative z-0">
       {/* Sidebar - Chat List */}
       <div className={`w-full md:w-80 flex-none border-r border-border-gray flex flex-col bg-white transition-all ${activeChatId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-5 border-b border-border-gray flex items-center justify-between">
-          <h2 className="font-serif text-xl text-navy font-bold">Mensagens</h2>
+          <PageTitle as="h2" size="lg" className="text-xl">Mensagens</PageTitle>
         </div>
         <div className="flex-1 overflow-y-auto">
           {chats.length === 0 ? (
@@ -90,7 +91,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
               const otherName = chat.participantNames?.[otherId] || 'Usuário';
               const isActive = chat.id === activeChatId;
               const initial = otherName.charAt(0).toUpperCase();
-              
+
               return (
                 <button
                   key={chat.id}
@@ -124,8 +125,8 @@ export function Messages({ profile }: { profile: UserProfile }) {
               <div className="w-16 h-16 rounded-full bg-white shadow-sm border border-border-gray flex items-center justify-center mx-auto mb-4">
                 <MessageSquare className="w-6 h-6 text-navy" />
               </div>
-              <h2 className="text-navy font-serif text-2xl mb-2">Suas Mensagens</h2>
-              <p className="text-slate text-sm leading-relaxed">
+              <PageTitle as="h2" size="lg">Suas Mensagens</PageTitle>
+              <p className="text-slate text-sm leading-relaxed mt-2">
                 Selecione uma conversa na lista ao lado ou inicie um novo bate-papo a partir do perfil de um membro.
               </p>
             </div>
@@ -134,14 +135,16 @@ export function Messages({ profile }: { profile: UserProfile }) {
           <>
             {/* Header */}
             <div className="h-16 px-4 border-b border-border-gray flex items-center gap-3 bg-white z-10 shrink-0">
-              <button 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setActiveChatId(null)}
-                className="md:hidden w-10 h-10 -ml-2 rounded-full flex items-center justify-center text-slate hover:bg-ice transition-colors"
+                className="md:hidden w-10 h-10 -ml-2 rounded-full p-0"
                 title="Voltar"
               >
                 <ChevronLeft className="w-5 h-5 text-navy" />
-              </button>
-              
+              </Button>
+
               {activeChat && (() => {
                  const otherId = activeChat.participants.find(p => p !== profile.id) || profile.id;
                  const otherName = activeChat.participantNames?.[otherId] || 'Usuário';
@@ -159,16 +162,16 @@ export function Messages({ profile }: { profile: UserProfile }) {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div role="log" aria-live="polite" className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg, i) => {
                 const isMe = msg.senderId === profile.id;
                 const showTime = true; // In a fuller app, conditionally show based on prev message time
                 return (
                   <div key={msg.id || i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                    <div 
+                    <div
                       className={`max-w-[85%] sm:max-w-[70%] px-4 py-2.5 text-[15px] shadow-sm relative ${
-                        isMe 
-                          ? 'bg-navy text-white rounded-t-2xl rounded-l-2xl rounded-br-sm' 
+                        isMe
+                          ? 'bg-navy text-white rounded-t-2xl rounded-l-2xl rounded-br-sm'
                           : 'bg-white border border-border-gray/50 text-slate rounded-t-2xl rounded-r-2xl rounded-bl-sm'
                       }`}
                     >
@@ -191,23 +194,26 @@ export function Messages({ profile }: { profile: UserProfile }) {
                 <input
                   type="text"
                   placeholder="Escreva sua mensagem..."
-                  className="flex-1 h-12 bg-ice/50 border border-border-gray/50 rounded-full px-5 text-[15px] focus:bg-white focus:ring-2 focus:ring-navy/20 focus:border-navy focus:outline-none transition-all"
+                  className="flex-1 h-12 bg-ice/50 border border-border-gray/50 rounded-full px-5 text-base focus:bg-white focus:ring-2 focus:ring-navy/20 focus:border-navy focus:outline-none transition-all"
                   value={newMessage}
                   onChange={e => setNewMessage(e.target.value)}
                   disabled={sending}
+                  aria-label="Nova mensagem"
                 />
-                <button
+                <Button
                   type="submit"
+                  variant="primary"
+                  size="lg"
                   disabled={!newMessage.trim() || sending}
-                  className="w-12 h-12 rounded-full bg-navy text-white hover:bg-opacity-90 disabled:opacity-50 disabled:bg-border-gray disabled:text-slate transition-colors flex items-center justify-center shrink-0"
+                  className="w-12 h-12 rounded-full p-0 shrink-0"
                 >
                   <Send className="w-5 h-5 ml-0.5" />
-                </button>
+                </Button>
               </form>
             </div>
           </>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

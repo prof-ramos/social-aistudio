@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { postoService } from '../services/postoService';
 import { reportService } from '../services/reportService';
 import { STATIC_POSTOS } from '../data/postosData';
+import { useToast } from '../components/ui/Toast';
 
 export function usePostoDetails(slug: string | undefined, profileId: string) {
+  const { addToast } = useToast();
   const [posto, setPosto] = useState<any>(null);
   const [fields, setFields] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,7 @@ export function usePostoDetails(slug: string | undefined, profileId: string) {
     return () => unsubFields();
   }, [slug]);
 
-  const handleAddField = async (e: React.FormEvent) => {
+  const handleAddField = async (e: FormEvent) => {
      e.preventDefault();
      if(!posto) return;
      try {
@@ -56,10 +58,10 @@ export function usePostoDetails(slug: string | undefined, profileId: string) {
     if (!reason || !reason.trim()) return;
     try {
       await reportService.createReport(type, contentId, preview, profileId, reason);
-      alert('Denúncia enviada com sucesso para a moderação.');
+      addToast("Denúncia enviada com sucesso para a moderação.", "success");
     } catch (e) {
       console.error(e);
-      alert('Erro ao enviar denúncia.');
+      addToast("Erro ao enviar denúncia.", "error");
     }
   };
 

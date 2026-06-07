@@ -18,6 +18,7 @@ import { Notifications } from './pages/Notifications';
 import { Messages } from './pages/Messages';
 import { Home, Building2, Briefcase, Archive, MessageSquare } from 'lucide-react';
 import { Tour } from './components/Tour';
+import { ToastProvider } from './components/ui/Toast';
 import { UserProfile, AuthUser } from './types';
 import { usePresence } from './hooks/usePresence';
 
@@ -72,7 +73,7 @@ export default function App() {
           </aside>
           
           {/* Content Skeleton */}
-          <section className="flex-1 p-16 overflow-y-auto bg-ice">
+          <section className="flex-1 p-4 sm:p-8 lg:p-16 overflow-y-auto bg-ice">
             <div className="max-w-3xl mx-auto space-y-8">
               <div className="w-48 h-8 bg-slate/10 animate-pulse" />
               <div className="w-full h-40 bg-white border border-border-gray shadow-sm animate-pulse" />
@@ -89,6 +90,7 @@ export default function App() {
   }
 
   return (
+    <ToastProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={user && profile ? <Navigate to="/feed" replace /> : <Navigate to="/login" replace />} />
@@ -117,6 +119,7 @@ export default function App() {
 
       </Routes>
     </BrowserRouter>
+    </ToastProvider>
   );
 }
 

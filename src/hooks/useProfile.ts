@@ -2,8 +2,10 @@ import { useEffect, useState, FormEvent } from 'react';
 import { userService } from '../services/userService';
 import { postService } from '../services/postService';
 import { UserProfile, Post } from '../types';
+import { useToast } from '../components/ui/Toast';
 
 export function useProfile(id: string | undefined, currentProfile: UserProfile) {
+  const { addToast } = useToast();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -71,7 +73,7 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
       setIsEditing(false);
     } catch (err) {
       console.error(err);
-      alert('Erro ao salvar perfil.');
+      addToast('Erro ao salvar perfil.', 'error');
     } finally {
       setSaving(false);
     }
