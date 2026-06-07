@@ -1,34 +1,45 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { postService } from '../services/postService';
 import { Post, UserProfile } from '../types';
+import { QueryDocumentSnapshot } from 'firebase/firestore';
 
 export type FeedFilter = 'RECENTES' | 'MAIS_COMENTADOS' | 'MEUS_POSTOS';
+const PAGE_SIZE = 10;
 
 export function useFeed(profile: UserProfile) {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [recentPosts, setRecentPosts] = useState<Post[]>([]);
+  const [olderPosts, setOlderPosts] = useState<Post[]>([]);
   const [isPosting, setIsPosting] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [filterCategory, setFilterCategory] = useState('TODOS');
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<FeedFilter>('RECENTES');
-  const [limitCount, setLimitCount] = useState(10);
   const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const lastDocRef = useRef<QueryDocumentSnapshot | null>(null);
 
+  // Real-time subscription for the most recent PAGE_SIZE posts
   useEffect(() => {
     const unsub = postService.subscribeToFeed(
       (fetchedPosts) => {
-        setPosts(fetchedPosts);
-        if (fetchedPosts.length < limitCount) {
-          setHasMore(false);
-        } else {
-          setHasMore(true);
-        }
+        setRecentPosts(fetchedPosts);
+        setHasMore(fetchedPosts.length >= PAGE_SIZE);
       },
       (error) => console.error('Error in feed snapshot:', error),
-      limitCount
+      PAGE_SIZE
     );
     return () => unsub();
-  }, [limitCount]);
+  }, []);
+
+  // Merge recent and older posts, removing duplicates by id
+  const posts = useMemo(() => {
+    const merged = new Map<string, Post>();
+    recentPosts.forEach(p => merged.set(p.id, p));
+    olderPosts.forEach(p => {
+      if (!merged.has(p.id)) merged.set(p.id, p);
+    });
+    return Array.from(merged.values());
+  }, [recentPosts, olderPosts]);
 
   const filteredPosts = useMemo(() => {
     const filtered = posts.filter(post => {
@@ -58,11 +69,24 @@ export function useFeed(profile: UserProfile) {
     return sorted;
   }, [posts, filterCategory, search, activeFilter, profile.id]);
 
-  const loadMore = useCallback(() => {
-    if (hasMore) {
-      setLimitCount(prev => prev + 10);
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    try {
+      const { posts: newPosts, lastDoc } = await postService.fetchMorePosts(lastDocRef.current, PAGE_SIZE);
+      if (newPosts.length > 0) {
+        setOlderPosts(prev => [...prev, ...newPosts]);
+        lastDocRef.current = lastDoc;
+      }
+      if (newPosts.length < PAGE_SIZE) {
+        setHasMore(false);
+      }
+    } catch (e) {
+      console.error('Error loading more posts:', e);
+    } finally {
+      setLoadingMore(false);
     }
-  }, [hasMore]);
+  }, [loadingMore, hasMore]);
 
   const handleCreatePost = useCallback(async (title: string, bodyHTML: string, category: string) => {
     setIsPosting(true);
@@ -89,6 +113,7 @@ export function useFeed(profile: UserProfile) {
     activeFilter,
     setActiveFilter,
     loadMore,
-    hasMore
+    hasMore,
+    loadingMore
   };
 }

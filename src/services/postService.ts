@@ -1,4 +1,4 @@
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, updateDoc, increment, limit } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, getDocs, doc, updateDoc, increment, limit, startAfter, QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { Post, PostCategory, UserProfile, PostComment } from '../types';
 import { userService } from './userService';
@@ -49,21 +49,34 @@ export const postService = {
 
   subscribeToFeed: (onUpdate: (posts: Post[]) => void, onError: (error: Error) => void, limitCount: number = 10) => {
     const q = query(collection(db, POSTS_COLLECTION), orderBy('createdAt', 'desc'), limit(limitCount));
-    
+
     return onSnapshot(q, (snap) => {
-      const fetchedPosts = snap.docs.map(doc => ({ 
-        id: doc.id, 
-        ...doc.data() 
+      const fetchedPosts = snap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
       })) as Post[];
-      
+
       fetchedPosts.sort((a, b) => {
         if (a.pinned && !b.pinned) return -1;
         if (!a.pinned && b.pinned) return 1;
         return 0;
       });
-      
+
       onUpdate(fetchedPosts);
     }, onError);
+  },
+
+  fetchMorePosts: async (lastDoc: QueryDocumentSnapshot | null, pageSize: number = 10): Promise<{ posts: Post[]; lastDoc: QueryDocumentSnapshot | null }> => {
+    let q = query(collection(db, POSTS_COLLECTION), orderBy('createdAt', 'desc'), limit(pageSize));
+    if (lastDoc) {
+      q = query(collection(db, POSTS_COLLECTION), orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(pageSize));
+    }
+
+    const snap = await getDocs(q);
+    const posts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as Post));
+    const newLastDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
+
+    return { posts, lastDoc: newLastDoc };
   },
 
   createPost: async (title: string, bodyHTML: string, category: PostCategory | string, profile: UserProfile) => {

@@ -7,19 +7,21 @@ import { Login } from './pages/Login';
 import { RegisterRequest } from './pages/RegisterRequest';
 import ForgotPassword from './pages/ForgotPassword';
 import { Feed } from './pages/Feed';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const PostDetails = lazy(() => import('./pages/PostDetails'));
 const Postos = lazy(() => import('./pages/Postos').then(m => ({ default: m.Postos })));
 const PostoDetails = lazy(() => import('./pages/PostoDetails').then(m => ({ default: m.PostoDetails })));
 const AdminMembers = lazy(() => import('./pages/AdminMembers').then(m => ({ default: m.AdminMembers })));
 const AdminModeration = lazy(() => import('./pages/AdminModeration'));
+const AdminHub = lazy(() => import('./pages/AdminHub'));
 const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
 const Notifications = lazy(() => import('./pages/Notifications').then(m => ({ default: m.Notifications })));
 const Messages = lazy(() => import('./pages/Messages').then(m => ({ default: m.Messages })));
 import { Home, Building2, Briefcase, Archive, MessageSquare } from 'lucide-react';
 import { Tour } from './components/Tour';
 import { ToastProvider } from './components/ui/Toast';
-import { UserProfile, AuthUser } from './types';
+import { UserProfile } from './types';
 import { usePresence } from './hooks/usePresence';
 
 function PageLoading() {
@@ -33,28 +35,12 @@ function PageLoading() {
   );
 }
 
-export default function App() {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Check connection
-    systemService.checkConnection();
-
-    const unsubscribe = authService.onAuthStateChanged((u, p) => {
-      setUser(u);
-      setProfile(p);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
+function AppRoutes() {
+  const { user, profile, loading } = useAuth();
 
   if (loading) {
     return (
       <div className="h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
-        {/* Navbar Skeleton */}
         <header className="h-[73px] bg-navy flex items-center justify-between px-6 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-8 h-8 bg-white/10 animate-pulse rounded-none" />
@@ -66,9 +52,7 @@ export default function App() {
             <div className="w-8 h-8 bg-white/10 animate-pulse rounded-full" />
           </div>
         </header>
-        
         <main className="flex flex-1 overflow-hidden">
-          {/* Sidebar Skeleton */}
           <aside className="w-64 bg-white border-r border-border-gray hidden md:flex flex-col py-8 px-6 flex-none shrink-0">
             <div className="mb-8">
               <div className="w-20 h-3 bg-slate/10 animate-pulse mb-6" />
@@ -82,8 +66,6 @@ export default function App() {
               </div>
             </div>
           </aside>
-          
-          {/* Content Skeleton */}
           <section className="flex-1 p-4 sm:p-8 lg:p-16 overflow-y-auto bg-ice">
             <div className="max-w-3xl mx-auto space-y-8">
               <div className="w-48 h-8 bg-slate/10 animate-pulse" />
@@ -101,17 +83,16 @@ export default function App() {
   }
 
   return (
-    <ToastProvider>
     <BrowserRouter>
       <Suspense fallback={<PageLoading />}>
       <Routes>
         <Route path="/" element={user && profile ? <Navigate to="/feed" replace /> : <Navigate to="/login" replace />} />
-        
+
         {/* Auth Routes */}
         <Route path="/login" element={user && profile ? <Navigate to="/feed" replace /> : <Login />} />
         <Route path="/solicitar-acesso" element={<RegisterRequest />} />
         <Route path="/recuperar-senha" element={<ForgotPassword />} />
-        
+
         {/* App Routes */}
         <Route element={user && profile ? <Layout profile={profile} /> : <Navigate to="/login" replace />}>
           <Route path="/feed" element={<Feed profile={profile!} />} />
@@ -125,6 +106,7 @@ export default function App() {
 
         {/* Admin Routes */}
         <Route element={user && profile?.role === 'ADMIN' ? <Layout profile={profile} isAdminView /> : <Navigate to="/feed" replace />}>
+           <Route path="/admin" element={<AdminHub />} />
            <Route path="/admin/membros" element={<AdminMembers />} />
            <Route path="/admin/moderacao" element={<AdminModeration />} />
         </Route>
@@ -132,7 +114,20 @@ export default function App() {
       </Routes>
       </Suspense>
     </BrowserRouter>
-    </ToastProvider>
+  );
+}
+
+export default function App() {
+  useEffect(() => {
+    systemService.checkConnection();
+  }, []);
+
+  return (
+    <AuthProvider>
+      <ToastProvider>
+        <AppRoutes />
+      </ToastProvider>
+    </AuthProvider>
   );
 }
 
