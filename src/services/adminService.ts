@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot, orderBy, doc, updateDoc, setDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, doc, updateDoc, setDoc, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 const MEMBER_REQUESTS_COLLECTION = 'memberRequests';
@@ -19,7 +19,7 @@ export const adminService = {
   },
 
   subscribeToAllRequests: (onUpdate: (requests: any[]) => void) => {
-    const q = query(collection(db, MEMBER_REQUESTS_COLLECTION), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, MEMBER_REQUESTS_COLLECTION), orderBy('createdAt', 'desc'), limit(50));
     return onSnapshot(q, (snap) => {
       onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data()})));
     }, (err) => console.error('Error fetching all requests:', err));
@@ -48,7 +48,7 @@ export const adminService = {
   },
 
   subscribeToReports: (onUpdate: (reports: any[]) => void) => {
-    const q = query(collection(db, REPORTS_COLLECTION), orderBy('createdAt', 'desc'));
+    const q = query(collection(db, REPORTS_COLLECTION), orderBy('createdAt', 'desc'), limit(50));
     return onSnapshot(q, (snap) => {
       onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     }, (err) => console.error('Error fetching reports:', err));

@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot, updateDoc, doc, writeBatch, serverTimestamp, addDoc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, updateDoc, doc, writeBatch, serverTimestamp, addDoc, limit, orderBy } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 
 const NOTIFICATIONS_COLLECTION = 'notifications';
@@ -20,11 +20,12 @@ export const notificationService = {
   subscribeToUserNotifications: (userId: string, onUpdate: (notifications: any[]) => void) => {
     const q = query(
       collection(db, NOTIFICATIONS_COLLECTION),
-      where('userId', '==', userId)
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(50)
     );
     return onSnapshot(q, (snapshot) => {
       const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      docs.sort((a: any, b: any) => b.createdAt - a.createdAt);
       onUpdate(docs);
     }, (error) => {
       console.error('Error in notifications snapshot:', error);

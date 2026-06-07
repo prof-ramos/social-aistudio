@@ -1,4 +1,4 @@
-import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ChatSession, ChatMessage } from '../types';
 
@@ -21,7 +21,8 @@ export const chatService = {
   subscribeToChatMessages: (chatId: string, onUpdate: (messages: ChatMessage[]) => void) => {
     const q = query(
       collection(db, CHATS_COLLECTION, chatId, 'messages'),
-      orderBy('createdAt', 'asc')
+      orderBy('createdAt', 'asc'),
+      limit(50)
     );
     
     return onSnapshot(q, (snap) => {

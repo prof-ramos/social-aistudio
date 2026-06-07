@@ -103,7 +103,7 @@ export const postService = {
   },
 
   subscribeToComments: (postId: string, onUpdate: (comments: PostComment[]) => void) => {
-    const q = query(collection(db, POSTS_COLLECTION, postId, 'comments'), orderBy('createdAt', 'asc'));
+    const q = query(collection(db, POSTS_COLLECTION, postId, 'comments'), orderBy('createdAt', 'asc'), limit(50));
     return onSnapshot(q, (snap) => {
       onUpdate(snap.docs.map(doc => ({ id: doc.id, postId, ...doc.data() } as PostComment)));
     }, (err) => console.error('Error fetching comments:', err));

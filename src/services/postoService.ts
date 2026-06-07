@@ -1,4 +1,4 @@
-import { collection, query, onSnapshot, orderBy, where, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, query, onSnapshot, orderBy, where, getDocs, addDoc, serverTimestamp, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { UserProfile } from '../types';
 
@@ -15,7 +15,7 @@ export const postoService = {
   },
 
   subscribeToPostoReviews: (postoId: string, onUpdate: (reviews: any[]) => void) => {
-    return onSnapshot(query(collection(db, REVIEWS_COLLECTION), where('postoId', '==', postoId)), (snap) => {
+    return onSnapshot(query(collection(db, REVIEWS_COLLECTION), where('postoId', '==', postoId), limit(50)), (snap) => {
       onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data()})));
     }, (error) => {
       console.error("Error fetching reviews:", error);
@@ -44,7 +44,7 @@ export const postoService = {
   },
 
   subscribeToPostoFields: (postoId: string, onUpdate: (fields: any[]) => void) => {
-    const fieldsQ = query(collection(db, 'postoFields'), where('postoId', '==', postoId));
+    const fieldsQ = query(collection(db, 'postoFields'), where('postoId', '==', postoId), limit(50));
     return onSnapshot(fieldsQ, (fSnap) => {
       onUpdate(fSnap.docs.map(doc => ({ id: doc.id, ...doc.data()})));
     }, (err) => {
