@@ -5,7 +5,7 @@ import { ArrowLeft, MessageSquare, ThumbsUp, AlertTriangle, Bookmark } from 'luc
 import { usePostDetails } from '../hooks/usePostDetails';
 import { ReactionButtons } from '../components/feed/ReactionButtons';
 import { userService } from '../services/userService';
-import { Card, PageTitle, Button, Alert } from '../components/ui';
+import { Card, PageTitle, Button, Alert, Breadcrumb } from '../components/ui';
 
 export default function PostDetails({ profile }: { profile: UserProfile }) {
   const { id } = useParams();
@@ -77,13 +77,21 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
     </div>
   );
 
+  const breadcrumbItems = [
+    { label: 'Início', href: '/feed' },
+    { label: 'Feed', href: '/feed' },
+    { label: post.title || 'Post' }
+  ];
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 pb-12 w-full">
+      <Breadcrumb items={breadcrumbItems} />
+
       <Link
         to="/feed"
         className="inline-flex items-center gap-2 text-sm font-medium text-slate hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]"
       >
-        <ArrowLeft className="w-4 h-4" /> Voltar
+        <ArrowLeft className="w-4 h-4" /> Voltar ao feed
       </Link>
 
       <Card variant="elevated" padding="lg">

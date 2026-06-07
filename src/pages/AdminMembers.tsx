@@ -1,4 +1,5 @@
 import { Check, X } from 'lucide-react';
+import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { useAdminMembers } from '../hooks/useAdminMembers';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { Button } from '../components/ui/Button';
@@ -8,6 +9,7 @@ export function AdminMembers() {
 
   return (
     <div>
+      <Breadcrumb items={[{ label: 'Início', href: '/feed' }, { label: 'Admin', href: '/admin' }, { label: 'Membros' }]} />
       <h1 className="font-serif text-3xl font-bold text-navy mb-8">Painel Admin: Membros</h1>
       
       <div className="bg-white border border-border-gray shadow-sm overflow-hidden">

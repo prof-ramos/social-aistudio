@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldAlert, Check, AlertTriangle, Trash2, ArrowRight } from 'lucide-react';
+import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { useAdminModeration } from '../hooks/useAdminModeration';
 import { Card } from '../components/ui/Card';
 import { PageTitle } from '../components/ui/PageTitle';
@@ -41,6 +42,7 @@ export default function AdminModeration() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-12 w-full">
+      <Breadcrumb items={[{ label: 'Início', href: '/feed' }, { label: 'Admin', href: '/admin' }, { label: 'Moderação' }]} />
       <div>
         <PageTitle as="h1" size="xl">Moderação</PageTitle>
         <p className="text-slate">Gerencie denúncias de conteúdo publicadas na plataforma.</p>

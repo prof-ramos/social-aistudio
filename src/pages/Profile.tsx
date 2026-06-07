@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { Camera, Save, MapPin, BookOpen, MessageSquare, Bookmark, X, Star } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
-import { Card, PageTitle, Button, Alert, StatusBadge } from '../components/ui';
+import { Card, PageTitle, Button, Alert, StatusBadge, Breadcrumb } from '../components/ui';
 
 export function Profile({ profile }: { profile: UserProfile }) {
   const { id } = useParams();
@@ -70,6 +70,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 w-full">
+      <Breadcrumb items={[{ label: 'Início', href: '/feed' }, { label: 'Perfil' }]} />
       <div className="flex items-end justify-between mb-2">
         <PageTitle as="h1" size="xl">Perfil do Usuário</PageTitle>
       </div>
