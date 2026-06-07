@@ -15,6 +15,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [pendingRequests, setPendingRequests] = useState(0);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   useEffect(() => {
     const isDark = localStorage.getItem('asof-dark-mode') === 'true';
@@ -50,7 +51,13 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     };
   }, [profile.id, profile.role]);
 
-  const handleLogout = async () => {
+  const handleLogoutClick = () => {
+    setShowLogoutDialog(true);
+    setDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
+  const performLogout = async () => {
     await authService.signOut();
     navigate('/login');
   };
@@ -164,7 +171,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
               </div>
               <Link to={`/perfil/${profile.id}`} className="block px-4 py-3 text-sm hover:bg-ice transition-colors text-navy font-medium" onClick={() => setDropdownOpen(false)}>Meu Perfil</Link>
               <button 
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 className="w-full text-left px-4 py-3 text-sm hover:bg-danger/5 hover:text-danger text-slate transition-colors flex items-center gap-2 border-t border-border-gray/50"
               >
                 <LogOut className="w-4 h-4" strokeWidth={1.5} /> Sair
@@ -204,7 +211,32 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
                   <Link to="/admin/moderacao" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3"><Shield className="w-5 h-5"/> Painel Admin - Moderação</Link>
                 </>
              )}
-             <button onClick={handleLogout} className="px-4 py-3 text-left border-border-gray/50 hover:bg-danger/5 hover:text-danger font-bold text-slate flex items-center gap-3 border-t mt-auto"><LogOut className="w-5 h-5" /> Sair</button>
+             <button onClick={handleLogoutClick} className="px-4 py-3 text-left border-border-gray/50 hover:bg-danger/5 hover:text-danger font-bold text-slate flex items-center gap-3 border-t mt-auto"><LogOut className="w-5 h-5" /> Sair</button>
+          </div>
+        </div>
+      )}
+
+      {/* Logout Confirmation Dialog */}
+      {showLogoutDialog && (
+        <div className="fixed inset-0 bg-navy/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+          <div className="bg-white border border-border-gray shadow-lg max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-xl font-serif font-bold text-navy mb-2">Confirmar Saída</h3>
+            <p className="text-slate mb-6">Tem certeza que deseja sair da sua conta?</p>
+            <div className="flex items-center justify-end gap-3">
+              <button 
+                onClick={() => setShowLogoutDialog(false)}
+                className="px-4 py-2 text-slate hover:bg-ice transition-colors font-medium border border-transparent"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={performLogout}
+                className="px-4 py-2 bg-danger text-white hover:bg-danger/90 transition-colors font-medium flex items-center gap-2"
+              >
+                <LogOut className="w-4 h-4" />
+                Sair
+              </button>
+            </div>
           </div>
         </div>
       )}
