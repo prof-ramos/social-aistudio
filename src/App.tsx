@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
 import { authService } from './services/authService';
 import { systemService } from './services/systemService';
@@ -7,20 +7,31 @@ import { Login } from './pages/Login';
 import { RegisterRequest } from './pages/RegisterRequest';
 import ForgotPassword from './pages/ForgotPassword';
 import { Feed } from './pages/Feed';
-import PostDetails from './pages/PostDetails';
-import { Postos } from './pages/Postos';
-import { AdminMembers } from './pages/AdminMembers';
-import AdminModeration from './pages/AdminModeration';
-import { PostoDetails } from './pages/PostoDetails';
 
-import { Profile } from './pages/Profile';
-import { Notifications } from './pages/Notifications';
-import { Messages } from './pages/Messages';
+const PostDetails = lazy(() => import('./pages/PostDetails'));
+const Postos = lazy(() => import('./pages/Postos').then(m => ({ default: m.Postos })));
+const PostoDetails = lazy(() => import('./pages/PostoDetails').then(m => ({ default: m.PostoDetails })));
+const AdminMembers = lazy(() => import('./pages/AdminMembers').then(m => ({ default: m.AdminMembers })));
+const AdminModeration = lazy(() => import('./pages/AdminModeration'));
+const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
+const Notifications = lazy(() => import('./pages/Notifications').then(m => ({ default: m.Notifications })));
+const Messages = lazy(() => import('./pages/Messages').then(m => ({ default: m.Messages })));
 import { Home, Building2, Briefcase, Archive, MessageSquare } from 'lucide-react';
 import { Tour } from './components/Tour';
 import { ToastProvider } from './components/ui/Toast';
 import { UserProfile, AuthUser } from './types';
 import { usePresence } from './hooks/usePresence';
+
+function PageLoading() {
+  return (
+    <div className="h-screen w-full bg-ice font-sans flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 border-2 border-navy/20 border-t-navy rounded-full animate-spin" />
+        <p className="text-sm text-slate font-medium">Carregando...</p>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -92,6 +103,7 @@ export default function App() {
   return (
     <ToastProvider>
     <BrowserRouter>
+      <Suspense fallback={<PageLoading />}>
       <Routes>
         <Route path="/" element={user && profile ? <Navigate to="/feed" replace /> : <Navigate to="/login" replace />} />
         
@@ -118,6 +130,7 @@ export default function App() {
         </Route>
 
       </Routes>
+      </Suspense>
     </BrowserRouter>
     </ToastProvider>
   );
@@ -179,7 +192,7 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
         </aside>
 
         {/* Main scrollable content area */}
-        <section className="flex-1 p-16 overflow-y-auto bg-ice">
+        <section className="flex-1 p-4 sm:p-8 lg:p-16 overflow-y-auto bg-ice">
           <div className="flex flex-col mx-auto max-w-5xl gap-8">
             <Outlet />
           </div>

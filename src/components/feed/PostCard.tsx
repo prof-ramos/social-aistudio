@@ -13,7 +13,7 @@ interface PostCardProps {
   key?: React.Key;
 }
 
-export function PostCard({ post, profile, onToggleSaved }: PostCardProps) {
+function PostCardComponent({ post, profile, onToggleSaved }: PostCardProps) {
   const isSaved = profile.savedPosts?.includes(post.id);
 
   return (
@@ -64,3 +64,5 @@ export function PostCard({ post, profile, onToggleSaved }: PostCardProps) {
   </Card>
   );
 }
+
+export const PostCard = React.memo(PostCardComponent);

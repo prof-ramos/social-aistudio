@@ -63,6 +63,22 @@ export const userService = {
   },
 
   /**
+   * Get users filtered by common postos with a limit.
+   * Fetches a limited set and filters client-side for shared postos.
+   */
+  getUsersWithCommonPostos: async (excludeUserId: string, userPostos: string[], limitCount: number = 50): Promise<UserProfile[]> => {
+    const { collection, getDocs, query, limit } = await import('firebase/firestore');
+    const q = query(collection(db, USERS_COLLECTION), limit(limitCount));
+    const snapshot = await getDocs(q);
+    const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as UserProfile));
+    return users.filter(u => {
+      if (u.id === excludeUserId) return false;
+      const theirPostos = u.postos || [];
+      return theirPostos.some(p => userPostos.includes(p));
+    });
+  },
+
+  /**
    * Toggle saved post in user profile.
    */
   toggleSavedPost: async (userId: string, postId: string): Promise<void> => {

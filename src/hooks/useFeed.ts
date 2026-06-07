@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { postService } from '../services/postService';
 import { Post, UserProfile } from '../types';
 
@@ -30,13 +30,41 @@ export function useFeed(profile: UserProfile) {
     return () => unsub();
   }, [limitCount]);
 
-  const loadMore = () => {
+  const filteredPosts = useMemo(() => {
+    const filtered = posts.filter(post => {
+      const matchCategory = filterCategory === 'TODOS' || post.category === filterCategory;
+      const term = search.toLowerCase();
+      const matchSearch = !search || post.title?.toLowerCase().includes(term) || post.body?.toLowerCase().includes(term);
+      const matchAuthor = activeFilter === 'MEUS_POSTOS' ? post.authorId === profile.id : true;
+      return matchCategory && matchSearch && matchAuthor;
+    });
+
+    const sorted = [...filtered];
+    if (activeFilter === 'MAIS_COMENTADOS') {
+      sorted.sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        return (b.commentCount || 0) - (a.commentCount || 0);
+      });
+    } else {
+      sorted.sort((a, b) => {
+        if (a.pinned && !b.pinned) return -1;
+        if (!a.pinned && b.pinned) return 1;
+        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return timeB - timeA;
+      });
+    }
+    return sorted;
+  }, [posts, filterCategory, search, activeFilter, profile.id]);
+
+  const loadMore = useCallback(() => {
     if (hasMore) {
       setLimitCount(prev => prev + 10);
     }
-  };
+  }, [hasMore]);
 
-  const handleCreatePost = async (title: string, bodyHTML: string, category: string) => {
+  const handleCreatePost = useCallback(async (title: string, bodyHTML: string, category: string) => {
     setIsPosting(true);
     try {
       await postService.createPost(title, bodyHTML, category, profile);
@@ -46,32 +74,7 @@ export function useFeed(profile: UserProfile) {
     } finally {
       setIsPosting(false);
     }
-  };
-
-  const filteredPosts = posts.filter(post => {
-    const matchCategory = filterCategory === 'TODOS' || post.category === filterCategory;
-    const term = search.toLowerCase();
-    const matchSearch = !search || post.title?.toLowerCase().includes(term) || post.body?.toLowerCase().includes(term);
-    const matchAuthor = activeFilter === 'MEUS_POSTOS' ? post.authorId === profile.id : true;
-    return matchCategory && matchSearch && matchAuthor;
-  });
-
-  if (activeFilter === 'MAIS_COMENTADOS') {
-    filteredPosts.sort((a, b) => {
-      if (a.pinned && !b.pinned) return -1;
-      if (!a.pinned && b.pinned) return 1;
-      return (b.commentCount || 0) - (a.commentCount || 0);
-    });
-  } else {
-    // Rely on default insertion sort which is descending by date but keeps pinned at top
-    filteredPosts.sort((a, b) => {
-      if (a.pinned && !b.pinned) return -1;
-      if (!a.pinned && b.pinned) return 1;
-      const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-      const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
-      return timeB - timeA;
-    });
-  }
+  }, [profile]);
 
   return {
     filteredPosts,
