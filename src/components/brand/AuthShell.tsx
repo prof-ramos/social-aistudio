@@ -29,7 +29,7 @@ export function AuthShell({
             <p className="mb-6 font-sans text-[0.625rem] font-bold uppercase tracking-[0.32em] text-sky/80">
               Associação de Oficiais de Chancelaria
             </p>
-            <BrandLockup theme="dark" size="panel" showSocialBadge showTagline />
+            <BrandLockup theme="dark" size="panel" align="start" showSocialBadge showTagline />
           </div>
           <div className="relative z-10 space-y-4 auth-reveal auth-reveal--3">
             <p className="max-w-md font-serif text-lg leading-relaxed text-ice/90">

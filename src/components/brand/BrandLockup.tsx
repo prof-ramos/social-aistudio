@@ -5,6 +5,7 @@ type BrandLockupProps = {
   theme?: AsofLogoTheme;
   size?: 'hero' | 'panel' | 'compact';
   variant?: 'full' | 'wordmark';
+  align?: 'center' | 'start';
   showTagline?: boolean;
   showSocialBadge?: boolean;
   className?: string;
@@ -20,15 +21,28 @@ export function BrandLockup({
   theme = 'light',
   size = 'hero',
   variant = 'full',
+  align = 'center',
   showTagline = true,
   showSocialBadge = true,
   className,
 }: BrandLockupProps) {
+  const isStart = align === 'start';
+
   return (
-    <div className={cn('flex flex-col items-center text-center', className)}>
-      <AsofLogo variant={variant} theme={theme} className={cn('mx-auto', logoSizes[size])} />
+    <div
+      className={cn(
+        'flex flex-col',
+        isStart ? 'items-start text-left' : 'items-center text-center',
+        className,
+      )}
+    >
+      <AsofLogo
+        variant={variant}
+        theme={theme}
+        className={cn(!isStart && 'mx-auto', logoSizes[size])}
+      />
       {showSocialBadge && (
-        <div className="mt-5 flex items-center gap-3">
+        <div className={cn('mt-5 flex items-center gap-3', isStart && 'w-full max-w-xs')}>
           <span className="h-px w-10 bg-institutional-gold/70" aria-hidden="true" />
           <span className="font-sans text-[0.65rem] font-bold uppercase tracking-[0.28em] text-sky-dark">
             Social
@@ -37,7 +51,12 @@ export function BrandLockup({
         </div>
       )}
       {showTagline && (
-        <p className="mt-3 max-w-xs font-serif text-sm leading-relaxed text-slate/90">
+        <p
+          className={cn(
+            'mt-3 max-w-xs font-serif text-sm leading-relaxed text-slate/90',
+            isStart && 'max-w-sm',
+          )}
+        >
           Comunidade exclusiva dos associados da ASOF
         </p>
       )}

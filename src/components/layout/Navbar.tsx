@@ -303,9 +303,9 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
                  theme={isDarkMode ? 'dark' : 'light'}
                  variant="wordmark"
                  size="compact"
+                 align="start"
                  showTagline={false}
                  showSocialBadge={false}
-                 className="items-start text-left"
                />
                <button
                  onClick={() => setMobileMenuOpen(false)}

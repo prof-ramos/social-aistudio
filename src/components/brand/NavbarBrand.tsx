@@ -14,24 +14,20 @@ export function NavbarBrand({ isDarkMode, className }: NavbarBrandProps) {
     <Link
       to="/feed"
       className={cn(
-        'group relative flex shrink-0 items-center gap-3 border-l-2 border-institutional-gold pl-3',
+        'group relative flex shrink-0 items-center border-l-2 border-institutional-gold pl-3',
         className,
       )}
       aria-label="Social-ASOF - Ir para o feed"
     >
-      <AsofLogo
-        variant="wordmark"
-        theme={theme}
-        className="hidden h-11 w-[12.5rem] sm:block md:h-12 md:w-[13.5rem]"
-      />
-      <AsofLogo variant="mark" theme={theme} className="h-10 w-10 sm:hidden" />
-      <span className="hidden min-[1100px]:flex flex-col leading-none">
-        <span className="font-sans text-[0.55rem] font-bold uppercase tracking-[0.26em] text-sky-dark">
-          Social
-        </span>
-        <span className="mt-1 font-serif text-sm font-bold text-navy transition-colors group-hover:text-sky-dark">
-          ASOF
-        </span>
+      <span className="hidden sm:block">
+        <AsofLogo
+          variant="wordmark"
+          theme={theme}
+          className="h-11 w-[12.5rem] md:h-12 md:w-[13.5rem]"
+        />
+      </span>
+      <span className="sm:hidden">
+        <AsofLogo variant="mark" theme={theme} className="h-10 w-10" />
       </span>
     </Link>
   );
