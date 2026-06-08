@@ -3,9 +3,8 @@ import { Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { Card } from '../components/ui/Card';
 import { Alert } from '../components/ui/Alert';
-import { AsofLogo } from '../components/brand/AsofLogo';
+import { AuthShell } from '../components/brand/AuthShell';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -30,67 +29,59 @@ export default function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-ice py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <Card variant="elevated" padding="lg" className="max-w-md w-full">
-        <div className="text-center mb-8">
-          <AsofLogo variant="full" theme="light" className="h-14 w-full max-w-[16rem] mx-auto mb-3" />
-          <p className="font-serif text-xl font-bold text-navy">Social-ASOF</p>
-          <p className="text-slate mt-2 text-sm">Recuperação de Acesso</p>
-        </div>
-
-        {success ? (
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 bg-success/10 text-success rounded-full flex items-center justify-center mx-auto mb-4 border border-success/20">
-               <Mail className="w-8 h-8" />
-            </div>
-            <h2 className="text-lg font-bold text-navy">E-mail enviado!</h2>
-            <p className="text-slate text-sm">
-              Se houver uma conta associada ao e-mail informado, você receberá um link para redefinir sua senha em instantes.
-            </p>
-            <div className="pt-4 mt-6 border-t border-border-gray">
-              <Link to="/login" className="text-navy font-medium text-sm flex items-center justify-center gap-2 hover:text-sky transition-colors">
-                <ArrowLeft className="w-4 h-4" /> Voltar para o Login
-              </Link>
-            </div>
+    <AuthShell
+      title="Recuperação de acesso"
+      description="Informe seu e-mail cadastrado para receber as instruções."
+    >
+      {success ? (
+        <div className="text-center space-y-4">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-success/20 bg-success/10 text-success">
+            <Mail className="h-8 w-8" />
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <p className="text-slate text-sm mb-4">
-              Informe seu e-mail cadastrado. Enviaremos as instruções para você redefinir sua senha.
-            </p>
+          <h2 className="font-serif text-lg font-bold text-navy">E-mail enviado</h2>
+          <p className="text-sm text-slate">
+            Se houver uma conta associada ao e-mail informado, você receberá um link para redefinir sua senha em instantes.
+          </p>
+          <div className="border-t border-border-gray/80 pt-6">
+            <Link to="/login" className="inline-flex items-center justify-center gap-2 text-sm font-medium text-navy transition-colors hover:text-asof-blue">
+              <ArrowLeft className="h-4 w-4" /> Voltar para o login
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && <Alert variant="error">{error}</Alert>}
 
-            {error && (
-              <Alert variant="error">{error}</Alert>
-            )}
+          <div>
+            <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate">E-mail</label>
+            <input
+              id="email"
+              type="email"
+              required
+              className="w-full h-11 rounded-none border border-border-gray bg-white/80 px-3 text-slate transition-colors focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate mb-1">E-mail</label>
-              <input 
-                id="email"
-                type="email" 
-                required
-                className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-colors"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-              />
-            </div>
-            
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              fullWidth
-              isLoading={loading}
-              className="mt-2"
-            >
-              {loading ? 'Enviando...' : 'Enviar link de recuperação'}
-            </Button>
-            <div className="pt-4 mt-6 border-t border-border-gray text-center text-sm">
-               <Link to="/login" className="text-slate hover:text-navy transition-colors font-medium">Lembrei minha senha</Link>
-            </div>
-          </form>
-        )}
-      </Card>
-    </div>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            isLoading={loading}
+            className="mt-2"
+          >
+            {loading ? 'Enviando...' : 'Enviar link de recuperação'}
+          </Button>
+
+          <div className="border-t border-border-gray/80 pt-6 text-center text-sm">
+            <Link to="/login" className="font-medium text-slate transition-colors hover:text-navy">
+              Lembrei minha senha
+            </Link>
+          </div>
+        </form>
+      )}
+    </AuthShell>
   );
 }

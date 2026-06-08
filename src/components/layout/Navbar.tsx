@@ -6,8 +6,9 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { notificationService } from '../../services/notificationService';
 import { adminService } from '../../services/adminService';
 import { cn } from '../../lib/utils';
-import { AsofLogo } from '../brand/AsofLogo';
 import { useDarkMode } from '../../hooks/useDarkMode';
+import { NavbarBrand } from '../brand/NavbarBrand';
+import { BrandLockup } from '../brand/BrandLockup';
 
 export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdminView?: boolean }) {
   const navigate = useNavigate();
@@ -143,22 +144,11 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
       </a>
 
       <nav
-        className="h-16 bg-white border-b border-border-gray shadow-sm sticky top-0 z-50 bg-white/90 backdrop-blur-md px-6 md:px-8 flex items-center justify-between flex-none font-sans transition-all"
+        className="sticky top-0 z-50 flex h-16 flex-none items-center justify-between border-b border-border-gray bg-white/92 px-6 font-sans shadow-[0_1px_0_color-mix(in_srgb,var(--app-institutional-gold)_55%,transparent)] backdrop-blur-md transition-all md:px-8"
         aria-label="Navegação principal"
       >
-        <div className="flex items-center gap-8 xl:gap-12 w-full md:w-auto">
-          <Link to="/feed" className="flex items-center gap-2 shrink-0" aria-label="Social-ASOF - Ir para o feed">
-            <AsofLogo
-              variant="full"
-              theme={isDarkMode ? 'dark' : 'light'}
-              className="h-10 w-[10.5rem] hidden sm:block"
-            />
-            <AsofLogo
-              variant="mark"
-              theme={isDarkMode ? 'dark' : 'light'}
-              className="h-9 w-9 sm:hidden"
-            />
-          </Link>
+        <div className="flex w-full items-center gap-8 md:w-auto xl:gap-12">
+          <NavbarBrand isDarkMode={isDarkMode} />
           <div className="hidden md:flex gap-2 text-sm font-medium h-16">
             {navItems.map((item) => {
               const isActive = location.pathname.startsWith(item.to);
@@ -309,10 +299,12 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
             aria-label="Menu de navegação"
           >
             <div className="flex justify-between items-center mb-8 h-12 text-navy border-b border-border-gray pb-4">
-               <AsofLogo
-                 variant="full"
+               <BrandLockup
                  theme={isDarkMode ? 'dark' : 'light'}
-                 className="h-10 w-[10.5rem]"
+                 size="compact"
+                 showTagline={false}
+                 showSocialBadge
+                 className="items-start text-left"
                />
                <button
                  onClick={() => setMobileMenuOpen(false)}
