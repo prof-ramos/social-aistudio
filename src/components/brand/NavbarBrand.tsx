@@ -20,11 +20,11 @@ export function NavbarBrand({ isDarkMode, className }: NavbarBrandProps) {
       aria-label="Social-ASOF - Ir para o feed"
     >
       <AsofLogo
-        variant="full"
+        variant="wordmark"
         theme={theme}
-        className="hidden h-9 w-[9.5rem] sm:block lg:h-10 lg:w-[10.5rem]"
+        className="hidden h-11 w-[12.5rem] sm:block md:h-12 md:w-[13.5rem]"
       />
-      <AsofLogo variant="mark" theme={theme} className="h-9 w-9 sm:hidden" />
+      <AsofLogo variant="mark" theme={theme} className="h-10 w-10 sm:hidden" />
       <span className="hidden min-[1100px]:flex flex-col leading-none">
         <span className="font-sans text-[0.55rem] font-bold uppercase tracking-[0.26em] text-sky-dark">
           Social

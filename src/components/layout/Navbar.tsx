@@ -301,9 +301,10 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
             <div className="flex justify-between items-center mb-8 h-12 text-navy border-b border-border-gray pb-4">
                <BrandLockup
                  theme={isDarkMode ? 'dark' : 'light'}
+                 variant="wordmark"
                  size="compact"
                  showTagline={false}
-                 showSocialBadge
+                 showSocialBadge={false}
                  className="items-start text-left"
                />
                <button

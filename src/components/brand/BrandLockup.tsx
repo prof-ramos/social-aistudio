@@ -4,27 +4,29 @@ import { AsofLogo, AsofLogoTheme } from './AsofLogo';
 type BrandLockupProps = {
   theme?: AsofLogoTheme;
   size?: 'hero' | 'panel' | 'compact';
+  variant?: 'full' | 'wordmark';
   showTagline?: boolean;
   showSocialBadge?: boolean;
   className?: string;
 };
 
 const logoSizes = {
-  hero: 'h-[4.75rem] w-full max-w-[18rem]',
-  panel: 'h-[5.5rem] w-full max-w-[20rem]',
-  compact: 'h-10 w-[10.5rem]',
+  hero: 'h-32 w-full max-w-md sm:h-36',
+  panel: 'h-40 w-full max-w-lg xl:h-44',
+  compact: 'h-11 w-full max-w-[12.5rem]',
 };
 
 export function BrandLockup({
   theme = 'light',
   size = 'hero',
+  variant = 'full',
   showTagline = true,
   showSocialBadge = true,
   className,
 }: BrandLockupProps) {
   return (
     <div className={cn('flex flex-col items-center text-center', className)}>
-      <AsofLogo variant="full" theme={theme} className={cn('mx-auto', logoSizes[size])} />
+      <AsofLogo variant={variant} theme={theme} className={cn('mx-auto', logoSizes[size])} />
       {showSocialBadge && (
         <div className="mt-5 flex items-center gap-3">
           <span className="h-px w-10 bg-institutional-gold/70" aria-hidden="true" />

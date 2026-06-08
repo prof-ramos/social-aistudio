@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 import fullLogoSvg from '../../assets/brand/logo.svg?raw';
 import markLogoSvg from '../../assets/brand/favicon.svg?raw';
 
-export type AsofLogoVariant = 'full' | 'mark';
+export type AsofLogoVariant = 'full' | 'wordmark' | 'mark';
 export type AsofLogoTheme = 'light' | 'dark' | 'auto';
 
 type AsofLogoProps = {
@@ -21,14 +21,23 @@ function resolveTheme(theme: AsofLogoTheme): 'light' | 'dark' {
 
 function withTheme(svg: string, theme: 'light' | 'dark') {
   return svg.replace(/<svg\b([^>]*)>/, (_match, attrs: string) => {
-    const cleanedAttrs = attrs.replace(/\sdata-theme="(?:light|dark)"/, '');
-    return `<svg data-theme="${theme}"${cleanedAttrs}>`;
+    const cleanedAttrs = attrs
+      .replace(/\sdata-theme="(?:light|dark)"/, '')
+      .replace(/\srole="img"/, '')
+      .replace(/\saria-labelledby="[^"]*"/, '')
+      .replace(/\sfocusable="[^"]*"/, '');
+    return `<svg data-theme="${theme}" focusable="false"${cleanedAttrs}>`;
   });
 }
 
-const VARIANT_SVG: Record<AsofLogoVariant, string> = {
-  full: fullLogoSvg,
-  mark: markLogoSvg,
+function withViewBox(svg: string, viewBox: string) {
+  return svg.replace(/viewBox="[^"]*"/, `viewBox="${viewBox}"`);
+}
+
+const VARIANT_CONFIG: Record<AsofLogoVariant, { source: string; viewBox: string; aspect: string }> = {
+  full: { source: fullLogoSvg, viewBox: '0 0 508 304', aspect: 'aspect-[508/304]' },
+  wordmark: { source: fullLogoSvg, viewBox: '0 0 508 156', aspect: 'aspect-[508/156]' },
+  mark: { source: markLogoSvg, viewBox: '248 -2 156 159', aspect: 'aspect-square' },
 };
 
 export function AsofLogo({
@@ -39,10 +48,10 @@ export function AsofLogo({
 }: AsofLogoProps) {
   const containerRef = useRef<HTMLSpanElement>(null);
   const resolvedTheme = resolveTheme(theme);
-  const svgMarkup = useMemo(
-    () => withTheme(VARIANT_SVG[variant], resolvedTheme),
-    [variant, resolvedTheme],
-  );
+  const svgMarkup = useMemo(() => {
+    const config = VARIANT_CONFIG[variant];
+    return withTheme(withViewBox(config.source, config.viewBox), resolvedTheme);
+  }, [variant, resolvedTheme]);
 
   useEffect(() => {
     const svg = containerRef.current?.querySelector('svg');
@@ -54,7 +63,7 @@ export function AsofLogo({
       ref={containerRef}
       className={cn(
         'inline-flex shrink-0 items-center [&>svg]:h-full [&>svg]:w-full',
-        variant === 'full' ? 'aspect-[508/304]' : 'aspect-square',
+        VARIANT_CONFIG[variant].aspect,
         className,
       )}
       role="img"

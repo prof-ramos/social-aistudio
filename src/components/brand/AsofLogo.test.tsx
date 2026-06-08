@@ -11,4 +11,9 @@ describe('AsofLogo', () => {
     const { container } = render(<AsofLogo theme="dark" variant="mark" />);
     expect(container.querySelector('svg[data-theme="dark"]')).toBeTruthy();
   });
+
+  it('crops wordmark variant to the upper brand block', () => {
+    const { container } = render(<AsofLogo theme="light" variant="wordmark" />);
+    expect(container.querySelector('svg')?.getAttribute('viewBox')).toBe('0 0 508 156');
+  });
 });
