@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Search, MapPin } from 'lucide-react';
 import { usePostos } from '../hooks/usePostos';
 import { Card, PageTitle } from '../components/ui';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function Postos() {
   const {
@@ -14,7 +15,7 @@ export function Postos() {
   } = usePostos();
 
   return (
-    <div className="flex flex-col h-full max-w-5xl mx-auto space-y-6">
+    <PageContainer variant="feed" className="flex h-full flex-col space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <PageTitle className="mb-2">Guia de Postos</PageTitle>
@@ -29,7 +30,7 @@ export function Postos() {
                id="search-postos"
                type="text"
                placeholder="Buscar por nome, país ou região..."
-               className="w-full h-12 border border-border-gray bg-white pl-10 pr-4 text-slate text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all placeholder:text-slate/50"
+               className="w-full h-12 border border-border-gray bg-white pl-10 pr-4 text-slate text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all placeholder:text-slate/70"
                value={search}
                onChange={e => setSearch(e.target.value)}
              />
@@ -79,6 +80,6 @@ export function Postos() {
            <p className="text-sm opacity-80">Não encontramos resultados para "{search}". Tente buscar por outro termo.</p>
          </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

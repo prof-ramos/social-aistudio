@@ -4,13 +4,14 @@ import { useAdminMembers } from '../hooks/useAdminMembers';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { Button } from '../components/ui/Button';
 import { useConfirm } from '../hooks/useConfirm.tsx';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function AdminMembers() {
   const { requests, handleApprove, handleReject } = useAdminMembers();
   const { confirm, dialog } = useConfirm();
 
   return (
-    <div>
+    <PageContainer variant="feed" className="space-y-8">
       <Breadcrumb items={[{ label: 'Início', href: '/feed' }, { label: 'Admin', href: '/admin' }, { label: 'Membros' }]} />
       <h1 className="font-serif text-3xl font-bold text-navy mb-8">Painel Admin: Membros</h1>
       
@@ -112,6 +113,6 @@ export function AdminMembers() {
         </div>
       </div>
       {dialog}
-    </div>
+    </PageContainer>
   );
 }

@@ -33,7 +33,7 @@ function PostCardComponent({ post, profile, onToggleSaved }: PostCardProps) {
              {post.authorName || 'Usuário'} <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador'}</span>
            </h3>
            <div className="flex items-center">
-             <p className="text-[10px] uppercase text-slate/50 font-bold tracking-wider mt-0.5">#{post.category}</p>
+             <p className="text-[10px] uppercase text-slate/70 font-bold tracking-wider mt-0.5">#{post.category}</p>
            </div>
          </div>
          <Button
@@ -57,7 +57,7 @@ function PostCardComponent({ post, profile, onToggleSaved }: PostCardProps) {
 
      <div className="flex gap-4 border-t border-border-gray/50 pt-4">
        <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
-       <Link to={`/feed/${post.id}#comment`} className="text-xs font-bold text-slate/50 flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
+       <Link to={`/feed/${post.id}#comment`} className="text-xs font-bold text-slate/70 flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
          <MessageSquare className="w-4 h-4" strokeWidth={1.5} /> RESPONDER
        </Link>
      </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Users, ShieldAlert, ChevronRight } from 'lucide-react';
 import { Card, PageTitle, StatusBadge } from '../components/ui';
+import { PageContainer } from '../components/layout/PageContainer';
 import { useAdminMembers } from '../hooks/useAdminMembers';
 import { useAdminModeration } from '../hooks/useAdminModeration';
 
@@ -13,7 +14,7 @@ export default function AdminHub() {
   const reportCount = pendingReports.length;
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-12 w-full">
+    <PageContainer variant="feed" className="space-y-8 pb-12">
       <div>
         <PageTitle as="h1" size="xl">Painel Administrativo</PageTitle>
         <p className="text-slate">Gerencie membros e modere conteúdo da plataforma.</p>
@@ -62,6 +63,6 @@ export default function AdminHub() {
           </Card>
         </Link>
       </div>
-    </div>
+    </PageContainer>
   );
 }

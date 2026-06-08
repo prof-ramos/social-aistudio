@@ -1,5 +1,6 @@
 import { useEffect, useState, Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, Link, useLocation } from 'react-router-dom';
+import { cn } from './lib/utils';
 import { authService } from './services/authService';
 import { systemService } from './services/systemService';
 import { Navbar } from './components/layout/Navbar';
@@ -67,7 +68,7 @@ function AppRoutes() {
             </div>
           </aside>
           <section id="main-content" className="flex-1 p-4 sm:p-8 lg:p-16 overflow-y-auto bg-ice">
-            <div className="max-w-5xl mx-auto space-y-8">
+            <div className="mx-auto w-full max-w-[var(--page-max-width-feed)] space-y-8">
               <div className="w-48 h-8 bg-slate/10 animate-pulse" />
               <div className="w-full h-40 bg-white border border-border-gray shadow-sm animate-pulse" />
               <div className="space-y-4">
@@ -133,6 +134,8 @@ export default function App() {
 
 function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: boolean }) {
   usePresence(profile);
+  const { pathname } = useLocation();
+  const isMessagesRoute = pathname === '/mensagens';
 
   return (
     <div className="h-dvh min-h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
@@ -142,7 +145,7 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
         {/* Sidebar */}
         <aside className="w-64 bg-white border-r border-border-gray text-navy hidden md:flex flex-col py-8 px-6 flex-none z-10 shadow-sm relative">
           <div className="mb-8 tour-sidebar-nav">
-            <p className="text-[10px] uppercase font-bold tracking-widest text-slate/50 mb-4 px-4">Navegação</p>
+            <p className="text-[10px] uppercase font-bold tracking-widest text-slate/70 mb-4 px-4">Navegação</p>
             <ul className="space-y-1 text-sm font-medium">
               <li>
                 <Link to="/feed" className="flex items-center gap-3 bg-ice text-navy py-3 px-4 rounded-none hover:bg-border-gray/30 transition-colors">
@@ -187,8 +190,20 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
         </aside>
 
         {/* Main scrollable content area */}
-        <section className="flex-1 min-h-0 p-4 sm:p-8 lg:p-16 overflow-y-auto overflow-x-clip bg-ice">
-          <div className="flex flex-col mx-auto max-w-5xl min-w-0 gap-8">
+        <section
+          className={cn(
+            'flex min-h-0 flex-1 flex-col bg-ice',
+            isMessagesRoute
+              ? 'overflow-hidden p-0'
+              : 'overflow-y-auto overflow-x-clip p-4 sm:p-8 lg:p-16',
+          )}
+        >
+          <div
+            className={cn(
+              'flex w-full min-w-0 flex-col',
+              isMessagesRoute ? 'min-h-0 flex-1' : 'gap-8',
+            )}
+          >
             <Outlet />
           </div>
         </section>

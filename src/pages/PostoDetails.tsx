@@ -4,6 +4,7 @@ import { UserProfile } from '../types';
 import { ChevronLeft, Plus, AlertTriangle } from 'lucide-react';
 import { usePostoDetails } from '../hooks/usePostoDetails';
 import { Card, PageTitle, Button, Alert } from '../components/ui';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function PostoDetails({ profile }: { profile: UserProfile }) {
   const { slug } = useParams();
@@ -23,7 +24,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto animate-pulse">
+      <PageContainer variant="detail" className="animate-pulse">
         <div className="w-40 h-5 bg-slate/10 mb-6" />
         <Card variant="elevated" padding="lg" className="mb-8">
           <div className="w-64 h-10 bg-slate/10 mb-3" />
@@ -42,13 +43,13 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
             </Card>
           ))}
         </div>
-      </div>
+      </PageContainer>
     );
   }
-  if (!posto) return <div className="py-12 text-center text-slate">Posto não encontrado.</div>;
+  if (!posto) return <PageContainer variant="detail" className="py-12 text-center text-slate">Posto não encontrado.</PageContainer>;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <PageContainer variant="detail">
       <Link to="/postos" className="inline-flex items-center gap-2 text-navy hover:underline font-medium mb-6">
         <ChevronLeft className="w-4 h-4" /> Voltar para Postos
       </Link>
@@ -130,6 +131,6 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
           ))
         )}
       </div>
-    </div>
+    </PageContainer>
   );
 }

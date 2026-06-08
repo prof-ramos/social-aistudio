@@ -33,11 +33,11 @@ export function LeftSidebar({ profile }: LeftSidebarProps) {
           
           <div className="mt-6 pt-4 border-t border-border-gray/50 flex gap-4 text-center w-full">
             <div className="flex-1">
-              <p className="text-[10px] uppercase font-bold text-slate/50">Posts</p>
+              <p className="text-[10px] uppercase font-bold text-slate/70">Posts</p>
               <p className="font-serif text-lg text-navy">12</p>
             </div>
             <div className="flex-1 border-l border-border-gray/50">
-              <p className="text-[10px] uppercase font-bold text-slate/50">Salvos</p>
+              <p className="text-[10px] uppercase font-bold text-slate/70">Salvos</p>
               <p className="font-serif text-lg text-navy">{profile.savedPosts?.length || 0}</p>
             </div>
           </div>
@@ -47,15 +47,15 @@ export function LeftSidebar({ profile }: LeftSidebarProps) {
       {/* Quick Links */}
       <div className="bg-white border border-border-gray shadow-sm font-sans">
         <Link to={`/perfil/${profile.id}#posts`} className="flex items-center gap-3 p-4 border-b border-border-gray/50 hover:bg-ice transition-colors text-sm font-medium text-slate hover:text-navy">
-          <FileEdit className="w-4 h-4 text-slate/50" strokeWidth={1.5} />
+          <FileEdit className="w-4 h-4 text-slate/70" strokeWidth={1.5} />
           Minhas Publicações
         </Link>
         <Link to={`/perfil/${profile.id}#salvos`} className="flex items-center gap-3 p-4 border-b border-border-gray/50 hover:bg-ice transition-colors text-sm font-medium text-slate hover:text-navy">
-          <Bookmark className="w-4 h-4 text-slate/50" strokeWidth={1.5} />
+          <Bookmark className="w-4 h-4 text-slate/70" strokeWidth={1.5} />
           Itens Salvos
         </Link>
         <Link to="/postos" className="flex items-center gap-3 p-4 hover:bg-ice transition-colors text-sm font-medium text-slate hover:text-navy">
-          <Compass className="w-4 h-4 text-slate/50" strokeWidth={1.5} />
+          <Compass className="w-4 h-4 text-slate/70" strokeWidth={1.5} />
           Explorar Postos
         </Link>
       </div>

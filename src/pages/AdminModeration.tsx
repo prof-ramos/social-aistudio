@@ -6,6 +6,7 @@ import { Card } from '../components/ui/Card';
 import { PageTitle } from '../components/ui/PageTitle';
 import { Button } from '../components/ui/Button';
 import { StatusBadge } from '../components/ui/StatusBadge';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export default function AdminModeration() {
   const {
@@ -23,7 +24,7 @@ export default function AdminModeration() {
 
   if (loading) {
     return (
-      <div className="max-w-5xl mx-auto space-y-8 pb-12 w-full animate-pulse">
+      <PageContainer variant="feed" className="animate-pulse space-y-8 pb-12">
         <div>
           <div className="w-48 h-8 bg-slate/10 mb-3" />
           <div className="w-96 h-5 bg-slate/10" />
@@ -36,12 +37,12 @@ export default function AdminModeration() {
             ))}
           </div>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8 pb-12 w-full">
+    <PageContainer variant="feed" className="space-y-8 pb-12">
       <Breadcrumb items={[{ label: 'Início', href: '/feed' }, { label: 'Admin', href: '/admin' }, { label: 'Moderação' }]} />
       <div>
         <PageTitle as="h1" size="xl">Moderação</PageTitle>
@@ -160,6 +161,6 @@ export default function AdminModeration() {
           </Card>
         </div>
       )}
-    </div>
+    </PageContainer>
   );
 }

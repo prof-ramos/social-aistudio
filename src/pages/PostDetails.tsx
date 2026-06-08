@@ -6,6 +6,7 @@ import { usePostDetails } from '../hooks/usePostDetails';
 import { ReactionButtons } from '../components/feed/ReactionButtons';
 import { userService } from '../services/userService';
 import { Card, PageTitle, Button, Alert, Breadcrumb } from '../components/ui';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export default function PostDetails({ profile }: { profile: UserProfile }) {
   const { id } = useParams();
@@ -51,7 +52,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto space-y-8 pb-12 w-full animate-pulse">
+      <PageContainer variant="detail" className="animate-pulse space-y-8 pb-12">
         <div className="w-24 h-6 bg-slate/10" />
         <Card variant="elevated" padding="lg">
           <div className="flex gap-4 mb-6">
@@ -68,13 +69,13 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
             <div className="w-5/6 h-4 bg-slate/10" />
           </div>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
   if (!post) return (
-    <div className="max-w-4xl mx-auto pb-12 w-full">
+    <PageContainer variant="detail" className="pb-12">
       <Alert variant="info">Publicação não encontrada.</Alert>
-    </div>
+    </PageContainer>
   );
 
   const breadcrumbItems = [
@@ -84,7 +85,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 pb-12 w-full">
+    <PageContainer variant="detail" className="space-y-8 pb-12">
       <Breadcrumb items={breadcrumbItems} />
 
       <Link
@@ -105,7 +106,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                 <Link to={`/perfil/${post.authorId}`} className="hover:text-sky transition-colors">{post.authorName || 'Usuário'}</Link>
                 <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
               </h3>
-              <p className="text-[10px] uppercase text-slate/50 font-medium">Postado em #{post.category}</p>
+              <p className="text-[10px] uppercase text-slate/70 font-medium">Postado em #{post.category}</p>
             </div>
             {profile.id !== post.authorId && (
               <Button
@@ -113,7 +114,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                 size="sm"
                 onClick={() => navigate('/mensagens', { state: { targetUserId: post.authorId, targetUserName: post.authorName } })}
                 title="Mandar Mensagem Direta"
-                className="text-xs font-semibold text-slate/50 hover:text-navy"
+                className="text-xs font-semibold text-slate/70 hover:text-navy"
               >
                 <MessageSquare className="w-4 h-4" /> MENSAGEM
               </Button>
@@ -197,7 +198,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                        setNewCommentBody(prev => prev ? `${prev}\n@${c.authorName} ` : `@${c.authorName} `);
                        document.getElementById('comment-body')?.focus();
                      }}
-                     className="text-[10px] font-bold text-slate/50 hover:text-navy min-h-[44px]"
+                     className="text-[10px] font-bold text-slate/70 hover:text-navy min-h-[44px]"
                    >
                      <MessageSquare className="w-3 h-3" /> RESPONDER
                    </Button>
@@ -224,6 +225,6 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

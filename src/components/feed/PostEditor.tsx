@@ -256,7 +256,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
           </Button>
         </div>
       </div>
-      <p className="text-[10px] text-slate/50 mt-4 font-medium uppercase tracking-wider text-right">
+      <p className="text-[10px] text-slate/70 mt-4 font-medium uppercase tracking-wider text-right">
         Rascunho salvo automaticamente
       </p>
     </form>

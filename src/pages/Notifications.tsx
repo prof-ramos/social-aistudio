@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Bell, Check, Info } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
 import { Button, Card, PageTitle } from '../components/ui';
+import { PageContainer } from '../components/layout/PageContainer';
 
 function isExternalLink(url: string): boolean {
   return url.startsWith('http://') || url.startsWith('https://');
@@ -12,7 +13,7 @@ export function Notifications({ profile }: { profile: UserProfile }) {
   const { notifications, markAsRead, markAllAsRead } = useNotifications(profile.id);
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 w-full">
+    <PageContainer variant="narrow" className="space-y-6">
       <div className="flex items-end justify-between mb-8">
         <PageTitle>Notificações</PageTitle>
         <Button
@@ -67,6 +68,6 @@ export function Notifications({ profile }: { profile: UserProfile }) {
           </div>
         )}
       </Card>
-    </div>
+    </PageContainer>
   );
 }

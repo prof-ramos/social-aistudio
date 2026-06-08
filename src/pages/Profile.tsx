@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { Camera, Save, MapPin, BookOpen, MessageSquare, Bookmark, X, Star } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
 import { Card, PageTitle, Button, Alert, StatusBadge, Breadcrumb } from '../components/ui';
+import { PageContainer } from '../components/layout/PageContainer';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export function Profile({ profile }: { profile: UserProfile }) {
   const { id } = useParams();
   const navigate = useNavigate();
+  const editDialogRef = useRef<HTMLDivElement>(null);
   const {
     user,
     loading,
@@ -31,9 +34,11 @@ export function Profile({ profile }: { profile: UserProfile }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isEditing, setIsEditing]);
 
+  useFocusTrap(editDialogRef, isEditing);
+
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto space-y-6 w-full animate-pulse">
+      <PageContainer variant="narrow" className="animate-pulse space-y-6">
         <div className="w-64 h-10 bg-slate/10 mb-2" />
         <Card variant="elevated" padding="lg">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
@@ -56,20 +61,20 @@ export function Profile({ profile }: { profile: UserProfile }) {
             </div>
           </div>
         </Card>
-      </div>
+      </PageContainer>
     );
   }
   if (!user) return (
-    <div className="max-w-3xl mx-auto w-full">
+    <PageContainer variant="narrow">
       <Alert variant="info">Usuário não encontrado.</Alert>
-    </div>
+    </PageContainer>
   );
 
   const roleLabel = user.role === 'MEMBRO_ATIVO' ? 'Membro Ativo' : user.role === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador';
   const roleStatus: 'success' | 'neutral' | 'info' = user.role === 'MEMBRO_ATIVO' ? 'success' : user.role === 'MEMBRO_APOSENTADO' ? 'neutral' : 'info';
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 w-full">
+    <PageContainer variant="narrow" className="space-y-6">
       <Breadcrumb items={[{ label: 'Início', href: '/feed' }, { label: 'Perfil' }]} />
       <div className="flex items-end justify-between mb-2">
         <PageTitle as="h1" size="xl">Perfil do Usuário</PageTitle>
@@ -165,10 +170,11 @@ export function Profile({ profile }: { profile: UserProfile }) {
       {isEditing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4">
           <div
+            ref={editDialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-profile-title"
-            className="bg-white w-full max-w-xl mx-auto shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            className="mx-auto flex max-h-[90dvh] w-full max-w-xl flex-col overflow-hidden bg-white shadow-2xl"
           >
             <div className="flex items-center justify-between p-6 border-b border-border-gray/50 bg-ice/30">
               <PageTitle as="h2" size="lg" id="edit-profile-title">Editar Perfil</PageTitle>
@@ -273,6 +279,6 @@ export function Profile({ profile }: { profile: UserProfile }) {
           )}
         </Card>
       )}
-    </div>
+    </PageContainer>
   );
 }

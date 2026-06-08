@@ -7,6 +7,7 @@ import { notificationService } from '../../services/notificationService';
 import { adminService } from '../../services/adminService';
 import { cn } from '../../lib/utils';
 import { useDarkMode } from '../../hooks/useDarkMode';
+import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { NavbarBrand } from '../brand/NavbarBrand';
 import { BrandLockup } from '../brand/BrandLockup';
 
@@ -76,45 +77,23 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     return () => document.removeEventListener('keydown', handleEscape);
   }, [showLogoutDialog]);
 
+  useFocusTrap(mobileMenuRef, mobileMenuOpen);
+  useFocusTrap(logoutDialogRef, showLogoutDialog);
+
   // Body scroll lock for mobile menu
   useEffect(() => {
     if (mobileMenuOpen) {
       document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
     } else {
       document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
     }
     return () => {
       document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
     };
   }, [mobileMenuOpen]);
-
-  // Focus trap for logout dialog
-  useEffect(() => {
-    if (showLogoutDialog && logoutDialogRef.current) {
-      const focusableElements = logoutDialogRef.current.querySelectorAll(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      );
-      const firstElement = focusableElements[0] as HTMLElement;
-      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-      function handleTabTrap(event: KeyboardEvent) {
-        if (event.key !== 'Tab') return;
-        if (event.shiftKey && document.activeElement === firstElement) {
-          event.preventDefault();
-          lastElement.focus();
-        } else if (!event.shiftKey && document.activeElement === lastElement) {
-          event.preventDefault();
-          firstElement.focus();
-        }
-      }
-
-      firstElement?.focus();
-      logoutDialogRef.current.addEventListener('keydown', handleTabTrap);
-      return () => {
-        logoutDialogRef.current?.removeEventListener('keydown', handleTabTrap);
-      };
-    }
-  }, [showLogoutDialog]);
 
   const handleLogoutClick = () => {
     setShowLogoutDialog(true);
@@ -175,7 +154,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         <div className="hidden md:flex flex-1 max-w-md mx-6">
           <div className="relative w-full">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-slate/50" strokeWidth={1.5} aria-hidden="true" />
+              <Search className="h-4 w-4 text-slate/70" strokeWidth={1.5} aria-hidden="true" />
             </div>
             <input
               type="text"

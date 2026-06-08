@@ -10,6 +10,7 @@ import { LeftSidebar } from '../components/feed/LeftSidebar';
 import { MemberSuggestionsCard } from '../components/feed/MemberSuggestionsCard';
 import { Button } from '../components/ui/Button';
 import { PageTitle } from '../components/ui/PageTitle';
+import { PageContainer } from '../components/layout/PageContainer';
 import { useFeed, FeedFilter } from '../hooks/useFeed';
 import { userService } from '../services/userService';
 
@@ -68,7 +69,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <PageContainer variant="feed" className="flex flex-col gap-8">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <PageTitle className="text-2xl sm:text-4xl">Feed da Comunidade</PageTitle>
         <Button
@@ -170,6 +171,6 @@ export function Feed({ profile }: { profile: UserProfile }) {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

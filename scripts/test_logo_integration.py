@@ -88,9 +88,10 @@ with sync_playwright() as playwright:
     favicon_response = page.request.get(f"{BASE_URL}/favicon.svg")
     assert_true(logo_response.ok, "logo.svg should be served from /public")
     assert_true(favicon_response.ok, "favicon.svg should be served from /public")
+    logo_text = logo_response.text()
     assert_true(
-        "asof-logo" in logo_response.text(),
-        "Public logo asset should contain thematic SVG markup",
+        "Logo da ASOF" in logo_text or "asof-logo" in logo_text,
+        "Public logo asset should contain institutional SVG markup",
     )
 
     print("PASS: logo integration checks")
