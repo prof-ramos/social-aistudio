@@ -4,14 +4,16 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 const url = process.env.VITE_SUPABASE_URL;
-const key = process.env.VITE_SUPABASE_ANON_KEY;
+const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!url || !key) {
-  console.error('Missing env vars');
+if (!url || !serviceRoleKey) {
+  console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY in .env.local');
   process.exit(1);
 }
 
-const supabase = createClient(url, key);
+const supabase = createClient(url, serviceRoleKey, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
 
 async function setupAdmin() {
   const email = process.env.ADMIN_EMAIL;

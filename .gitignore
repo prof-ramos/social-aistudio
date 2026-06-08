@@ -9,8 +9,11 @@ coverage/
 
 .claude/
 .omc/
-
+.omo/
 
 # Lighthouse
 .lighthouseci/
 lighthouse-reports/
+
+# Supabase local
+supabase/.temp/
