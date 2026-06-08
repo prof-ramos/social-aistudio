@@ -10,7 +10,6 @@ interface PostCardProps {
   post: Post;
   profile: UserProfile;
   onToggleSaved: (postId: string) => void;
-  key?: React.Key;
 }
 
 function PostCardComponent({ post, profile, onToggleSaved }: PostCardProps) {

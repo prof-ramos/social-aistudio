@@ -1,73 +1,144 @@
-import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc, limit } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import { ChatSession, ChatMessage } from '../types';
-
-const CHATS_COLLECTION = 'chats';
 
 export const chatService = {
   subscribeToUserChats: (userId: string, onUpdate: (chats: ChatSession[]) => void) => {
-    const q = query(
-      collection(db, CHATS_COLLECTION),
-      where('participants', 'array-contains', userId),
-      orderBy('updatedAt', 'desc')
-    );
-    
-    return onSnapshot(q, (snap) => {
-      const chats = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatSession));
+    const fetchChats = async () => {
+      const { data, error } = await supabase
+        .from('chat_participants')
+        .select('chat_id, chat_sessions(*)')
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error('Error fetching user chats:', error);
+        return;
+      }
+
+      const chats = (data || []).map(row => {
+        const session = row.chat_sessions as any;
+        return {
+          id: session.id,
+          participants: session.participants || [],
+          participantNames: session.participant_names || {},
+          updatedAt: session.updated_at,
+          lastMessage: session.last_message,
+          unreadCount: session.unread_count,
+        } as ChatSession;
+      });
+
       onUpdate(chats);
-    }, (err) => console.error('Error fetching user chats:', err));
+    };
+
+    fetchChats();
+
+    const channel = supabase
+      .channel(`chat_participants_${userId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'chat_participants', filter: 'user_id=eq.' + userId },
+        () => fetchChats()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   },
 
   subscribeToChatMessages: (chatId: string, onUpdate: (messages: ChatMessage[]) => void) => {
-    const q = query(
-      collection(db, CHATS_COLLECTION, chatId, 'messages'),
-      orderBy('createdAt', 'asc'),
-      limit(50)
-    );
-    
-    return onSnapshot(q, (snap) => {
-      onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ChatMessage)));
-    }, (err) => console.error('Error fetching chat messages:', err));
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('chat_id', chatId)
+        .order('created_at', { ascending: true })
+        .limit(50);
+
+      if (error) {
+        console.error('Error fetching chat messages:', error);
+        return;
+      }
+
+      const messages = (data || []).map(row => ({
+        id: row.id,
+        senderId: row.sender_id,
+        body: row.body,
+        createdAt: row.created_at,
+        read: row.read,
+      } as ChatMessage));
+
+      onUpdate(messages);
+    };
+
+    fetchMessages();
+
+    const channel = supabase
+      .channel(`chat_messages_${chatId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'chat_messages', filter: 'chat_id=eq.' + chatId },
+        () => fetchMessages()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   },
 
   getOrCreateChat: async (userId1: string, userId2: string, name1: string, name2: string) => {
-    const sortedIds = [userId1, userId2].sort();
-    const chatId = `${sortedIds[0]}_${sortedIds[1]}`;
-    
-    const chatRef = doc(db, CHATS_COLLECTION, chatId);
-    const chatSnap = await getDoc(chatRef);
-    
-    if (!chatSnap.exists()) {
-      await setDoc(chatRef, {
-        participants: sortedIds,
-        participantNames: {
-          [userId1]: name1,
-          [userId2]: name2
-        },
-        updatedAt: serverTimestamp(),
-      });
+    const { data, error } = await supabase.rpc('get_or_create_chat', {
+      user1_id: userId1,
+      user2_id: userId2,
+    });
+
+    if (error) {
+      console.error('Error in get_or_create_chat RPC:', error);
+      throw error;
     }
-    
-    return chatId;
+
+    return data as string;
   },
 
   sendMessage: async (chatId: string, senderId: string, body: string) => {
-    await addDoc(collection(db, CHATS_COLLECTION, chatId, 'messages'), {
-      senderId,
-      body,
-      createdAt: serverTimestamp(),
-      read: false
-    });
-    
-    await updateDoc(doc(db, CHATS_COLLECTION, chatId), {
-      updatedAt: serverTimestamp(),
-      lastMessage: body
-    });
+    const { error: msgError } = await supabase
+      .from('chat_messages')
+      .insert({
+        chat_id: chatId,
+        sender_id: senderId,
+        body,
+        read: false,
+      });
+
+    if (msgError) {
+      console.error('Error sending message:', msgError);
+      throw msgError;
+    }
+
+    const { error: updateError } = await supabase
+      .from('chat_sessions')
+      .update({
+        updated_at: new Date().toISOString(),
+        last_message: body,
+      })
+      .eq('id', chatId);
+
+    if (updateError) {
+      console.error('Error updating chat session:', updateError);
+      throw updateError;
+    }
   },
 
   markMessagesAsRead: async (chatId: string, userId: string) => {
-    // Basic read placeholder - true robust implementation would use a batch
-    // but just checking the collection simplifies it for now.
-    // Assuming updating the session unreadCount or just letting the observer handle it
+    const { error } = await supabase
+      .from('chat_messages')
+      .update({ read: true })
+      .eq('chat_id', chatId)
+      .neq('sender_id', userId);
+
+    if (error) {
+      console.error('Error marking messages as read:', error);
+      throw error;
+    }
   }
 };

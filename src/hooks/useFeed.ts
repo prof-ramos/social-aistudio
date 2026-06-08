@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { postService } from '../services/postService';
 import { Post, UserProfile } from '../types';
-import { QueryDocumentSnapshot } from 'firebase/firestore';
 
 export type FeedFilter = 'RECENTES' | 'MAIS_COMENTADOS' | 'MEUS_POSTOS';
 const PAGE_SIZE = 10;
@@ -16,7 +15,7 @@ export function useFeed(profile: UserProfile) {
   const [activeFilter, setActiveFilter] = useState<FeedFilter>('RECENTES');
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const lastDocRef = useRef<QueryDocumentSnapshot | null>(null);
+  const lastCreatedAtRef = useRef<string | null>(null);
 
   // Real-time subscription for the most recent PAGE_SIZE posts
   useEffect(() => {
@@ -61,8 +60,8 @@ export function useFeed(profile: UserProfile) {
       sorted.sort((a, b) => {
         if (a.pinned && !b.pinned) return -1;
         if (!a.pinned && b.pinned) return 1;
-        const timeA = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
-        const timeB = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
         return timeB - timeA;
       });
     }
@@ -73,10 +72,10 @@ export function useFeed(profile: UserProfile) {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     try {
-      const { posts: newPosts, lastDoc } = await postService.fetchMorePosts(lastDocRef.current, PAGE_SIZE);
+      const { posts: newPosts, lastCreatedAt } = await postService.fetchMorePosts(lastCreatedAtRef.current, PAGE_SIZE);
       if (newPosts.length > 0) {
         setOlderPosts(prev => [...prev, ...newPosts]);
-        lastDocRef.current = lastDoc;
+        lastCreatedAtRef.current = lastCreatedAt;
       }
       if (newPosts.length < PAGE_SIZE) {
         setHasMore(false);

@@ -1,12 +1,10 @@
-import { doc, getDocFromServer } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 
 export const systemService = {
-  checkConnection: () => {
-    getDocFromServer(doc(db, 'test', 'connection')).catch(e => {
-      if (e instanceof Error && e.message.includes('the client is offline')) {
-        console.error("Please check your Firebase configuration.");
-      }
-    });
+  checkConnection: async () => {
+    const { error } = await supabase.from('users').select('id', { count: 'exact', head: true });
+    if (error) {
+      console.error('Supabase connection check failed:', error.message);
+    }
   }
 };

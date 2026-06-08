@@ -1,66 +1,156 @@
-import { collection, query, onSnapshot, orderBy, where, getDocs, addDoc, serverTimestamp, limit } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { supabase } from '../lib/supabase';
 import { UserProfile } from '../types';
 
-const POSTOS_COLLECTION = 'postos';
-const REVIEWS_COLLECTION = 'reviews';
+const POSTOS_TABLE = 'postos';
+const REVIEWS_TABLE = 'reviews';
+const POSTO_FIELDS_TABLE = 'posto_fields';
 
 export const postoService = {
   subscribeToPostos: (onUpdate: (postos: any[]) => void) => {
-    return onSnapshot(query(collection(db, POSTOS_COLLECTION), orderBy('name')), (snap) => {
-      onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data()})));
-    }, (error) => {
-      console.error("Error fetching postos:", error);
-    });
+    const fetchPostos = async () => {
+      const { data, error } = await supabase
+        .from(POSTOS_TABLE)
+        .select('*')
+        .order('name');
+
+      if (error) {
+        console.error('Error fetching postos:', error);
+        return;
+      }
+
+      onUpdate(data ?? []);
+    };
+
+    fetchPostos();
+
+    const channel = supabase
+      .channel('postos-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: POSTOS_TABLE },
+        () => {
+          fetchPostos();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   },
 
   subscribeToPostoReviews: (postoId: string, onUpdate: (reviews: any[]) => void) => {
-    return onSnapshot(query(collection(db, REVIEWS_COLLECTION), where('postoId', '==', postoId), limit(50)), (snap) => {
-      onUpdate(snap.docs.map(doc => ({ id: doc.id, ...doc.data()})));
-    }, (error) => {
-      console.error("Error fetching reviews:", error);
-    });
+    const fetchReviews = async () => {
+      const { data, error } = await supabase
+        .from(REVIEWS_TABLE)
+        .select('*')
+        .eq('posto_id', postoId)
+        .limit(50);
+
+      if (error) {
+        console.error('Error fetching reviews:', error);
+        return;
+      }
+
+      onUpdate(data ?? []);
+    };
+
+    fetchReviews();
+
+    const channel = supabase
+      .channel(`reviews-changes-${postoId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: REVIEWS_TABLE, filter: `posto_id=eq.${postoId}` },
+        () => {
+          fetchReviews();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   },
-  
+
   createReview: async (postoId: string, profile: UserProfile, category: string, bodyText: string) => {
-    return await addDoc(collection(db, REVIEWS_COLLECTION), {
-      postoId,
-      authorId: profile.id,
-      authorName: profile.name,
-      authorRole: profile.role,
+    const { data, error } = await supabase.from(REVIEWS_TABLE).insert({
+      posto_id: postoId,
+      author_id: profile.id,
+      author_name: profile.name,
+      author_role: profile.role,
       category,
       body: bodyText,
-      createdAt: serverTimestamp()
     });
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
   },
 
   getPostoBySlug: async (slug: string) => {
-    const q = query(collection(db, POSTOS_COLLECTION), where('slug', '==', slug));
-    const snap = await getDocs(q);
-    if (!snap.empty) {
-      return { id: snap.docs[0].id, ...snap.docs[0].data() };
+    const { data, error } = await supabase.from(POSTOS_TABLE).select('*').eq('slug', slug).single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null;
+      }
+      throw error;
     }
-    return null;
+
+    return data;
   },
 
   subscribeToPostoFields: (postoId: string, onUpdate: (fields: any[]) => void) => {
-    const fieldsQ = query(collection(db, 'postoFields'), where('postoId', '==', postoId), limit(50));
-    return onSnapshot(fieldsQ, (fSnap) => {
-      onUpdate(fSnap.docs.map(doc => ({ id: doc.id, ...doc.data()})));
-    }, (err) => {
-      console.error('Error fetching posto fields:', err);
-    });
+    const fetchFields = async () => {
+      const { data, error } = await supabase
+        .from(POSTO_FIELDS_TABLE)
+        .select('*')
+        .eq('posto_id', postoId)
+        .limit(50);
+
+      if (error) {
+        console.error('Error fetching posto fields:', error);
+        return;
+      }
+
+      onUpdate(data ?? []);
+    };
+
+    fetchFields();
+
+    const channel = supabase
+      .channel(`posto-fields-changes-${postoId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: POSTO_FIELDS_TABLE, filter: `posto_id=eq.${postoId}` },
+        () => {
+          fetchFields();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   },
 
   createPostoField: async (postoId: string, fieldType: string, body: string, authorId: string) => {
-    return await addDoc(collection(db, 'postoFields'), {
-      postoId,
-      fieldType,
+    const { data, error } = await supabase.from(POSTO_FIELDS_TABLE).insert({
+      posto_id: postoId,
+      field_type: fieldType,
       body,
-      authorId,
-      experienceStart: new Date().getTime() - 31536000000,
-      experienceEnd: new Date().getTime(),
-      createdAt: serverTimestamp()
+      author_id: authorId,
+      experience_start: new Date().getTime() - 31536000000,
+      experience_end: new Date().getTime(),
     });
-  }
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  },
 };

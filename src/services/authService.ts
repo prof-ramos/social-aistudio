@@ -1,15 +1,17 @@
-import { auth, db } from '../lib/firebase';
-import { onAuthStateChanged, signOut as firebaseSignOut, signInWithEmailAndPassword, sendPasswordResetEmail, User as FirebaseUser } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { supabase } from '../lib/supabase';
 import { UserProfile, AuthUser } from '../types';
 
 export const authService = {
-  signIn: (email: string, password: string) => {
-    return signInWithEmailAndPassword(auth, email, password);
+  signIn: async (email: string, password: string) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    return data;
   },
 
-  sendPasswordReset: (email: string) => {
-    return sendPasswordResetEmail(auth, email);
+  sendPasswordReset: async (email: string) => {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) throw error;
+    return data;
   },
 
   /**
@@ -18,36 +20,59 @@ export const authService = {
   onAuthStateChanged: (
     onUserChanged: (user: AuthUser | null, profile: UserProfile | null) => void
   ) => {
-    return onAuthStateChanged(auth, async (u) => {
-      if (!u) {
-        onUserChanged(null, null);
-        return;
-      }
-      
-      const authUser: AuthUser = { uid: u.uid, email: u.email };
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!session?.user) {
+          onUserChanged(null, null);
+          return;
+        }
 
-      try {
-        const docSnap = await getDoc(doc(db, 'users', u.uid));
-        if (docSnap.exists()) {
-          const profile = { id: docSnap.id, ...docSnap.data() } as UserProfile;
+        const u = session.user;
+        const authUser: AuthUser = { uid: u.id, email: u.email ?? null };
+
+        try {
+          const { data: profileData, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('id', u.id)
+            .single();
+
+          if (error || !profileData) {
+            await supabase.auth.signOut();
+            onUserChanged(null, null);
+            return;
+          }
+
+          const profile: UserProfile = {
+            id: profileData.id,
+            name: profileData.name,
+            email: profileData.email,
+            role: profileData.role,
+            avatarUrl: profileData.avatar_url,
+            bio: profileData.bio,
+            currentPost: profileData.current_post,
+            interests: profileData.interests,
+            isOnline: profileData.is_online,
+            lastOnline: profileData.last_online,
+            createdAt: profileData.created_at,
+          };
+
           onUserChanged(authUser, profile);
-        } else {
-          // User exists in auth but no profile document found
-          await firebaseSignOut(auth);
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+          await supabase.auth.signOut();
           onUserChanged(null, null);
         }
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-        await firebaseSignOut(auth);
-        onUserChanged(null, null);
       }
-    });
+    );
+
+    return () => subscription.unsubscribe();
   },
 
   /**
    * Sign out the current user.
    */
   signOut: () => {
-    return firebaseSignOut(auth);
-  }
+    return supabase.auth.signOut();
+  },
 };
