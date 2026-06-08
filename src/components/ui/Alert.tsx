@@ -25,9 +25,13 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
 
     const Icon = icons[variant];
 
+    const liveRole = variant === 'error' ? 'alert' : 'status';
+
     return (
       <div
         ref={ref}
+        role={liveRole}
+        aria-live={variant === 'error' ? 'assertive' : 'polite'}
         className={cn(
           'flex items-start gap-3 p-4 border shadow-sm',
           variants[variant],

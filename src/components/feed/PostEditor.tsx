@@ -117,7 +117,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
   if (!editor) return null;
 
   const toolbarButtonClass = (active: boolean) =>
-    `p-1.5 rounded min-h-[32px] min-w-[32px] flex items-center justify-center transition-colors focus:ring-2 focus:ring-navy focus:outline-none ${
+    `flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none ${
       active ? 'bg-navy text-white' : 'text-slate hover:bg-white border border-transparent'
     }`;
 

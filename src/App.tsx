@@ -26,7 +26,7 @@ import { usePresence } from './hooks/usePresence';
 
 function PageLoading() {
   return (
-    <div className="h-screen w-full bg-ice font-sans flex items-center justify-center">
+    <div className="h-dvh min-h-screen w-full bg-ice font-sans flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <div className="w-10 h-10 border-2 border-navy/20 border-t-navy rounded-full animate-spin" />
         <p className="text-sm text-slate font-medium">Carregando...</p>
@@ -40,8 +40,8 @@ function AppRoutes() {
 
   if (loading) {
     return (
-      <div className="h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
-        <header className="h-[73px] bg-navy flex items-center justify-between px-6 border-b border-white/10 shrink-0">
+      <div className="h-dvh min-h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
+        <header className="h-16 bg-navy flex items-center justify-between px-6 border-b border-white/10 shrink-0">
           <div className="flex items-center gap-4">
             <div className="w-8 h-8 bg-white/10 animate-pulse rounded-none" />
             <div className="w-32 h-6 bg-white/10 animate-pulse" />
@@ -66,8 +66,8 @@ function AppRoutes() {
               </div>
             </div>
           </aside>
-          <section className="flex-1 p-4 sm:p-8 lg:p-16 overflow-y-auto bg-ice">
-            <div className="max-w-3xl mx-auto space-y-8">
+          <section id="main-content" className="flex-1 p-4 sm:p-8 lg:p-16 overflow-y-auto bg-ice">
+            <div className="max-w-5xl mx-auto space-y-8">
               <div className="w-48 h-8 bg-slate/10 animate-pulse" />
               <div className="w-full h-40 bg-white border border-border-gray shadow-sm animate-pulse" />
               <div className="space-y-4">
@@ -135,10 +135,10 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
   usePresence(profile);
 
   return (
-    <div className="h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
+    <div className="h-dvh min-h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
       <Tour />
       <Navbar profile={profile} isAdminView={isAdminView} />
-      <main className="flex flex-1 overflow-hidden">
+      <main id="main-content" className="flex flex-1 min-h-0 overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 bg-white border-r border-border-gray text-navy hidden md:flex flex-col py-8 px-6 flex-none z-10 shadow-sm relative">
           <div className="mb-8 tour-sidebar-nav">
@@ -187,8 +187,8 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
         </aside>
 
         {/* Main scrollable content area */}
-        <section className="flex-1 p-4 sm:p-8 lg:p-16 overflow-y-auto bg-ice">
-          <div className="flex flex-col mx-auto max-w-5xl gap-8">
+        <section className="flex-1 min-h-0 p-4 sm:p-8 lg:p-16 overflow-y-auto overflow-x-clip bg-ice">
+          <div className="flex flex-col mx-auto max-w-5xl min-w-0 gap-8">
             <Outlet />
           </div>
         </section>

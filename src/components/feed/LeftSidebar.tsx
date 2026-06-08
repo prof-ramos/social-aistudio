@@ -9,7 +9,7 @@ interface LeftSidebarProps {
 
 export function LeftSidebar({ profile }: LeftSidebarProps) {
   return (
-    <div className="w-full lg:w-[280px] xl:w-[300px] flex-none flex flex-col gap-6 sticky top-24">
+    <div className="flex w-full flex-none flex-col gap-8 xl:w-[300px] xl:sticky xl:top-16">
       {/* Mini Profile Card */}
       <div className="bg-white border border-border-gray shadow-sm overflow-hidden flex flex-col items-center">
         <div className="h-24 bg-navy w-full relative">

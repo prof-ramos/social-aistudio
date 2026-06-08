@@ -38,6 +38,16 @@
   --app-asof-blue: #2d82cc;
 }
 
+html {
+  overflow-x: clip;
+}
+
+input,
+select,
+textarea {
+  font-size: 1rem;
+}
+
 @theme {
   --color-navy: var(--app-navy);
   --color-navy-dark: var(--app-navy-dark);
@@ -110,6 +120,12 @@
 
 .dark .auth-shell__card {
   background: color-mix(in srgb, var(--app-white) 96%, transparent);
+}
+
+@media (max-width: 767px) {
+  .auth-shell__card {
+    backdrop-filter: none;
+  }
 }
 
 .auth-reveal {

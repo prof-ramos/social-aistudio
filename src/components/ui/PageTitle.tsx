@@ -8,13 +8,19 @@ export interface PageTitleProps extends React.HTMLAttributes<HTMLHeadingElement>
 
 export const PageTitle = React.forwardRef<HTMLHeadingElement, PageTitleProps>(
   ({ as: Tag = 'h1', size, className, children, ...props }, ref) => {
-    const sizeMap: Record<string, string> = {
+    const tagSizeMap: Record<'h1' | 'h2' | 'h3', string> = {
       h1: 'text-4xl',
       h2: 'text-3xl',
       h3: 'text-2xl',
     };
 
-    const resolvedSize = size ? `text-${size}` : sizeMap[Tag];
+    const propSizeMap: Record<'xl' | 'lg' | 'md', string> = {
+      xl: 'text-4xl',
+      lg: 'text-3xl',
+      md: 'text-2xl',
+    };
+
+    const resolvedSize = size ? propSizeMap[size] : tagSizeMap[Tag];
 
     return (
       <Tag

@@ -5,12 +5,12 @@ export function Tour() {
   const [run, setRun] = useState(false);
 
   useEffect(() => {
-    // Small delay to ensure dom is mounted
     const timeout = setTimeout(() => {
-        const hasSeenTour = localStorage.getItem('hasSeenTour');
-        if (!hasSeenTour) {
+      const hasSeenTour = localStorage.getItem('hasSeenTour');
+      const isDesktop = window.matchMedia('(min-width: 768px)').matches;
+      if (!hasSeenTour && isDesktop) {
         setRun(true);
-        }
+      }
     }, 1000);
     return () => clearTimeout(timeout);
   }, []);
@@ -61,7 +61,7 @@ export function Tour() {
         zIndex: 10000,
         primaryColor: 'var(--app-navy)',
         textColor: 'var(--app-slate)',
-        width: 400,
+        width: Math.min(400, window.innerWidth - 32),
         showProgress: true,
       }}
       styles={{

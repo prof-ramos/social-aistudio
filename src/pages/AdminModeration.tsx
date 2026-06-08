@@ -28,7 +28,7 @@ export default function AdminModeration() {
           <div className="w-48 h-8 bg-slate/10 mb-3" />
           <div className="w-96 h-5 bg-slate/10" />
         </div>
-        <Card variant="elevated" padding="lg" className="h-[calc(100vh-12rem)]">
+        <Card variant="elevated" padding="lg" className="h-[calc(100dvh-12rem)] min-h-[24rem]">
           <div className="w-full h-10 bg-slate/10 mb-4" />
           <div className="space-y-2">
             {[1, 2, 3, 4].map(i => (
@@ -48,7 +48,7 @@ export default function AdminModeration() {
         <p className="text-slate">Gerencie denúncias de conteúdo publicadas na plataforma.</p>
       </div>
 
-      <Card variant="elevated" className="h-[calc(100vh-12rem)] flex flex-col">
+      <Card variant="elevated" className="flex h-[calc(100dvh-12rem)] min-h-[24rem] flex-col">
         {pendingReports.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-slate">
             <ShieldAlert className="w-12 h-12 mb-4 opacity-50" />

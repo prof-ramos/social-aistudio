@@ -144,10 +144,10 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
       </a>
 
       <nav
-        className="sticky top-0 z-50 flex h-16 flex-none items-center justify-between border-b border-border-gray bg-white/92 px-6 font-sans shadow-[0_1px_0_color-mix(in_srgb,var(--app-institutional-gold)_55%,transparent)] backdrop-blur-md transition-all md:px-8"
+        className="sticky top-0 z-50 flex h-16 flex-none items-center justify-between border-b border-border-gray bg-white px-6 font-sans shadow-[0_1px_0_color-mix(in_srgb,var(--app-institutional-gold)_55%,transparent)] transition-all md:bg-white/92 md:backdrop-blur-md md:px-8"
         aria-label="Navegação principal"
       >
-        <div className="flex w-full items-center gap-8 md:w-auto xl:gap-12">
+        <div className="flex min-w-0 flex-1 items-center gap-8 md:flex-none md:w-auto xl:gap-12">
           <NavbarBrand isDarkMode={isDarkMode} />
           <div className="hidden md:flex gap-2 text-sm font-medium h-16">
             {navItems.map((item) => {
@@ -293,7 +293,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         {mobileMenuOpen && (
           <div
             ref={mobileMenuRef}
-            className="fixed inset-0 bg-white z-50 flex flex-col p-4"
+            className="fixed inset-0 z-50 flex flex-col bg-white p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
             role="dialog"
             aria-modal="true"
             aria-label="Menu de navegação"

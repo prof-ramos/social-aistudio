@@ -50,7 +50,12 @@ function ToastContainer() {
   const { toasts, removeToast } = useToast();
 
   return (
-    <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2" role="region" aria-live="polite" aria-label="Notificações">
+    <div
+      className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 right-4 z-[100] flex flex-col gap-2 sm:left-auto sm:right-4 sm:max-w-md"
+      role="region"
+      aria-live="polite"
+      aria-label="Notificações"
+    >
       {toasts.map((toast) => (
         <React.Fragment key={toast.id}>
           <ToastItem toast={toast} onRemove={removeToast} />
@@ -91,7 +96,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
       <p className="text-sm font-medium flex-1">{toast.message}</p>
       <button
         onClick={() => onRemove(toast.id)}
-        className="text-current opacity-50 hover:opacity-100 transition-opacity min-h-[24px] min-w-[24px] flex items-center justify-center"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center text-current opacity-50 transition-opacity hover:opacity-100"
         aria-label="Fechar notificação"
       >
         <X className="w-4 h-4" aria-hidden="true" />

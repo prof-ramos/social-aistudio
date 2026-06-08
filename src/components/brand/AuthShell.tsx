@@ -21,8 +21,8 @@ export function AuthShell({
   className,
 }: AuthShellProps) {
   return (
-    <div className={cn('auth-shell min-h-screen font-sans', className)}>
-      <div className="auth-shell__grid min-h-screen lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+    <div className={cn('auth-shell min-h-dvh min-h-screen font-sans', className)}>
+      <div className="auth-shell__grid min-h-dvh min-h-screen lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <aside className="auth-shell__hero relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:px-12 lg:py-14 xl:px-16">
           <div className="auth-shell__hero-glow" aria-hidden="true" />
           <div className="relative z-10 auth-reveal auth-reveal--1">
@@ -42,7 +42,7 @@ export function AuthShell({
           </div>
         </aside>
 
-        <main className="auth-shell__main flex flex-col justify-center px-4 py-10 sm:px-8 lg:px-12 xl:px-16">
+        <main className="auth-shell__main flex flex-col justify-start px-4 py-10 sm:justify-center sm:px-8 lg:px-12 xl:px-16">
           <div className="mx-auto w-full lg:hidden mb-8 auth-reveal">
             <BrandLockup theme="light" size="hero" showSocialBadge showTagline={false} />
           </div>
