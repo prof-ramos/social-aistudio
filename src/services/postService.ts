@@ -34,7 +34,7 @@ const resolveJoinedUser = (users: { name: string; role: string } | { name: strin
 };
 
 const mapPostRow = (row: Record<string, any>): Post => {
-  const user = resolveJoinedUser(row.users);
+  const user = resolveJoinedUser(row.users_public);
   return {
     id: row.id,
     title: row.title,
@@ -50,7 +50,7 @@ const mapPostRow = (row: Record<string, any>): Post => {
 };
 
 const mapCommentRow = (row: Record<string, any>): PostComment => {
-  const user = resolveJoinedUser(row.users);
+  const user = resolveJoinedUser(row.users_public);
   return {
     id: row.id,
     postId: row.post_id,
@@ -95,7 +95,7 @@ export const postService = {
 
     const { data, error } = await supabase
       .from('posts')
-      .select('*, users!author_id(name, role)')
+      .select('*, users_public!author_id(name, role)')
       .in('id', ids);
 
     if (error) {
@@ -112,7 +112,7 @@ export const postService = {
       try {
         const { data, error } = await supabase
           .from('posts')
-          .select('*, users!author_id(name, role)')
+          .select('*, users_public!author_id(name, role)')
           .order('created_at', { ascending: false })
           .limit(limitCount);
 
@@ -163,7 +163,7 @@ export const postService = {
   fetchMorePosts: async (lastCreatedAt: string | null, pageSize: number = 10): Promise<{ posts: Post[]; lastCreatedAt: string | null }> => {
     let query = supabase
       .from('posts')
-      .select('*, users!author_id(name, role)')
+      .select('*, users_public!author_id(name, role)')
       .order('created_at', { ascending: false })
       .limit(pageSize);
 
@@ -195,7 +195,7 @@ export const postService = {
         author_id: profile.id,
         pinned: false,
       })
-      .select('*, users!author_id(name, role)')
+      .select('*, users_public!author_id(name, role)')
       .single();
 
     if (error) {
@@ -213,7 +213,7 @@ export const postService = {
   getPost: async (id: string): Promise<Post | null> => {
     const { data, error } = await supabase
       .from('posts')
-      .select('*, users!author_id(name, role)')
+      .select('*, users_public!author_id(name, role)')
       .eq('id', id)
       .single();
 
@@ -276,7 +276,7 @@ export const postService = {
       try {
         const { data, error } = await supabase
           .from('comments')
-          .select('*, users!author_id(name, role)')
+          .select('*, users_public!author_id(name, role)')
           .eq('post_id', postId)
           .order('created_at', { ascending: true })
           .limit(50);
@@ -320,7 +320,7 @@ export const postService = {
         body,
         author_id: profile.id,
       })
-      .select('*, users!author_id(name, role)')
+      .select('*, users_public!author_id(name, role)')
       .single();
 
     if (error) {

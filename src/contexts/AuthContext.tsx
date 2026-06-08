@@ -8,37 +8,6 @@ interface AuthContextType {
   loading: boolean;
 }
 
-const DEV_BYPASS_KEY = 'dev_bypass_auth';
-
-const MOCK_ADMIN: { user: AuthUser; profile: UserProfile } = {
-  user: {
-    uid: 'dev-admin-001',
-    email: 'dev@asof.local',
-  },
-  profile: {
-    id: 'dev-admin-001',
-    name: 'Dev Admin',
-    email: 'dev@asof.local',
-    role: 'ADMIN',
-    avatarUrl: null,
-    bio: 'Bypass de desenvolvimento',
-    isOnline: true,
-    createdAt: new Date().toISOString(),
-  },
-};
-
-export function enableDevBypass() {
-  localStorage.setItem(DEV_BYPASS_KEY, '1');
-}
-
-export function disableDevBypass() {
-  localStorage.removeItem(DEV_BYPASS_KEY);
-}
-
-export function isDevBypassEnabled() {
-  return localStorage.getItem(DEV_BYPASS_KEY) === '1';
-}
-
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -47,13 +16,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isDevBypassEnabled()) {
-      setUser(MOCK_ADMIN.user);
-      setProfile(MOCK_ADMIN.profile);
-      setLoading(false);
-      return;
-    }
-
     const unsubscribe = authService.onAuthStateChanged((u, p) => {
       setUser(u);
       setProfile(p);

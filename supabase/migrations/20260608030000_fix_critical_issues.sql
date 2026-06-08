@@ -15,8 +15,7 @@ CREATE POLICY "Users read own complete profile" ON users
 -- 2. Add missing INSERT/SELECT policies for chat_sessions and chat_participants
 -- Users can insert chat sessions
 DROP POLICY IF EXISTS "Users create chat sessions" ON chat_sessions;
-CREATE POLICY "Users create chat sessions" ON chat_sessions
-  FOR INSERT WITH CHECK (true);
+-- Sessions are created via the get_or_create_chat RPC (SECURITY DEFINER), not direct INSERT
 
 -- Users can join chats (chat_participants)
 DROP POLICY IF EXISTS "Users join chats" ON chat_participants;
@@ -31,4 +30,4 @@ CREATE POLICY "Users see own chat memberships" ON chat_participants
 -- Notifications INSERT policy
 DROP POLICY IF EXISTS "Users create notifications" ON notifications;
 CREATE POLICY "Users create notifications" ON notifications
-  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+  FOR INSERT WITH CHECK (auth.uid() = user_id);

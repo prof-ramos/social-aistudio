@@ -13,6 +13,12 @@ dotenv.config({ path: '.env.local' });
 const url = process.env.VITE_SUPABASE_URL!;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+const SEED_PASSWORD = process.env.SEED_PASSWORD || (
+  process.env.NODE_ENV === 'production'
+    ? (() => { throw new Error('SEED_PASSWORD must be set in production'); })()
+    : 'dev-seed-password-change-me'
+);
+
 const admin = createClient(url, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
@@ -45,9 +51,9 @@ async function seed() {
   log('Creating test data...');
 
   // ─── Create 3 distinct test users ────────────────────────────
-  const u1 = await createTestUser('test1@asof.org.br', 'Maria Silva', 'TestPass123!');
-  const u2 = await createTestUser('test2@asof.org.br', 'João Pereira', 'TestPass123!');
-  const u3 = await createTestUser('test3@asof.org.br', 'Ana Costa', 'TestPass123!');
+  const u1 = await createTestUser('test1@asof.org.br', 'Maria Silva', SEED_PASSWORD);
+  const u2 = await createTestUser('test2@asof.org.br', 'João Pereira', SEED_PASSWORD);
+  const u3 = await createTestUser('test3@asof.org.br', 'Ana Costa', SEED_PASSWORD);
 
   if (!u1 || !u2 || !u3) {
     log('Failed to create test users');

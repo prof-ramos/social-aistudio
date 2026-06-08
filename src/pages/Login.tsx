@@ -4,10 +4,7 @@ import { Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
 import { Alert } from '../components/ui/Alert';
-import { enableDevBypass } from '../contexts/AuthContext';
 import { AuthShell } from '../components/brand/AuthShell';
-
-const IS_DEV = import.meta.env.DEV;
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -27,11 +24,6 @@ export function Login() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDevBypass = () => {
-    enableDevBypass();
-    window.location.reload();
   };
 
   return (
@@ -79,17 +71,6 @@ export function Login() {
       </form>
 
       <div className="mt-8 flex flex-col gap-3 border-t border-border-gray/80 pt-6">
-        {IS_DEV && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="md"
-            fullWidth
-            onClick={handleDevBypass}
-          >
-            [DEV] Login Rápido (Admin)
-          </Button>
-        )}
         <Link to="/solicitar-acesso" className="text-center text-sm font-medium text-navy transition-colors hover:text-asof-blue">
           Não tem uma conta? Solicitar acesso
         </Link>

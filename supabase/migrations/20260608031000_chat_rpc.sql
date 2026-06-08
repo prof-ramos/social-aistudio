@@ -7,6 +7,11 @@ AS $$
 DECLARE
   v_chat_id UUID;
 BEGIN
+  -- Authorize: caller must be one of the participants
+  IF auth.uid() <> user1_id AND auth.uid() <> user2_id THEN
+    RAISE EXCEPTION 'Not authorized';
+  END IF;
+
   -- Search for an existing chat session between the two users
   SELECT cp1.chat_id INTO v_chat_id
   FROM chat_participants cp1
