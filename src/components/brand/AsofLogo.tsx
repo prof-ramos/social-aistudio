@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { cn } from '../../lib/utils';
 import fullLogoSvg from '../../assets/brand/logo.svg?raw';
 import markLogoSvg from '../../assets/brand/favicon.svg?raw';
@@ -20,10 +20,10 @@ function resolveTheme(theme: AsofLogoTheme): 'light' | 'dark' {
 }
 
 function withTheme(svg: string, theme: 'light' | 'dark') {
-  if (svg.includes('data-theme=')) {
-    return svg.replace(/data-theme="(?:light|dark)"/, `data-theme="${theme}"`);
-  }
-  return svg.replace(/^<svg/, `<svg data-theme="${theme}"`);
+  return svg.replace(/<svg\b([^>]*)>/, (_match, attrs: string) => {
+    const cleanedAttrs = attrs.replace(/\sdata-theme="(?:light|dark)"/, '');
+    return `<svg data-theme="${theme}"${cleanedAttrs}>`;
+  });
 }
 
 const VARIANT_SVG: Record<AsofLogoVariant, string> = {
@@ -37,14 +37,21 @@ export function AsofLogo({
   className,
   title = 'Logo da ASOF',
 }: AsofLogoProps) {
+  const containerRef = useRef<HTMLSpanElement>(null);
   const resolvedTheme = resolveTheme(theme);
   const svgMarkup = useMemo(
     () => withTheme(VARIANT_SVG[variant], resolvedTheme),
     [variant, resolvedTheme],
   );
 
+  useEffect(() => {
+    const svg = containerRef.current?.querySelector('svg');
+    svg?.setAttribute('data-theme', resolvedTheme);
+  }, [resolvedTheme, svgMarkup]);
+
   return (
     <span
+      ref={containerRef}
       className={cn(
         'inline-flex shrink-0 items-center [&>svg]:h-full [&>svg]:w-full',
         variant === 'full' ? 'aspect-[508/304]' : 'aspect-square',

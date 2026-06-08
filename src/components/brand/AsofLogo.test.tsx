@@ -4,7 +4,7 @@ import { AsofLogo } from './AsofLogo';
 describe('AsofLogo', () => {
   it('renders the institutional logo markup', () => {
     const { container } = render(<AsofLogo theme="light" />);
-    expect(container.querySelector('svg.asof-logo, svg[data-theme="light"]')).toBeTruthy();
+    expect(container.querySelector('svg[data-theme="light"]')).toBeTruthy();
   });
 
   it('applies dark theme when requested', () => {
