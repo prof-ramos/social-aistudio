@@ -6,6 +6,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { notificationService } from '../../services/notificationService';
 import { adminService } from '../../services/adminService';
 import { cn } from '../../lib/utils';
+import { AsofLogo } from '../brand/AsofLogo';
+import { useDarkMode } from '../../hooks/useDarkMode';
 
 export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdminView?: boolean }) {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [pendingRequests, setPendingRequests] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -23,21 +25,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const logoutDialogRef = useRef<HTMLDivElement>(null);
   const logoutButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const isDark = localStorage.getItem('asof-dark-mode') === 'true';
-    setIsDarkMode(isDark);
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleDarkMode = () => {
-    const newDarkMode = !isDarkMode;
-    setIsDarkMode(newDarkMode);
-    localStorage.setItem('asof-dark-mode', String(newDarkMode));
-    document.documentElement.classList.toggle('dark', newDarkMode);
-  };
 
   useEffect(() => {
     const unsubNotif = notificationService.subscribeToUnreadNotifications(
@@ -160,7 +147,18 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         aria-label="Navegação principal"
       >
         <div className="flex items-center gap-8 xl:gap-12 w-full md:w-auto">
-          <Link to="/feed" className="font-serif text-2xl font-bold tracking-tight text-navy">Social-ASOF</Link>
+          <Link to="/feed" className="flex items-center gap-2 shrink-0" aria-label="Social-ASOF - Ir para o feed">
+            <AsofLogo
+              variant="full"
+              theme={isDarkMode ? 'dark' : 'light'}
+              className="h-10 w-[10.5rem] hidden sm:block"
+            />
+            <AsofLogo
+              variant="mark"
+              theme={isDarkMode ? 'dark' : 'light'}
+              className="h-9 w-9 sm:hidden"
+            />
+          </Link>
           <div className="hidden md:flex gap-2 text-sm font-medium h-16">
             {navItems.map((item) => {
               const isActive = location.pathname.startsWith(item.to);
@@ -311,7 +309,11 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
             aria-label="Menu de navegação"
           >
             <div className="flex justify-between items-center mb-8 h-12 text-navy border-b border-border-gray pb-4">
-               <span className="font-serif text-2xl font-bold w-full">Social-ASOF</span>
+               <AsofLogo
+                 variant="full"
+                 theme={isDarkMode ? 'dark' : 'light'}
+                 className="h-10 w-[10.5rem]"
+               />
                <button
                  onClick={() => setMobileMenuOpen(false)}
                  className="p-2 text-slate font-medium min-h-[44px] min-w-[44px]"

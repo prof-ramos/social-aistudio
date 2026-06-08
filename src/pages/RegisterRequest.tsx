@@ -4,6 +4,7 @@ import { memberRequestService } from '../services/memberRequestService';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Alert } from '../components/ui/Alert';
+import { AsofLogo } from '../components/brand/AsofLogo';
 
 export function RegisterRequest() {
   const [formData, setFormData] = useState({
@@ -51,7 +52,8 @@ export function RegisterRequest() {
   return (
     <div className="min-h-screen flex flex-col items-center bg-ice py-12 px-4 font-sans">
       <div className="text-center mb-8">
-        <h1 className="font-serif text-4xl font-bold text-navy mb-2">Social-ASOF</h1>
+        <AsofLogo variant="full" theme="light" className="h-16 w-full max-w-xs mx-auto mb-3" />
+        <p className="font-serif text-xl font-bold text-navy">Social-ASOF</p>
       </div>
       <Card variant="elevated" padding="lg" className="max-w-xl w-full">
         <h2 className="text-xl font-bold text-navy mb-6">Solicitar Acesso</h2>

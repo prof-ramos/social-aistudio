@@ -5,6 +5,7 @@ import { Mail, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Alert } from '../components/ui/Alert';
+import { AsofLogo } from '../components/brand/AsofLogo';
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -32,7 +33,8 @@ export default function ForgotPassword() {
     <div className="min-h-screen flex items-center justify-center bg-ice py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <Card variant="elevated" padding="lg" className="max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold text-navy">Social-ASOF</h1>
+          <AsofLogo variant="full" theme="light" className="h-14 w-full max-w-[16rem] mx-auto mb-3" />
+          <p className="font-serif text-xl font-bold text-navy">Social-ASOF</p>
           <p className="text-slate mt-2 text-sm">Recuperação de Acesso</p>
         </div>
 

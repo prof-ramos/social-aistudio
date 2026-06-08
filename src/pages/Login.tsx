@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { Alert } from '../components/ui/Alert';
 import { enableDevBypass } from '../contexts/AuthContext';
+import { AsofLogo } from '../components/brand/AsofLogo';
 
 const IS_DEV = import.meta.env.DEV;
 
@@ -41,7 +42,8 @@ export function Login() {
       <div className="max-w-md w-full relative">
         {/* Branding header inside layout */}
         <div className="text-center mb-8">
-          <h1 className="font-serif text-5xl font-bold text-navy mb-2">Social-ASOF</h1>
+          <AsofLogo variant="full" theme="light" className="h-20 w-full max-w-sm mx-auto mb-4" />
+          <p className="font-serif text-lg font-bold text-navy mb-1">Social-ASOF</p>
           <p className="text-slate/80 text-sm">Apenas associados da ASOF.</p>
         </div>
         
