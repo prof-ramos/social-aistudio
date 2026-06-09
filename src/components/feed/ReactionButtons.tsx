@@ -64,8 +64,8 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
             onClick={(e) => handleReact(e, emoji)}
             aria-label={`${reacts.length} ${label.toLowerCase()}`}
             aria-pressed={hasReacted}
-            className={`text-xs font-bold flex items-center gap-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
-              hasReacted ? 'text-sky dark:text-asof-blue' : 'text-slate/70 hover:text-navy'
+            className={`text-xs font-bold flex items-center gap-1.5 transition-colors transition-transform duration-150 hover:scale-110 active:scale-95 focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
+              hasReacted ? 'text-sky' : 'text-muted hover:text-navy'
             }`}
           >
             <Icon className="w-4 h-4" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} />

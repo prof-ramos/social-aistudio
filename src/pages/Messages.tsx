@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { UserProfile } from '../types';
 import { chatService } from '../services/chatService';
 import { ChevronLeft, Send, MessageSquare } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { Button, Card, PageTitle } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useVisualViewportOffset } from '../hooks/useVisualViewportOffset';
@@ -87,7 +87,13 @@ export function Messages({ profile }: { profile: UserProfile }) {
                   <MessageSquare className="h-5 w-5 text-navy opacity-50" />
                 </div>
                 <p className="font-medium text-navy">Nenhuma conversa</p>
-                <p className="mt-1 opacity-70">Suas mensagens aparecerão aqui.</p>
+                <p className="mt-1 opacity-70">Visite o perfil de um membro para iniciar uma conversa.</p>
+                <Link
+                  to="/feed"
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider border border-navy text-navy hover:bg-ice transition-colors min-h-[44px]"
+                >
+                  Explorar Membros
+                </Link>
               </div>
             ) : (
               chats.map((chat) => {
@@ -110,7 +116,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                     <div className="min-w-0 flex-1">
                       <div className="mb-0.5 flex items-center justify-between">
                         <p className="truncate text-sm font-bold text-navy">{otherName}</p>
-                        <span className="ml-2 shrink-0 text-[10px] text-slate/70">
+                        <span className="ml-2 shrink-0 text-xs text-muted">
                           {chat.updatedAt ? formatTime(chat.updatedAt) : ''}
                         </span>
                       </div>
@@ -119,7 +125,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                       </p>
                     </div>
                     {chat.unreadCount > 0 && (
-                      <span className="ml-auto shrink-0 bg-navy text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      <span className="ml-auto shrink-0 bg-navy text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                         {chat.unreadCount}
                       </span>
                     )}
@@ -192,13 +198,13 @@ export function Messages({ profile }: { profile: UserProfile }) {
                       <div
                         className={`relative max-w-[85%] px-4 py-2.5 text-[15px] shadow-sm sm:max-w-[70%] ${
                           isMe
-                            ? 'rounded-t-2xl rounded-l-2xl rounded-br-sm bg-navy text-white'
-                            : 'rounded-t-2xl rounded-r-2xl rounded-bl-sm border border-border-gray/50 bg-white text-slate'
+                            ? 'rounded-sm bg-navy text-white'
+                            : 'rounded-sm border border-border-gray/50 bg-white text-slate'
                         }`}
                       >
                         <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.body}</p>
                       </div>
-                      <span className="mt-1 px-1 text-[10px] text-slate/70">
+                      <span className="mt-1 px-1 text-xs text-muted">
                         {formatTime(msg.createdAt)}
                       </span>
                     </div>

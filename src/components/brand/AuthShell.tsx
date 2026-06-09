@@ -54,7 +54,7 @@ export function AuthShell({
             )}
           >
             <header className="mb-8 border-b border-border-gray/80 pb-6">
-              <h1 className="font-serif text-2xl font-bold text-navy sm:text-[1.75rem]">{title}</h1>
+              <h1 className="font-serif text-2xl font-bold text-navy sm:text-[1.75rem] text-balance">{title}</h1>
               {description && (
                 <p className="mt-2 text-sm leading-relaxed text-slate">{description}</p>
               )}

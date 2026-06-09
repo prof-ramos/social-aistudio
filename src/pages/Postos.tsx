@@ -30,7 +30,7 @@ export function Postos() {
                id="search-postos"
                type="text"
                placeholder="Buscar por nome, país ou região..."
-               className="w-full h-12 border border-border-gray bg-white pl-10 pr-4 text-slate text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all placeholder:text-slate/70"
+               className="w-full h-12 border border-border-gray bg-white pl-10 pr-4 text-slate text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all placeholder:text-muted"
                value={search}
                onChange={e => setSearch(e.target.value)}
              />

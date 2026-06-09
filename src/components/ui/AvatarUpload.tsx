@@ -87,7 +87,7 @@ export function AvatarUpload({ currentAvatarUrl, userName, userId, onUploadCompl
         )}
         <div className="absolute inset-0 bg-navy/60 flex flex-col items-center justify-center text-white transition-opacity opacity-0 group-hover:opacity-100 pointer-events-none">
           <Camera className="w-6 h-6 mb-1" />
-          <span className="text-[10px] uppercase font-bold text-center px-2 tracking-wider">Mudar Foto</span>
+          <span className="text-xs uppercase font-bold text-center px-2 tracking-wider">Mudar Foto</span>
         </div>
         {uploading && (
           <div className="absolute inset-0 bg-navy/60 flex items-center justify-center">

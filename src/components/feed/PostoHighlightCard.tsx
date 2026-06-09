@@ -26,7 +26,7 @@ export function PostoHighlightCard({ profile }: PostoHighlightCardProps) {
   if (!profile.currentPost || !posto) return null;
 
   return (
-    <div className="bg-white border border-border-gray shadow-sm border-l-4 border-l-navy p-6 font-sans">
+    <div className="bg-ice/40 border border-border-gray shadow-sm p-6 font-sans">
       <div className="flex justify-between items-start mb-4">
         <h2 className="font-serif text-2xl text-navy">Posto: {posto.name}</h2>
       </div>

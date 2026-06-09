@@ -108,7 +108,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
              {isOwnProfile && isEditing && (
                 <div className="absolute inset-0 bg-navy/60 flex flex-col items-center justify-center text-white transition-opacity pointer-events-none z-10">
                   <Camera className="w-6 h-6 mb-1" />
-                  <span className="text-[10px] uppercase font-bold text-center px-2 tracking-wider">Mudar Foto</span>
+                  <span className="text-xs uppercase font-bold text-center px-2 tracking-wider">Mudar Foto</span>
                 </div>
              )}
           </div>
@@ -120,7 +120,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
             <div className="space-y-6">
               {user.currentPost && (
                 <div>
-                  <span className="text-[10px] uppercase font-bold tracking-widest text-navy flex items-center gap-1 mb-1">
+                  <span className="text-xs uppercase font-bold tracking-widest text-navy flex items-center gap-1 mb-1">
                      <MapPin className="w-3 h-3" /> Lotação Atual
                   </span>
                   <p className="text-sm text-navy font-bold bg-ice inline-block px-3 py-1.5 border border-border-gray/50">{user.currentPost}</p>
@@ -128,7 +128,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
               )}
               {user.bio ? (
                 <div>
-                   <span className="text-[10px] uppercase font-bold tracking-widest text-navy flex items-center gap-1 mb-2">
+                   <span className="text-xs uppercase font-bold tracking-widest text-navy flex items-center gap-1 mb-2">
                      <BookOpen className="w-3 h-3" /> Biografia e Trajetória
                    </span>
                    <p className="text-slate text-sm leading-relaxed whitespace-pre-wrap break-words">{user.bio}</p>
@@ -139,7 +139,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
               {user.interests && (
                 <div>
-                   <span className="text-[10px] uppercase font-bold tracking-widest text-navy flex items-center gap-1 mb-2">
+                   <span className="text-xs uppercase font-bold tracking-widest text-navy flex items-center gap-1 mb-2">
                      <Star className="w-3 h-3" /> Áreas de Interesse
                    </span>
                    <p className="text-slate text-sm leading-relaxed whitespace-pre-wrap break-words">{user.interests}</p>
@@ -274,8 +274,8 @@ export function Profile({ profile }: { profile: UserProfile }) {
                 <Link key={post.id} to={`/feed/${post.id}`} className="block border border-border-gray p-4 hover:border-navy hover:shadow-sm transition-all bg-ice/30">
                   <h3 className="font-bold text-navy mb-2 line-clamp-2">{post.title}</h3>
                   <div className="flex items-center justify-between mt-auto">
-                     <p className="text-xs text-slate/80">Por {post.authorName || 'Usuário'}</p>
-                     <span className="text-[10px] uppercase font-bold text-navy">{post.category}</span>
+                     <p className="text-xs text-muted">Por {post.authorName || 'Usuário'}</p>
+                     <span className="text-xs uppercase font-bold text-navy">{post.category}</span>
                   </div>
                 </Link>
               ))}

@@ -25,7 +25,7 @@ export const PageTitle = React.forwardRef<HTMLHeadingElement, PageTitleProps>(
     return (
       <Tag
         ref={ref}
-        className={cn('font-serif font-bold text-navy', resolvedSize, className)}
+        className={cn('font-serif font-bold text-navy text-balance', resolvedSize, className)}
         {...props}
       >
         {children}

@@ -51,15 +51,13 @@ function ToastContainer() {
 
   return (
     <div
-      className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 right-4 z-[100] flex flex-col gap-2 sm:left-auto sm:right-4 sm:max-w-md"
+      className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] left-4 right-4 z-[60] flex flex-col gap-2 sm:left-auto sm:right-4 sm:max-w-md"
       role="region"
       aria-live="polite"
       aria-label="Notificações"
     >
       {toasts.map((toast) => (
-        <React.Fragment key={toast.id}>
-          <ToastItem toast={toast} onRemove={removeToast} />
-        </React.Fragment>
+        <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
       ))}
     </div>
   );

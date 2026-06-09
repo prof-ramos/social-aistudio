@@ -49,7 +49,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`${size} ${i < Math.round(rating) ? 'text-gold fill-gold' : 'text-slate/30'}`}
+        className={`${size} ${i < Math.round(rating) ? 'text-gold fill-gold' : 'text-muted'}`}
       />
     ));
   };
@@ -154,7 +154,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-slate/30 hover:text-danger p-2 min-h-[44px] min-w-[44px]"
+                    className="text-muted hover:text-danger p-2 min-h-[44px] min-w-[44px]"
                     onClick={() => handleReport('POSTO_FIELD', field.id, field.body)}
                     title="Denunciar Relato"
                   >
@@ -207,7 +207,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                         className={`w-7 h-7 transition-colors ${
                           starValue <= (hoverRating || reviewRating)
                             ? 'text-gold fill-gold'
-                            : 'text-slate/30'
+                            : 'text-muted'
                         }`}
                       />
                     </button>

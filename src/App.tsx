@@ -23,6 +23,8 @@ const CarreiraPromocao = lazy(() => import('./pages/CarreiraPromocao').then(m =>
 const Aposentadoria = lazy(() => import('./pages/Aposentadoria').then(m => ({ default: m.Aposentadoria })));
 import { Home, Building2, Briefcase, Archive, MessageSquare } from 'lucide-react';
 import { Tour } from './components/Tour';
+import { KeyboardShortcuts, useKeyboardShortcutsOverlay } from './components/ui/KeyboardShortcuts';
+import { OfflineIndicator } from './components/ui/OfflineIndicator';
 import { ToastProvider } from './components/ui/Toast';
 import { UserProfile } from './types';
 import { usePresence } from './hooks/usePresence';
@@ -140,16 +142,19 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
   usePresence(profile);
   const { pathname } = useLocation();
   const isMessagesRoute = pathname === '/mensagens';
+  const shortcutsOverlay = useKeyboardShortcutsOverlay();
 
   return (
     <div className="h-dvh min-h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
       <Tour />
+      <OfflineIndicator />
+      <KeyboardShortcuts isOpen={shortcutsOverlay.isOpen} onClose={shortcutsOverlay.close} />
       <Navbar profile={profile} isAdminView={isAdminView} />
       <main id="main-content" className="flex flex-1 min-h-0 overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 bg-white border-r border-border-gray text-navy hidden md:flex flex-col py-8 px-6 flex-none z-10 shadow-sm relative">
           <div className="mb-8 tour-sidebar-nav">
-            <p className="text-[10px] uppercase font-bold tracking-widest text-slate/70 mb-4 px-4">Navegação</p>
+            <p className="text-xs uppercase font-bold tracking-widest text-muted mb-4 px-4">Navegação</p>
             <ul className="space-y-1 text-sm font-medium">
               <li>
                 <Link to="/feed" className="flex items-center gap-3 bg-ice text-navy py-3 px-4 rounded-none hover:bg-border-gray/30 transition-colors">

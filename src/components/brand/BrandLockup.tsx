@@ -53,7 +53,7 @@ export function BrandLockup({
       {showTagline && (
         <p
           className={cn(
-            'mt-3 max-w-xs font-serif text-sm leading-relaxed text-slate/90',
+            'mt-3 max-w-xs font-serif text-sm leading-relaxed text-slate',
             isStart && 'max-w-sm',
           )}
         >

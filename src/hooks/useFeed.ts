@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { postService } from '../services/postService';
 import { Post, UserProfile } from '../types';
+import { useToast } from '../components/ui/Toast';
 
 export type FeedFilter = 'RECENTES' | 'MAIS_COMENTADOS' | 'MEUS_POSTOS';
 const PAGE_SIZE = 10;
 
 export function useFeed(profile: UserProfile) {
+  const { addToast } = useToast();
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [olderPosts, setOlderPosts] = useState<Post[]>([]);
   const [isPosting, setIsPosting] = useState(false);
@@ -94,6 +96,7 @@ export function useFeed(profile: UserProfile) {
       setShowEditor(false);
     } catch (e) {
       console.error(e);
+      addToast('Erro ao criar publicação. Tente novamente.', 'error');
     } finally {
       setIsPosting(false);
     }

@@ -40,6 +40,19 @@ export function Feed({ profile }: { profile: UserProfile }) {
   }, [profile.id]);
 
   useEffect(() => {
+    function handleShortcut(e: KeyboardEvent) {
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable;
+      if (e.key === 'n' && !isInput && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        setShowEditor(true);
+      }
+    }
+    document.addEventListener('keydown', handleShortcut);
+    return () => document.removeEventListener('keydown', handleShortcut);
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore) {
@@ -83,6 +96,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
           variant="primary"
           size="md"
           className="tour-new-post shrink-0 uppercase tracking-wider text-xs font-bold"
+          title="Novo post (N)"
         >
           NOVO POST
         </Button>
@@ -97,16 +111,29 @@ export function Feed({ profile }: { profile: UserProfile }) {
           />
         )}
 
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <input 
-          type="text" 
-          placeholder="Buscar no feed..."
-          aria-label="Buscar no feed"
-          className="flex-1 h-11 border border-border-gray px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-slate/60"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        <select 
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <input
+            type="text"
+            placeholder="Buscar no feed..."
+            aria-label="Buscar no feed"
+            className="flex-1 h-11 border border-border-gray px-4 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-muted"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
+              <button
+                key={filterKey}
+                onClick={() => setActiveFilter(filterKey)}
+                className={`min-h-[44px] px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-institutional-gold/15 text-navy border-institutional-gold/40' : 'bg-white text-slate border-border-gray hover:bg-ice'}`}
+              >
+                {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <select
           className="h-11 border border-border-gray bg-white px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none"
           aria-label="Filtrar por categoria"
           value={filterCategory}
@@ -119,18 +146,6 @@ export function Feed({ profile }: { profile: UserProfile }) {
           <option value="APOSENTADORIA">Aposentadoria</option>
           <option value="GERAL">Geral</option>
         </select>
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
-           <button 
-             key={filterKey}
-             onClick={() => setActiveFilter(filterKey)}
-             className={`min-h-[44px] px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-ice'}`}
-           >
-             {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
-           </button>
-        ))}
       </div>
 
       <div className="flex flex-col items-start gap-8 xl:flex-row">
@@ -146,7 +161,14 @@ export function Feed({ profile }: { profile: UserProfile }) {
             <div className="py-16 px-6 text-center text-slate bg-white border border-dashed border-border-gray flex flex-col items-center justify-center">
               <MessageSquare className="w-12 h-12 mb-4 opacity-20 text-navy" />
               <p className="font-serif text-xl text-navy mb-2">Nenhum post encontrado</p>
-              <p className="text-sm opacity-80 max-w-sm mx-auto">Não encontramos publicações para sua busca ou categoria selecionada.</p>
+              <p className="text-sm opacity-80 max-w-sm mx-auto mb-6">Não encontramos publicações para sua busca ou categoria selecionada.</p>
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => setShowEditor(true)}
+              >
+                Criar Publicação
+              </Button>
             </div>
           ) : (
             filteredPosts.map(post => (

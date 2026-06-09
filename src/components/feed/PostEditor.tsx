@@ -5,6 +5,7 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, List, ListOrdered, Code, Quote } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { Post } from '../../types';
 
 interface PostEditorProps {
@@ -21,6 +22,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
   const [category, setCategory] = useState(() => editPost?.category || '');
   const [error, setError] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const DRAFT_KEY = 'social-asof-draft-post';
   const debounceTimeout = useRef<any>(null);
   const isEditing = !!editPost;
@@ -47,7 +49,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
     content: editPost?.body || '',
     editorProps: {
       attributes: {
-        class: 'prose prose-slate max-w-none min-h-[200px] p-5 sm:p-6 text-slate focus:outline-none border-none resize-y',
+        class: 'prose prose-slate min-h-[200px] p-5 sm:p-6 text-slate focus:outline-none border-none resize-y text-pretty',
         'aria-label': 'Conteúdo da publicação',
       },
     },
@@ -133,18 +135,21 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
   };
 
   const handleDiscardDraft = () => {
-    if (window.confirm("Deseja realmente descartar o rascunho?")) {
-      localStorage.removeItem(DRAFT_KEY);
-      setTitle('');
-      editor?.commands.setContent('');
-      setCategory('');
-    }
+    setShowDiscardConfirm(true);
+  };
+
+  const confirmDiscardDraft = () => {
+    localStorage.removeItem(DRAFT_KEY);
+    setTitle('');
+    editor?.commands.setContent('');
+    setCategory('');
+    setShowDiscardConfirm(false);
   };
 
   if (!editor) return null;
 
   const toolbarButtonClass = (active: boolean) =>
-    `flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none ${
+    `flex min-h-[44px] min-w-[44px] items-center justify-center rounded p-1.5 transition-colors transition-transform duration-150 active:scale-95 focus:ring-2 focus:ring-navy focus:outline-none ${
       active ? 'bg-navy text-white' : 'text-slate hover:bg-white border border-transparent'
     }`;
 
@@ -160,7 +165,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
         id="post-title"
         type="text"
         placeholder="Título da publicação"
-        className="w-full text-lg sm:text-xl font-bold text-navy focus:ring-2 focus:ring-navy focus:outline-none mb-6 placeholder:text-slate/40 px-4 py-3 border border-border-gray bg-white"
+        className="w-full text-lg sm:text-xl font-bold text-navy focus:ring-2 focus:ring-navy focus:outline-none mb-6 placeholder:text-muted px-4 py-3 border border-border-gray bg-white"
         value={title}
         onChange={handleTitleChange}
       />
@@ -220,14 +225,14 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
             <Quote className="w-4 h-4" />
           </button>
           <button
-             type="button"
-             onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-             className={toolbarButtonClass(editor.isActive('codeBlock'))}
-             aria-label="Bloco de código"
-             aria-pressed={editor.isActive('codeBlock')}
-             title="Bloco de código"
+            type="button"
+            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+            className={toolbarButtonClass(editor.isActive('codeBlock'))}
+            aria-label="Bloco de código"
+            aria-pressed={editor.isActive('codeBlock')}
+            title="Bloco de código"
           >
-             <Code className="w-4 h-4" />
+            <Code className="w-4 h-4" />
           </button>
         </div>
         <EditorContent editor={editor} />
@@ -284,10 +289,20 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
         </div>
       </div>
       {!isEditing && (
-        <p className="text-[10px] text-slate/70 mt-4 font-medium uppercase tracking-wider text-right">
+        <p className="text-xs text-muted mt-4 font-medium uppercase tracking-wider text-right">
           Rascunho salvo automaticamente
         </p>
       )}
+      <ConfirmDialog
+        isOpen={showDiscardConfirm}
+        title="Descartar rascunho"
+        message="Deseja realmente descartar o rascunho? Esta ação não pode ser desfeita."
+        confirmLabel="Descartar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={confirmDiscardDraft}
+        onCancel={() => setShowDiscardConfirm(false)}
+      />
     </form>
   );
 }

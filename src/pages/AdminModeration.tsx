@@ -143,7 +143,7 @@ export default function AdminModeration() {
                 {resolvedReports.map(rep => (
                   <tr key={rep.id}>
                     <td className="p-4">
-                      <span className="text-[10px] font-bold text-sky uppercase">{rep.type}</span>
+                      <span className="text-xs font-bold text-sky uppercase">{rep.type}</span>
                       <p className="line-clamp-2 max-w-xs">{rep.preview}</p>
                     </td>
                     <td className="p-4">

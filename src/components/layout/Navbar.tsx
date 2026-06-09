@@ -74,6 +74,20 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     clearQuery();
   }, [location.pathname, clearQuery]);
 
+  // Keyboard shortcut: / focuses search
+  useEffect(() => {
+    function handleSlash(event: KeyboardEvent) {
+      const target = event.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable;
+      if (event.key === '/' && !isInput) {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    }
+    document.addEventListener('keydown', handleSlash);
+    return () => document.removeEventListener('keydown', handleSlash);
+  }, []);
+
   // Escape key handling
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
@@ -154,8 +168,8 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
                   key={item.to}
                   to={item.to}
                   className={cn(
-                    'flex items-center gap-2 px-3 transition-colors border-b-2 h-full',
-                    isActive ? 'border-navy text-navy font-bold' : 'border-transparent text-slate hover:text-navy'
+                    'flex items-center gap-2 px-3 transition-colors h-full',
+                    isActive ? 'text-navy font-bold bg-institutional-gold/10' : 'text-slate hover:text-navy hover:bg-ice/50'
                   )}
                   aria-current={isActive ? 'page' : undefined}
                 >
@@ -171,15 +185,15 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         <div className="hidden md:flex flex-1 max-w-md mx-6">
           <div ref={searchRef} className="relative w-full">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-slate/70" strokeWidth={1.5} aria-hidden="true" />
+              <Search className="h-4 w-4 text-muted" strokeWidth={1.5} aria-hidden="true" />
             </div>
             <input
               type="text"
               ref={searchInputRef}
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className="block w-full pl-10 pr-4 py-2 bg-ice/50 border border-transparent rounded-full text-base placeholder-slate/50 focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy focus:bg-white transition-all text-navy"
-              placeholder="Buscar membros, posts ou postos..."
+              className="block w-full pl-10 pr-4 py-2 bg-ice/50 border border-transparent text-base placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy focus:bg-white transition-all text-navy"
+              placeholder="Buscar... (Pressione /)"
               aria-label="Buscar membros, posts ou postos"
             />
             {query.length >= 2 && (
@@ -198,7 +212,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         <div className="hidden md:flex items-center gap-2 lg:gap-4">
           <button
             onClick={toggleDarkMode}
-            className="relative p-2 transition-colors rounded-none flex items-center h-16 border-b-2 border-transparent text-slate hover:text-navy hover:bg-ice/50"
+            className="relative p-2 transition-colors rounded-none flex items-center h-16 text-slate hover:text-navy hover:bg-ice/50"
             title={isDarkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
             aria-label={isDarkMode ? 'Mudar para Modo Claro' : 'Mudar para Modo Escuro'}
           >
@@ -208,8 +222,8 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
           <Link
             to="/notificacoes"
             className={cn(
-              'relative p-2 transition-colors rounded-none flex items-center h-16 border-b-2',
-              location.pathname.startsWith('/notificacoes') ? 'border-navy text-navy font-bold' : 'border-transparent text-slate hover:text-navy hover:bg-ice/50'
+              'relative p-2 transition-colors rounded-none flex items-center h-16',
+              location.pathname.startsWith('/notificacoes') ? 'text-navy font-bold bg-institutional-gold/10' : 'text-slate hover:text-navy hover:bg-ice/50'
             )}
             title="Notificações"
             aria-label={unreadNotifications > 0 ? `Notificações, ${unreadNotifications} não lidas` : 'Notificações'}
@@ -225,8 +239,8 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
                <button
                  onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
                  className={cn(
-                   'relative p-2 transition-colors rounded-none flex items-center h-16 border-b-2',
-                   location.pathname.startsWith('/admin') ? 'border-navy text-navy font-bold' : 'border-transparent text-slate hover:text-navy hover:bg-ice/50'
+                   'relative p-2 transition-colors rounded-none flex items-center h-16',
+                   location.pathname.startsWith('/admin') ? 'text-navy font-bold bg-institutional-gold/10' : 'text-slate hover:text-navy hover:bg-ice/50'
                  )}
                  title="Painel Admin"
                  aria-expanded={adminDropdownOpen}
@@ -259,7 +273,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
             >
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-navy group-hover:text-sky transition-colors">{profile.name.split(' ')[0]}</p>
-                <p className="text-[10px] text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : 'Admin'}</p>
+                <p className="text-xs text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : 'Admin'}</p>
               </div>
               <div className="w-9 h-9 bg-ice border border-border-gray flex items-center justify-center text-navy font-bold uppercase overflow-hidden">
                 {profile.avatarUrl ? <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" /> : profile.name.charAt(0)}

@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="w-16 h-16 bg-danger/5 text-danger flex items-center justify-center mx-auto mb-6 shrink-0">
               <AlertTriangle className="w-8 h-8" />
             </div>
-            <h1 className="text-3xl font-serif text-navy mb-4">Algo deu errado</h1>
+            <h1 className="text-3xl font-serif text-navy mb-4 text-balance">Algo deu errado</h1>
             <p className="text-slate mb-8 leading-relaxed">
               Encontramos um erro inesperado ao carregar esta página. Nossa equipe já foi notificada.
             </p>
@@ -51,7 +51,7 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
             {this.state.error && (
               <div className="mt-8 pt-6 border-t border-border-gray/50 text-left">
-                <p className="text-[10px] uppercase font-bold text-slate/70 mb-2">Detalhes do Erro</p>
+                <p className="text-xs uppercase font-bold text-muted mb-2">Detalhes do Erro</p>
                 <div className="bg-ice p-4 overflow-auto text-xs text-slate font-mono whitespace-pre-wrap max-h-32">
                   {this.state.error.toString()}
                 </div>

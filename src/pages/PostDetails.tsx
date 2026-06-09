@@ -149,9 +149,9 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
               <div>
                 <h3 className="font-bold text-lg text-slate flex items-center gap-2">
                   <Link to={`/perfil/${post.authorId}`} className="hover:text-sky transition-colors">{post.authorName || 'Usuário'}</Link>
-                  <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
+                  <span className="text-xs font-normal text-muted">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
                 </h3>
-                <p className="text-[10px] uppercase text-slate/70 font-medium">Postado em #{post.category}</p>
+                <p className="text-xs uppercase text-muted font-medium">Postado em #{post.category}</p>
               </div>
               <div className="flex items-center gap-1">
                 {canModify && (
@@ -191,7 +191,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                   variant="ghost"
                   size="sm"
                   onClick={toggleSaved}
-                  className={`min-h-[44px] min-w-[44px] ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate/30 hover:text-navy'}`}
+                  className={`min-h-[44px] min-w-[44px] ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-muted hover:text-navy'}`}
                   title="Salvar Post"
                 >
                   <Bookmark className="w-5 h-5" fill={profile.savedPosts?.includes(post.id) ? 'currentColor' : 'none'} />
@@ -202,7 +202,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
               variant="ghost"
               size="sm"
               onClick={() => handleReport('POST', post.id, post.title + ' ' + post.body)}
-              className="min-h-[44px] min-w-[44px] text-slate/40 hover:text-danger"
+              className="min-h-[44px] min-w-[44px] text-muted hover:text-danger"
               title="Denunciar Publicação"
             >
               <AlertTriangle className="w-4 h-4" />
@@ -268,7 +268,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                        setNewCommentBody(prev => prev ? `${prev}\n@${c.authorName} ` : `@${c.authorName} `);
                        document.getElementById('comment-body')?.focus();
                      }}
-                     className="text-[10px] font-bold text-slate/70 hover:text-navy min-h-[44px]"
+                     className="text-xs font-bold text-muted hover:text-navy min-h-[44px]"
                    >
                      <MessageSquare className="w-3 h-3" /> RESPONDER
                    </Button>
@@ -276,7 +276,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                      variant="ghost"
                      size="sm"
                      onClick={() => handleReport('COMMENT', c.id, c.body)}
-                     className="min-h-[44px] min-w-[44px] text-slate/30 hover:text-danger"
+                     className="min-h-[44px] min-w-[44px] text-muted hover:text-danger"
                      title="Denunciar Comentário"
                    >
                      <AlertTriangle className="w-3.5 h-3.5" />

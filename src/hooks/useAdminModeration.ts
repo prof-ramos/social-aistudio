@@ -1,6 +1,7 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { adminService } from '../services/adminService';
 import { postService } from '../services/postService';
+import { postoService } from '../services/postoService';
 import { useToast } from '../components/ui/Toast';
 
 // Extract this interface to types if needed, but for now keeping it self-contained
@@ -50,6 +51,8 @@ export function useAdminModeration() {
             await postService.softDeletePost(report.contentId);
           } else if (report.type === 'COMMENT') {
             await postService.softDeleteComment(report.contentId);
+          } else if (report.type === 'POSTO_FIELD') {
+            await postoService.softDeleteField(report.contentId);
           } else {
             addToast(`Tipo de denúncia "${report.type}" não suportado para remoção automática.`, 'warning');
           }

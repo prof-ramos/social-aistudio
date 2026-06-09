@@ -24,6 +24,7 @@
   --app-white-fixed: #ffffff;
   --app-institutional-gold: #c4a35a;
   --app-asof-blue: #04528d;
+  --app-muted: #4B5563;
 }
 
 .dark {
@@ -43,6 +44,7 @@
   --app-white-fixed: #ffffff;
   --app-institutional-gold: #d4b76a;
   --app-asof-blue: #2d82cc;
+  --app-muted: #94A3B8;
 }
 
 html {
@@ -72,6 +74,7 @@ textarea {
   --color-white-fixed: var(--app-white-fixed);
   --color-institutional-gold: var(--app-institutional-gold);
   --color-asof-blue: var(--app-asof-blue);
+  --color-muted: var(--app-muted);
 
   --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
