@@ -12,7 +12,7 @@ describe('Button - active/hover states', () => {
   it('renders primary variant with hover classes', () => {
     render(<Button variant="primary">Primary</Button>);
     const button = screen.getByRole('button', { name: /primary/i });
-    expect(button.className).toContain('hover:bg-asof-blue');
+    expect(button.className).toContain('hover:bg-navy-dark');
     expect(button.className).toContain('hover:shadow-md');
     expect(button.className).toContain('hover:-translate-y-px');
   });
@@ -46,7 +46,8 @@ describe('Button - active/hover states', () => {
     render(<Button disabled>Disabled</Button>);
     const button = screen.getByRole('button', { name: /disabled/i });
     expect(button).toBeDisabled();
-    expect(button.className).toContain('disabled:opacity-80');
+    expect(button.className).toContain('disabled:bg-border-gray');
+    expect(button.className).toContain('disabled:text-navy-accent');
     expect(button.className).toContain('disabled:cursor-not-allowed');
   });
 });

@@ -3,6 +3,11 @@ import { BrowserRouter } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { vi } from 'vitest';
 
+// Mock AsofLogo para evitar act() warnings causados pelo fetch async de SVG
+vi.mock('../../components/brand/AsofLogo', () => ({
+  AsofLogo: () => <span data-testid="asof-logo" />,
+}));
+
 // Mock the services since they connect to Firebase
 vi.mock('../../services/notificationService', () => ({
   notificationService: {

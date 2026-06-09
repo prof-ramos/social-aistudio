@@ -30,16 +30,16 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
        </div>
      )}
      <div className="flex gap-4 mb-4">
-       <div className="w-12 h-12 bg-ice flex items-center justify-center font-bold text-navy shrink-0 uppercase">
+       <div className="w-12 h-12 bg-ice border border-border-gray flex items-center justify-center font-bold text-navy shrink-0 uppercase">
           {post.authorName ? post.authorName.charAt(0) : 'U'}
        </div>
        <div className="flex-1 flex justify-between items-start">
          <div>
-           <span className="font-bold text-lg text-slate block">
-             {post.authorName || 'Usuário'} <span className="text-sm font-normal text-slate/90">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador'}</span>
-           </span>
+            <span className="font-bold text-lg text-slate block">
+              {post.authorName || 'Usuário'} <span className="text-sm font-normal text-slate">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador'}</span>
+            </span>
            <div className="flex items-center">
-              <p className="text-sm uppercase text-slate/90 font-bold tracking-wider mt-0.5">#{post.category}</p>
+               <p className="text-sm uppercase text-slate font-bold tracking-wider mt-0.5">#{post.category}</p>
            </div>
          </div>
          <div className="flex items-center gap-1">
@@ -73,7 +73,7 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
              variant="ghost"
              size="sm"
              onClick={() => onToggleSaved(post.id)}
-             className={`min-h-[44px] min-w-[44px] ${isSaved ? 'text-sky bg-sky/10' : 'text-slate/30 hover:text-navy hover:bg-ice'}`}
+             className={`min-h-[44px] min-w-[44px] ${isSaved ? 'text-sky bg-sky/10' : 'text-slate hover:text-navy hover:bg-ice'}`}
              aria-label={isSaved ? 'Remover dos salvos' : 'Salvar post'}
            >
              <Bookmark className="w-5 h-5" strokeWidth={isSaved ? 2 : 1.5} fill={isSaved ? 'currentColor' : 'none'} />
@@ -85,14 +85,14 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
         <h3 className="font-bold text-navy text-xl mb-3 hover:text-sky transition-colors">{post.title}</h3>
      </Link>
      <div
-       className="text-base leading-loose mb-6 text-slate/90 line-clamp-3 prose prose-slate prose-sm"
+       className="text-base leading-loose mb-6 text-slate line-clamp-3 prose prose-slate prose-sm"
        dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.body) }}
      />
 
      <div className="flex items-center justify-between border-t border-border-gray/50 pt-4">
        <div className="flex items-center gap-6">
          <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
-         <Link to={`/feed/${post.id}#comment`} className="text-base font-medium text-slate/90 flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
+         <Link to={`/feed/${post.id}#comment`} className="text-base font-medium text-slate flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
            <MessageSquare className="w-5 h-5" strokeWidth={1.5} /> Responder
          </Link>
        </div>

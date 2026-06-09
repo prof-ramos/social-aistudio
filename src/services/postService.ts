@@ -458,7 +458,7 @@ export const postService = {
     return mapPostRow(updated);
   },
 
-  getPostCountByAuthor: async (authorId: string): Promise<number> => {
+  getPostCountByAuthor: async (authorId: string): Promise<number | null> => {
     const { count, error } = await supabase
       .from('posts')
       .select('*', { count: 'exact', head: true })
@@ -467,9 +467,9 @@ export const postService = {
 
     if (error) {
       console.error('Error fetching post count:', error);
-      return 0;
+      return null;
     }
 
-    return count ?? 0;
+    return count ?? null;
   },
 };

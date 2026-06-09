@@ -8,6 +8,25 @@ import { vi } from 'vitest';
 
 vi.mock('../hooks/useFeed');
 vi.mock('../services/userService');
+vi.mock('../services/postService', () => ({
+  postService: {
+    getPostCountByAuthor: vi.fn().mockResolvedValue(0),
+    getPosts: vi.fn().mockResolvedValue([]),
+    createPost: vi.fn(),
+    updatePost: vi.fn(),
+    deletePost: vi.fn(),
+    toggleReaction: vi.fn(),
+  },
+}));
+
+
+// Mocka componentes sidebar que fazem chamadas async — fora do escopo deste teste
+vi.mock('../components/feed/MemberSuggestionsCard', () => ({
+  MemberSuggestionsCard: () => null,
+}));
+vi.mock('../components/feed/PostoHighlightCard', () => ({
+  PostoHighlightCard: () => null,
+}));
 
 const renderWithRouter = (ui: React.ReactElement) => {
   return render(ui, { wrapper: BrowserRouter });
@@ -36,9 +55,10 @@ describe('Feed', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     (userService.getAllUsers as any).mockResolvedValue([]);
+    (userService.getUsersWithCommonPostos as any) = vi.fn().mockResolvedValue([]);
   });
 
-  it('renders "Nenhum post encontrado" when the filtered posts are empty', () => {
+  it('renders "Nenhum post encontrado" when the filtered posts are empty', async () => {
     useFeedMock.mockReturnValue({
       filteredPosts: [],
       isPosting: false,
@@ -55,7 +75,9 @@ describe('Feed', () => {
       hasMore: false
     });
 
-    renderWithRouter(<Feed profile={profile} />);
+    await act(async () => {
+      renderWithRouter(<Feed profile={profile} />);
+    });
 
     expect(screen.getByText('Nenhum post encontrado')).toBeInTheDocument();
   });

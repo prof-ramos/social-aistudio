@@ -97,7 +97,7 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
     if (items.length === 0) return null;
     return (
       <div key={type}>
-        <div className="px-3 py-2 text-sm font-bold uppercase tracking-wider text-slate/90 border-b border-border-gray/50">
+        <div className="px-3 py-2 text-sm font-bold uppercase tracking-wider text-slate border-b border-border-gray/50">
           {icon}<span className="ml-1.5">{label}</span>
         </div>
         {items.map(item => {

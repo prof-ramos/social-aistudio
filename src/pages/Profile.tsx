@@ -82,8 +82,9 @@ export function Profile({ profile }: { profile: UserProfile }) {
   const roleLabel = user.role === 'MEMBRO_ATIVO' ? 'Membro Ativo' : user.role === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador';
   const roleStatus: 'success' | 'neutral' | 'info' = user.role === 'MEMBRO_ATIVO' ? 'success' : user.role === 'MEMBRO_APOSENTADO' ? 'neutral' : 'info';
   const isViewingOwnProfile = profile.id === id;
-  const visiblePhone = isViewingOwnProfile ? (user.showPhone && user.phone) : !!user.phone;
-  const visibleEmail = isViewingOwnProfile ? (user.showEmail && user.email) : !!user.email;
+  // users_public view is the authoritative filter; this is defense-in-depth
+  const visiblePhone = user.showPhone && user.phone;
+  const visibleEmail = user.showEmail && user.email;
 
   return (
     <PageContainer variant="narrow" className="space-y-6">
@@ -120,7 +121,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
           <div className="flex-1 text-center md:text-left w-full">
             <h2 className="font-serif font-bold text-navy text-3xl mb-1">{user.name}</h2>
-            <p className="text-base font-medium text-slate/90 mb-6 leading-relaxed"><StatusBadge status={roleStatus}>{roleLabel}</StatusBadge> • OFC</p>
+            <p className="text-base font-medium text-slate mb-6 leading-relaxed"><StatusBadge status={roleStatus}>{roleLabel}</StatusBadge> • OFC</p>
 
             <div className="space-y-6">
               {user.currentPost && (
@@ -139,7 +140,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
                    <p className="text-slate text-base leading-relaxed whitespace-pre-wrap break-words">{user.bio}</p>
                 </div>
               ) : (
-                <p className="text-base text-slate/90 italic leading-relaxed">Nenhum detalhe de biografia ou trajetória profissional foi adicionado.</p>
+                <p className="text-base text-slate italic leading-relaxed">Nenhum detalhe de biografia ou trajetória profissional foi adicionado.</p>
               )}
 
               {visiblePhone || visibleEmail ? (
@@ -152,7 +153,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
                       <p className="text-base text-slate leading-relaxed flex items-center gap-2">
                         <Phone className="w-4 h-4 text-navy" />
                         {user.phone}
-                        {user.phoneIsWhatsapp && <span className="text-sm font-medium text-slate/90">(WhatsApp)</span>}
+                        {user.phoneIsWhatsapp && <span className="text-sm font-medium text-slate">(WhatsApp)</span>}
                       </p>
                     )}
                     {visibleEmail && (
@@ -209,7 +210,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="edit-profile-title"
-            className="mx-auto flex max-h-[90dvh] w-full max-w-xl flex-col overflow-hidden bg-white shadow-2xl"
+            className="mx-auto flex max-h-[90dvh] w-full max-w-xl flex-col overflow-hidden bg-white shadow-lg"
           >
             <div className="flex items-center justify-between p-6 border-b border-border-gray/50 bg-ice/30">
               <PageTitle as="h2" size="lg" id="edit-profile-title">Editar Perfil</PageTitle>
@@ -238,12 +239,12 @@ export function Profile({ profile }: { profile: UserProfile }) {
                   <textarea
                     id="profile-bio"
                     autoComplete="off"
-                    className="w-full min-h-[120px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-2 focus:ring-navy focus:outline-none leading-relaxed resize-y transition-colors bg-white/50"
+                    className="w-full min-h-[120px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-2 focus:ring-navy focus:outline-none leading-relaxed resize-y max-h-[400px] transition-colors bg-white/50"
                     placeholder="Conte um pouco sobre sua trajetória profissional e postos anteriores..."
                     value={editForm.bio}
                     onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
                   />
-                  <p className="text-sm text-slate/90 font-medium leading-relaxed">Escreva um breve resumo da sua carreira.</p>
+                  <p className="text-sm text-slate font-medium leading-relaxed">Escreva um breve resumo da sua carreira.</p>
                 </div>
                 <div className="space-y-1 text-left">
                   <label htmlFor="profile-interests" className="block text-sm uppercase tracking-widest font-bold text-navy">Áreas de Interesse</label>
@@ -261,7 +262,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
                 <div className="space-y-4 text-left border-t border-border-gray/50 pt-6">
                   <h3 className="text-base font-bold text-navy">Informações de Contato</h3>
-                  <p className="text-base text-slate/90 leading-relaxed flex items-start gap-2">
+                  <p className="text-base text-slate leading-relaxed flex items-start gap-2">
                     <Lock className="w-4 h-4 text-navy shrink-0 mt-1" />
                     Usamos seus dados de contato apenas para que colegas possam falar com você. Seu dado não será compartilhado sem sua autorização.
                   </p>
@@ -284,7 +285,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
                       id="profile-email"
                       type="email"
                       readOnly
-                      className="w-full h-11 border border-border-gray px-3 text-base text-slate/90 bg-ice/50 cursor-not-allowed"
+                      className="w-full h-11 border border-border-gray px-3 text-base text-slate bg-ice/50 cursor-not-allowed"
                       value={user.email}
                     />
                   </div>
@@ -343,7 +344,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
           {userPosts.length === 0 ? (
             <div className="text-center py-8">
-              <FileEdit className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+              <FileEdit className="w-12 h-12 mx-auto text-slate mb-3" />
               <p className="text-navy font-bold leading-relaxed">Nenhuma publicação ainda</p>
               <p className="text-base text-slate mt-1 leading-relaxed">
                 {isViewingOwnProfile
@@ -354,10 +355,10 @@ export function Profile({ profile }: { profile: UserProfile }) {
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {userPosts.map(post => (
-                <Link key={post.id} to={`/feed/${post.id}`} className="block border border-border-gray p-4 hover:border-navy hover:shadow-sm transition-all bg-ice/30">
+                <Link key={post.id} to={`/feed/${post.id}`} className="block min-h-[44px] border border-border-gray p-4 hover:border-navy hover:shadow-sm transition-all bg-ice/30">
                   <h3 className="font-bold text-navy mb-2 line-clamp-2">{post.title}</h3>
                   <div className="flex items-center justify-between mt-auto">
-                    <p className="text-sm text-slate/90 leading-relaxed">{post.category}</p>
+                    <p className="text-sm text-slate leading-relaxed">{post.category}</p>
                     <span className="text-sm uppercase font-bold text-navy">Ver post</span>
                   </div>
                 </Link>
@@ -375,17 +376,17 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
           {savedPosts.length === 0 ? (
             <div className="text-center py-8">
-               <Bookmark className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+               <Bookmark className="w-12 h-12 mx-auto text-slate mb-3" />
                <p className="text-navy font-bold leading-relaxed">Nenhum post salvo</p>
                <p className="text-base text-slate mt-1 leading-relaxed">Os posts que você salvar aparecerão aqui.</p>
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {savedPosts.map(post => (
-                <Link key={post.id} to={`/feed/${post.id}`} className="block border border-border-gray p-4 hover:border-navy hover:shadow-sm transition-all bg-ice/30">
+                <Link key={post.id} to={`/feed/${post.id}`} className="block min-h-[44px] border border-border-gray p-4 hover:border-navy hover:shadow-sm transition-all bg-ice/30">
                   <h3 className="font-bold text-navy mb-2 line-clamp-2">{post.title}</h3>
                   <div className="flex items-center justify-between mt-auto">
-                     <p className="text-sm text-slate/90 leading-relaxed">Por {post.authorName || 'Usuário'}</p>
+                     <p className="text-sm text-slate leading-relaxed">Por {post.authorName || 'Usuário'}</p>
                      <span className="text-sm uppercase font-bold text-navy">{post.category}</span>
                   </div>
                 </Link>

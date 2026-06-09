@@ -70,10 +70,10 @@ describe('Profile - Contact Fields (OFC)', () => {
     vi.clearAllMocks();
   });
 
-  it('shows public contact when phone is present without showPhone flag', () => {
+  it('shows public contact when showPhone is true for other users', () => {
     vi.mocked(useProfile).mockReturnValue(
       mockUseProfile({
-        user: { ...mockUser, id: 'other-user', phone: '(61) 99999-9999', showPhone: undefined },
+        user: { ...mockUser, id: 'other-user', phone: '(61) 99999-9999', showPhone: true },
         isOwnProfile: false,
       })
     );
@@ -90,6 +90,66 @@ describe('Profile - Contact Fields (OFC)', () => {
 
     expect(screen.getByText('Contato')).toBeInTheDocument();
     expect(screen.getByText('(61) 99999-9999')).toBeInTheDocument();
+  });
+
+  it('hides phone and email for other users when showPhone/showEmail is false', () => {
+    vi.mocked(useProfile).mockReturnValue(
+      mockUseProfile({
+        user: {
+          ...mockUser,
+          id: 'other-user',
+          phone: '(61) 99999-9999',
+          email: 'test@example.com',
+          showPhone: false,
+          showEmail: false,
+        },
+        isOwnProfile: false,
+      })
+    );
+
+    render(
+      <MemoryRouter initialEntries={['/perfil/other-user']}>
+        <ToastProvider>
+          <Routes>
+            <Route path="/perfil/:id" element={<Profile profile={mockProfile} />} />
+          </Routes>
+        </ToastProvider>
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByText('Contato')).not.toBeInTheDocument();
+    expect(screen.queryByText('(61) 99999-9999')).not.toBeInTheDocument();
+    expect(screen.queryByText('test@example.com')).not.toBeInTheDocument();
+  });
+
+  it('shows phone and email for other users when showPhone/showEmail is true', () => {
+    vi.mocked(useProfile).mockReturnValue(
+      mockUseProfile({
+        user: {
+          ...mockUser,
+          id: 'other-user',
+          phone: '(61) 99999-9999',
+          email: 'test@example.com',
+          showPhone: true,
+          showEmail: true,
+        },
+        isOwnProfile: false,
+      })
+    );
+
+    render(
+      <MemoryRouter initialEntries={['/perfil/other-user']}>
+        <ToastProvider>
+          <Routes>
+            <Route path="/perfil/:id" element={<Profile profile={mockProfile} />} />
+          </Routes>
+        </ToastProvider>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Contato')).toBeInTheDocument();
+    expect(screen.getByText('(61) 99999-9999')).toBeInTheDocument();
+    expect(screen.getByText('test@example.com')).toBeInTheDocument();
   });
 
   it('shows contact fields section in edit form', async () => {

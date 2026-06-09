@@ -143,16 +143,16 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
       ) : (
         <Card variant="elevated" padding="lg">
           <div className="flex gap-4 mb-6">
-            <div className="w-12 h-12 bg-ice flex items-center justify-center font-bold text-navy shrink-0 uppercase">
+            <div className="w-12 h-12 bg-ice border border-border-gray flex items-center justify-center font-bold text-navy shrink-0 uppercase">
                {post.authorName ? post.authorName.charAt(0) : 'U'}
             </div>
             <div className="flex-1 flex items-center justify-between">
               <div>
                 <h3 className="font-bold text-lg text-slate flex items-center gap-2">
                   <Link to={`/perfil/${post.authorId}`} className="hover:text-sky transition-colors">{post.authorName || 'Usuário'}</Link>
-                  <span className="text-sm font-normal text-slate/90">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
+                  <span className="text-sm font-normal text-slate">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
                 </h3>
-                <p className="text-sm uppercase text-slate/90 font-medium leading-relaxed">Postado em #{post.category}</p>
+                <p className="text-sm uppercase text-slate font-medium leading-relaxed">Postado em #{post.category}</p>
               </div>
               <div className="flex items-center gap-1">
                 {canModify && (
@@ -185,7 +185,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                     size="sm"
                     onClick={() => navigate('/mensagens', { state: { targetUserId: post.authorId, targetUserName: post.authorName } })}
                     title="Mandar Mensagem Direta"
-                    className="text-sm font-semibold text-slate/90 hover:text-navy"
+                    className="text-sm font-semibold text-slate hover:text-navy"
                   >
                     <MessageSquare className="w-4 h-4" /> MENSAGEM
                   </Button>
@@ -194,7 +194,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                   variant="ghost"
                   size="sm"
                   onClick={toggleSaved}
-                  className={`min-h-[44px] min-w-[44px] ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate/30 hover:text-navy'}`}
+                  className={`min-h-[44px] min-w-[44px] ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate hover:text-navy'}`}
                   title="Salvar Post"
                 >
                   <Bookmark className="w-5 h-5" fill={profile.savedPosts?.includes(post.id) ? 'currentColor' : 'none'} />
@@ -205,7 +205,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
               variant="ghost"
               size="sm"
               onClick={() => handleReport('POST', post.id, post.title + ' ' + post.body)}
-              className="min-h-[44px] min-w-[44px] text-slate/40 hover:text-danger"
+              className="min-h-[44px] min-w-[44px] text-slate hover:text-danger"
               title="Denunciar Publicação"
             >
               <AlertTriangle className="w-4 h-4" />
@@ -271,7 +271,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                        setNewCommentBody(prev => prev ? `${prev}\n@${c.authorName} ` : `@${c.authorName} `);
                        document.getElementById('comment-body')?.focus();
                      }}
-                      className="text-sm font-bold text-slate/90 hover:text-navy min-h-[44px]"
+                      className="text-sm font-bold text-slate hover:text-navy min-h-[44px]"
                    >
                      <MessageSquare className="w-3 h-3" /> RESPONDER
                    </Button>
@@ -279,7 +279,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                      variant="ghost"
                      size="sm"
                      onClick={() => handleReport('COMMENT', c.id, c.body)}
-                     className="min-h-[44px] min-w-[44px] text-slate/30 hover:text-danger"
+                     className="min-h-[44px] min-w-[44px] text-slate hover:text-danger"
                      title="Denunciar Comentário"
                    >
                      <AlertTriangle className="w-3.5 h-3.5" />
@@ -291,9 +291,9 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
           ))}
           {comments.length === 0 && (
             <Card variant="outlined" padding="lg" className="flex flex-col items-center justify-center text-center text-slate border-dashed">
-              <MessageSquare className="w-12 h-12 mb-4 opacity-20 text-navy" />
+              <MessageSquare className="w-12 h-12 mb-4 text-navy" />
               <PageTitle as="h3" size="md" className="mb-2">Seja o primeiro a participar</PageTitle>
-              <p className="text-base opacity-80 max-w-sm mx-auto leading-relaxed">Esta publicação ainda não possui comentários. Contribua com a discussão adicionando o seu!</p>
+              <p className="text-base text-slate max-w-sm mx-auto leading-relaxed">Esta publicação ainda não possui comentários. Contribua com a discussão adicionando o seu!</p>
             </Card>
           )}
         </div>
