@@ -23,6 +23,8 @@ const CarreiraPromocao = lazy(() => import('./pages/CarreiraPromocao').then(m =>
 const Aposentadoria = lazy(() => import('./pages/Aposentadoria').then(m => ({ default: m.Aposentadoria })));
 import { Home, Building2, Briefcase, Archive, MessageSquare } from 'lucide-react';
 import { Tour } from './components/Tour';
+import { KeyboardShortcuts, useKeyboardShortcutsOverlay } from './components/ui/KeyboardShortcuts';
+import { OfflineIndicator } from './components/ui/OfflineIndicator';
 import { ToastProvider } from './components/ui/Toast';
 import { UserProfile } from './types';
 import { usePresence } from './hooks/usePresence';
@@ -140,10 +142,13 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
   usePresence(profile);
   const { pathname } = useLocation();
   const isMessagesRoute = pathname === '/mensagens';
+  const shortcutsOverlay = useKeyboardShortcutsOverlay();
 
   return (
     <div className="h-dvh min-h-screen w-full bg-ice font-sans flex flex-col overflow-hidden">
       <Tour />
+      <OfflineIndicator />
+      <KeyboardShortcuts isOpen={shortcutsOverlay.isOpen} onClose={shortcutsOverlay.close} />
       <Navbar profile={profile} isAdminView={isAdminView} />
       <main id="main-content" className="flex flex-1 min-h-0 overflow-hidden">
         {/* Sidebar */}

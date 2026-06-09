@@ -40,6 +40,19 @@ export function Feed({ profile }: { profile: UserProfile }) {
   }, [profile.id]);
 
   useEffect(() => {
+    function handleShortcut(e: KeyboardEvent) {
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable;
+      if (e.key === 'n' && !isInput && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        setShowEditor(true);
+      }
+    }
+    document.addEventListener('keydown', handleShortcut);
+    return () => document.removeEventListener('keydown', handleShortcut);
+  }, []);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
         if (entries[0].isIntersecting && hasMore) {

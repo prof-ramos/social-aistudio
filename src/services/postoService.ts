@@ -147,6 +147,17 @@ export const postoService = {
     };
   },
 
+  softDeleteField: async (fieldId: string) => {
+    const { error } = await supabase
+      .from(POSTO_FIELDS_TABLE)
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', fieldId);
+    if (error) {
+      console.error('Error soft-deleting posto field:', error);
+      throw error;
+    }
+  },
+
   createPostoField: async (postoId: string, fieldType: string, body: string, authorId: string) => {
     const { data, error } = await supabase.from(POSTO_FIELDS_TABLE).insert({
       posto_id: postoId,

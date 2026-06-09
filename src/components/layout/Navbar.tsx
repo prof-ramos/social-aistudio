@@ -74,6 +74,20 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     clearQuery();
   }, [location.pathname, clearQuery]);
 
+  // Keyboard shortcut: / focuses search
+  useEffect(() => {
+    function handleSlash(event: KeyboardEvent) {
+      const target = event.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable;
+      if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !isInput) {
+        event.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    }
+    document.addEventListener('keydown', handleSlash);
+    return () => document.removeEventListener('keydown', handleSlash);
+  }, []);
+
   // Escape key handling
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
