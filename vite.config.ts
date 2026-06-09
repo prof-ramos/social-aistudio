@@ -17,6 +17,17 @@ export default defineConfig(() => {
       setupFiles: './vitest.setup.ts',
       css: true,
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            react: ['react', 'react-dom', 'react-router-dom'],
+            ui: ['lucide-react', '@tiptap/react', '@tiptap/starter-kit'],
+            supabase: ['@supabase/supabase-js'],
+          },
+        },
+      },
+    },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.

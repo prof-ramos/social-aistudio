@@ -19,7 +19,7 @@ export const StatusBadge = React.forwardRef<HTMLSpanElement, StatusBadgeProps>(
       <span
         ref={ref}
         className={cn(
-          'inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold border rounded-sm',
+          'inline-flex items-center gap-1 px-2 py-1 text-sm font-semibold border rounded-sm',
           variants[status],
           className
         )}

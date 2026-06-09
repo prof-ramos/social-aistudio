@@ -42,9 +42,14 @@ export function BrandLockup({
         className={cn(!isStart && 'mx-auto', logoSizes[size])}
       />
       {showSocialBadge && (
-        <div className={cn('mt-5 flex items-center gap-3', isStart && 'w-full max-w-xs')}>
+        <div className={cn('mt-6 flex items-center gap-3', isStart && 'w-full max-w-xs')}>
           <span className="h-px w-10 bg-institutional-gold/70" aria-hidden="true" />
-          <span className="font-sans text-[0.65rem] font-bold uppercase tracking-[0.28em] text-sky-dark">
+          <span
+            className={cn(
+              'font-serif text-2xl font-bold uppercase tracking-[0.25em] text-balance',
+              theme === 'dark' ? 'text-white' : 'text-navy'
+            )}
+          >
             Social
           </span>
           <span className="h-px w-10 bg-institutional-gold/70" aria-hidden="true" />
@@ -53,7 +58,8 @@ export function BrandLockup({
       {showTagline && (
         <p
           className={cn(
-            'mt-3 max-w-xs font-serif text-sm leading-relaxed text-slate/90',
+            'mt-3 max-w-xs font-serif text-lg leading-loose text-balance',
+            theme === 'dark' ? 'text-white/95' : 'text-slate',
             isStart && 'max-w-sm',
           )}
         >

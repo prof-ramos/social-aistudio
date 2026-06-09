@@ -39,6 +39,28 @@ Interpret creatively and make unexpected choices that feel genuinely designed fo
 
 **IMPORTANT**: Match implementation complexity to the aesthetic vision. Maximalist designs need elaborate code with extensive animations and effects. Minimalist or refined designs need restraint, precision, and careful attention to spacing, typography, and subtle details. Elegance comes from executing the vision well.
 
+**ASOF Specific Rules - Senior Accessibility & Persona Constraints**
+
+The ASOF user base is predominantly **65-85 years old (aposentados)** plus **50-65 years old (ativos)**. Both groups are predominantly public servants with low digital tolerance for complexity.
+
+**Typography & Readability:**
+- NEVER use `text-xs` (12px).
+- Use `text-sm` (14px) only for non-essential metadata with high contrast.
+- Body text must be at least `text-base` (16px), and ideally `text-lg` (18px) for reading areas.
+- Always use `leading-relaxed` or `leading-loose` for paragraphs.
+- Avoid low opacity text (`opacity-50`, `opacity-60`); ensure high contrast using darker colors or font weights (`font-medium`).
+
+**Navigation & Cognitive Load:**
+- NEVER require more than 3 taps/clicks to reach core actions (benefits, dependents, search, profile).
+- NEVER use jargon, acronyms, or technical IT terms in UI copy. Use clear, institutional language.
+- Avoid "feed" or stream-of-information layouts; prefer categorized, filterable content.
+- Do NOT overwhelm with notifications. Make notification settings explicit and easy to disable.
+
+**Trust & Privacy:**
+- Always explain WHY data is being requested. The veteran persona deeply distrusts digital scams.
+- Show clear privacy indicators (lock icons, "seu dado não será compartilhado") on any data-collection flow.
+- Provide visible, easy-to-find "Fale Conosco" or "Ajuda" entry points on every screen.
+
 ---
 name: code-reviewer
 description: Comprehensive code review skill for TypeScript, JavaScript, Python, Swift, Kotlin, Go. Includes automated code analysis, best practice checking, security scanning, and review checklist generation. Use when reviewing pull requests, providing code feedback, identifying issues, or ensuring code quality standards.
@@ -412,3 +434,27 @@ Then import database types from `src/types/supabase.ts` for fully typed queries.
 | `supabase/test-connection.ts` | Verify remote connectivity and schema presence |
 | `supabase/setup-admin.ts` | Create or ensure an admin user exists in `users` + `auth.users` |
 | `supabase/seed-data.ts` | Populate the database with test users, posts, comments, etc. Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` |
+
+
+---
+
+## User Personas Reference
+
+All frontend and UX decisions must align with the two dominant personas derived from a sample of 1,750 member records:
+
+### Persona 1: The Veteran Public Servant (Retired)
+- **Age:** 65-85 (born 1935-1955)
+- **Location:** Brasília (DF) and Rio de Janeiro (RJ)
+- **Digital behavior:** Mobile/tablet only; low tolerance for complex UI; fearful of scams
+- **Goals:** Reconnect with former colleagues, track pension/benefits, read official communiqués
+- **Pain points:** Small fonts, confusing navigation, lack of privacy cues, excessive notifications
+
+### Persona 2: The Senior Public Servant (Active)
+- **Age:** 50-65 (born 1960-1975)
+- **Location:** Brasília (DF) and state capitals
+- **Digital behavior:** Smartphone power user (WhatsApp, banking apps); time-constrained
+- **Goals:** Manage dependents, access health plan data, resolve bureaucracy digitally
+- **Pain points:** Too many clicks for simple tasks, noisy/unfiltered information feeds
+
+**Design mandate:** Clarity over decoration. Accessibility over aesthetics. Trust over cleverness.
+

@@ -82,12 +82,12 @@ export function Messages({ profile }: { profile: UserProfile }) {
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">
             {chats.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center p-8 text-center text-sm text-slate">
+              <div className="flex h-full flex-col items-center justify-center p-8 text-center text-base text-slate">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-ice">
-                  <MessageSquare className="h-5 w-5 text-navy opacity-50" />
+                  <MessageSquare className="h-5 w-5 text-navy opacity-80" />
                 </div>
-                <p className="font-medium text-navy">Nenhuma conversa</p>
-                <p className="mt-1 opacity-70">Suas mensagens aparecerão aqui.</p>
+                <p className="font-medium text-navy leading-relaxed">Nenhuma conversa</p>
+                <p className="mt-1 opacity-80 leading-relaxed">Suas mensagens aparecerão aqui.</p>
               </div>
             ) : (
               chats.map((chat) => {
@@ -109,17 +109,17 @@ export function Messages({ profile }: { profile: UserProfile }) {
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="mb-0.5 flex items-center justify-between">
-                        <p className="truncate text-sm font-bold text-navy">{otherName}</p>
-                        <span className="ml-2 shrink-0 text-[10px] text-slate/70">
+                        <p className="truncate text-base font-bold text-navy leading-relaxed">{otherName}</p>
+                        <span className="ml-2 shrink-0 text-xs text-slate/90">
                           {chat.updatedAt ? formatTime(chat.updatedAt) : ''}
                         </span>
                       </div>
-                      <p className="truncate text-sm text-slate">
+                      <p className="truncate text-base text-slate leading-relaxed">
                         {chat.lastMessage || 'Envie a primeira mensagem...'}
                       </p>
                     </div>
                     {chat.unreadCount > 0 && (
-                      <span className="ml-auto shrink-0 bg-navy text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      <span className="ml-auto shrink-0 bg-navy text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
                         {chat.unreadCount}
                       </span>
                     )}
@@ -145,7 +145,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                 <PageTitle as="h2" size="lg">
                   Suas Mensagens
                 </PageTitle>
-                <p className="mt-2 text-sm leading-relaxed text-slate">
+                <p className="mt-2 text-base leading-relaxed text-slate">
                   Selecione uma conversa na lista ao lado ou inicie um novo bate-papo a partir do perfil de um membro.
                 </p>
               </div>
@@ -173,7 +173,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                           <span className="font-bold text-white">{otherName.charAt(0).toUpperCase()}</span>
                         </div>
                         <div>
-                          <h2 className="text-sm font-bold text-navy">{otherName}</h2>
+                          <h2 className="text-base font-bold text-navy">{otherName}</h2>
                         </div>
                       </div>
                     );
@@ -198,7 +198,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                       >
                         <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.body}</p>
                       </div>
-                      <span className="mt-1 px-1 text-[10px] text-slate/70">
+                      <span className="mt-1 px-1 text-xs text-slate/90">
                         {formatTime(msg.createdAt)}
                       </span>
                     </div>

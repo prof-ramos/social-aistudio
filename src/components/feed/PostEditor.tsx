@@ -7,6 +7,8 @@ import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
 import { Post } from '../../types';
 
+import { ConfirmDialog } from '../ui/ConfirmDialog';
+
 interface PostEditorProps {
   onCancel: () => void;
   onSubmit: (title: string, bodyHTML: string, category: string) => Promise<void>;
@@ -21,6 +23,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
   const [category, setCategory] = useState(() => editPost?.category || '');
   const [error, setError] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showDiscardDialog, setShowDiscardDialog] = useState(false);
   const DRAFT_KEY = 'social-asof-draft-post';
   const debounceTimeout = useRef<any>(null);
   const isEditing = !!editPost;
@@ -47,7 +50,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
     content: editPost?.body || '',
     editorProps: {
       attributes: {
-        class: 'prose prose-slate max-w-none min-h-[200px] p-5 sm:p-6 text-slate focus:outline-none border-none resize-y',
+        class: 'prose prose-slate max-w-none min-h-[200px] p-5 sm:p-6 text-slate focus:outline-none border-none',
         'aria-label': 'Conteúdo da publicação',
       },
     },
@@ -73,6 +76,28 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
       }
     }
   }, [editor, isEditing]);
+
+  // Adjust scroll when virtual keyboard opens on mobile
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const handleResize = () => {
+      const sel = window.getSelection();
+      const range = sel?.rangeCount ? sel.getRangeAt(0) : null;
+      const rect = range?.getBoundingClientRect();
+      if (rect) {
+        const bottom = rect.bottom + 16;
+        if (bottom > vv.height) {
+          const offset = bottom - vv.height;
+          window.scrollBy({ top: offset, behavior: 'smooth' });
+        }
+      }
+    };
+
+    vv.addEventListener('resize', handleResize);
+    return () => vv.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -133,12 +158,16 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
   };
 
   const handleDiscardDraft = () => {
-    if (window.confirm("Deseja realmente descartar o rascunho?")) {
-      localStorage.removeItem(DRAFT_KEY);
-      setTitle('');
-      editor?.commands.setContent('');
-      setCategory('');
-    }
+    setShowDiscardDialog(true);
+  };
+
+  const confirmDiscardDraft = () => {
+    localStorage.removeItem(DRAFT_KEY);
+    setTitle('');
+    editor?.commands.setContent('');
+    setCategory('');
+    setShowDiscardDialog(false);
+    onCancel();
   };
 
   if (!editor) return null;
@@ -166,13 +195,14 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
       />
 
       <div className="border border-border-gray mb-6 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-navy transition-shadow">
-        <div className="flex flex-wrap gap-1.5 border-b border-border-gray p-2 sm:p-3 bg-ice/50">
+        <div role="toolbar" aria-label="Formatação do editor" className="flex flex-wrap gap-1.5 border-b border-border-gray p-2 sm:p-3 bg-ice/50">
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
             className={toolbarButtonClass(editor.isActive('bold'))}
             aria-label="Negrito"
             aria-pressed={editor.isActive('bold')}
+            aria-controls="post-editor-content"
             title="Negrito"
           >
             <Bold className="w-4 h-4" />
@@ -183,6 +213,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
             className={toolbarButtonClass(editor.isActive('italic'))}
             aria-label="Itálico"
             aria-pressed={editor.isActive('italic')}
+            aria-controls="post-editor-content"
             title="Itálico"
           >
             <Italic className="w-4 h-4" />
@@ -194,6 +225,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
             className={toolbarButtonClass(editor.isActive('bulletList'))}
             aria-label="Lista com marcadores"
             aria-pressed={editor.isActive('bulletList')}
+            aria-controls="post-editor-content"
             title="Lista com marcadores"
           >
             <List className="w-4 h-4" />
@@ -204,6 +236,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
             className={toolbarButtonClass(editor.isActive('orderedList'))}
             aria-label="Lista numerada"
             aria-pressed={editor.isActive('orderedList')}
+            aria-controls="post-editor-content"
             title="Lista numerada"
           >
             <ListOrdered className="w-4 h-4" />
@@ -215,6 +248,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
             className={toolbarButtonClass(editor.isActive('blockquote'))}
             aria-label="Citação"
             aria-pressed={editor.isActive('blockquote')}
+            aria-controls="post-editor-content"
             title="Citação"
           >
             <Quote className="w-4 h-4" />
@@ -225,12 +259,15 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
              className={toolbarButtonClass(editor.isActive('codeBlock'))}
              aria-label="Bloco de código"
              aria-pressed={editor.isActive('codeBlock')}
+             aria-controls="post-editor-content"
              title="Bloco de código"
           >
              <Code className="w-4 h-4" />
           </button>
         </div>
-        <EditorContent editor={editor} />
+        <div id="post-editor-content">
+          <EditorContent editor={editor} />
+        </div>
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between border-t border-border-gray pt-6 gap-5">
@@ -238,7 +275,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
           <label htmlFor="post-category" className="sr-only">Categoria</label>
           <select
             id="post-category"
-            className="w-full h-11 px-4 text-sm font-medium border border-border-gray bg-white text-slate focus:ring-2 focus:ring-navy focus:outline-none cursor-pointer"
+            className="w-full h-11 px-4 text-base font-medium border border-border-gray bg-white text-slate focus:ring-2 focus:ring-navy focus:outline-none cursor-pointer"
             value={category}
             onChange={handleCategoryChange}
           >
@@ -284,10 +321,20 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
         </div>
       </div>
       {!isEditing && (
-        <p className="text-[10px] text-slate/70 mt-4 font-medium uppercase tracking-wider text-right">
+        <p className="text-xs text-slate/90 mt-4 font-medium uppercase tracking-wider text-right">
           Rascunho salvo automaticamente
         </p>
       )}
+      <ConfirmDialog
+        isOpen={showDiscardDialog}
+        title="Descartar rascunho"
+        message="Deseja realmente descartar o rascunho?"
+        confirmLabel="Descartar"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={confirmDiscardDraft}
+        onCancel={() => setShowDiscardDialog(false)}
+      />
     </form>
   );
 }

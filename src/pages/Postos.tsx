@@ -19,18 +19,18 @@ export function Postos() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <PageTitle className="mb-2">Guia de Postos</PageTitle>
-          <p className="text-slate text-sm font-medium opacity-80">Fichas e relatos alimentados pelos Oficiais de Chancelaria</p>
+          <p className="text-slate text-base font-medium opacity-80 leading-relaxed">Fichas e relatos alimentados pelos Oficiais de Chancelaria</p>
         </div>
 
         <div className="flex flex-col md:flex-row w-full md:w-auto gap-4">
           <div className="relative w-full md:w-80">
-             <Search className="w-5 h-5 absolute left-3 top-3.5 text-navy opacity-50" />
+             <Search className="w-5 h-5 absolute left-3 top-3.5 text-navy opacity-80" />
              <label htmlFor="search-postos" className="sr-only">Buscar por nome, país ou região</label>
              <input
                id="search-postos"
                type="text"
                placeholder="Buscar por nome, país ou região..."
-               className="w-full h-12 border border-border-gray bg-white pl-10 pr-4 text-slate text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all placeholder:text-slate/70"
+               className="w-full h-12 border border-border-gray bg-white pl-10 pr-4 text-slate text-base font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all placeholder:text-slate/90"
                value={search}
                onChange={e => setSearch(e.target.value)}
              />
@@ -41,7 +41,7 @@ export function Postos() {
               id="region-filter"
               value={regionFilter}
               onChange={e => setRegionFilter(e.target.value)}
-              className="w-full h-12 border border-border-gray bg-white px-3 text-slate text-sm font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all"
+              className="w-full h-12 border border-border-gray bg-white px-3 text-slate text-base font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all"
             >
               <option value="">Todas as Regiões</option>
               {regions.map(r => (
@@ -62,9 +62,9 @@ export function Postos() {
                 </div>
               </div>
               <h3 className="font-serif text-2xl text-navy mb-1 leading-tight">{posto.name}</h3>
-              <p className="text-xs uppercase tracking-widest text-sky font-bold mb-4">{posto.country} • {posto.region}</p>
+              <p className="text-sm uppercase tracking-widest text-sky font-bold mb-4 leading-relaxed">{posto.country} • {posto.region}</p>
 
-              <div className="mt-auto pt-4 border-t border-border-gray/50 text-xs text-navy font-bold flex items-center justify-between group-hover:text-sky transition-colors">
+              <div className="mt-auto pt-4 border-t border-border-gray/50 text-sm text-navy font-bold flex items-center justify-between group-hover:text-sky transition-colors">
                 <span>ACESSAR FICHA COMPLETA</span>
                 <span className="font-serif text-lg leading-none">→</span>
               </div>
@@ -76,8 +76,8 @@ export function Postos() {
       {filtered.length === 0 && (
          <Card variant="default" padding="none" className="text-center py-16 text-slate">
            <MapPin className="w-12 h-12 mx-auto mb-4 opacity-20 text-navy" />
-           <p className="font-serif text-xl text-navy mb-1">Nenhum posto encontrado</p>
-           <p className="text-sm opacity-80">Não encontramos resultados para "{search}". Tente buscar por outro termo.</p>
+           <p className="font-serif text-xl text-navy mb-1 leading-relaxed">Nenhum posto encontrado</p>
+           <p className="text-base opacity-80 leading-relaxed">Não encontramos resultados para "{search}". Tente buscar por outro termo.</p>
          </Card>
       )}
     </PageContainer>

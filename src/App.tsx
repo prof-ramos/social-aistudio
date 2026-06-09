@@ -149,7 +149,7 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
         {/* Sidebar */}
         <aside className="w-64 bg-white border-r border-border-gray text-navy hidden md:flex flex-col py-8 px-6 flex-none z-10 shadow-sm relative">
           <div className="mb-8 tour-sidebar-nav">
-            <p className="text-[10px] uppercase font-bold tracking-widest text-slate/70 mb-4 px-4">Navegação</p>
+            <p className="text-xs uppercase font-bold tracking-widest text-slate/90 mb-4 px-4">Navegação</p>
             <ul className="space-y-1 text-sm font-medium">
               <li>
                 <Link to="/feed" className="flex items-center gap-3 bg-ice text-navy py-3 px-4 rounded-none hover:bg-border-gray/30 transition-colors">

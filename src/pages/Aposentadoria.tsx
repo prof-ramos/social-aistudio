@@ -18,8 +18,8 @@ export function Aposentadoria({ profile }: { profile: UserProfile }) {
         </div>
         <div className="text-center py-8">
           <FileText className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
-          <p className="text-navy font-bold">Documentos em breve</p>
-          <p className="text-sm text-slate mt-1">Guias e documentos sobre o processo de aposentadoria serão publicados aqui.</p>
+          <p className="text-navy font-bold leading-relaxed">Documentos em breve</p>
+          <p className="text-base text-slate mt-1 leading-relaxed">Guias e documentos sobre o processo de aposentadoria serão publicados aqui.</p>
         </div>
       </Card>
 
@@ -32,8 +32,8 @@ export function Aposentadoria({ profile }: { profile: UserProfile }) {
         </div>
         <div className="text-center py-8">
           <Calculator className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
-          <p className="text-navy font-bold">Simulador em breve</p>
-          <p className="text-sm text-slate mt-1">O simulador de aposentadoria estará disponível em breve.</p>
+          <p className="text-navy font-bold leading-relaxed">Simulador em breve</p>
+          <p className="text-base text-slate mt-1 leading-relaxed">O simulador de aposentadoria estará disponível em breve.</p>
         </div>
       </Card>
 
@@ -46,8 +46,8 @@ export function Aposentadoria({ profile }: { profile: UserProfile }) {
         </div>
         <div className="text-center py-8">
           <Newspaper className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
-          <p className="text-navy font-bold">Notícias em breve</p>
-          <p className="text-sm text-slate mt-1">Notícias e atualizações sobre aposentadoria serão divulgadas aqui.</p>
+          <p className="text-navy font-bold leading-relaxed">Notícias em breve</p>
+          <p className="text-base text-slate mt-1 leading-relaxed">Notícias e atualizações sobre aposentadoria serão divulgadas aqui.</p>
         </div>
       </Card>
     </PageContainer>

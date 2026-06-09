@@ -60,7 +60,7 @@ export function MemberSuggestionsCard({ profile }: MemberSuggestionsCardProps) {
       <div className="absolute top-0 right-0 w-24 h-24 bg-ice/50 rounded-bl-full -z-0 transition-transform group-hover:scale-110"></div>
       
       <div className="relative z-10">
-        <h3 className="text-sm font-bold text-navy uppercase tracking-wider mb-5 flex items-center gap-2">
+        <h3 className="text-base font-bold text-navy uppercase tracking-wider mb-5 flex items-center gap-2">
           <UserPlus className="w-4 h-4 text-sky-dark" />
           Sugestões para Você
         </h3>
@@ -80,10 +80,10 @@ export function MemberSuggestionsCard({ profile }: MemberSuggestionsCardProps) {
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-navy truncate group-hover/user:text-sky-dark transition-colors">
+                    <p className="text-base font-bold text-navy truncate group-hover/user:text-sky-dark transition-colors">
                       {user.name}
                     </p>
-                    <p className="text-xs text-slate truncate">
+                    <p className="text-sm text-slate truncate">
                       {commonPostos.length > 0 ? commonPostos[0].split(',')[0] : 'Membro'}
                     </p>
                   </div>

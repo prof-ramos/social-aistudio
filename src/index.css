@@ -8,10 +8,17 @@
   --page-max-width-wide: 80rem;
   --page-max-width-default: var(--page-max-width-feed);
 
+  /*
+   * Design system palette.
+   * Current: srgb hex values. Future: migrate to OKLCH for perceptually-uniform
+   * mixing, better accessibility contrast control, and smoother dark-mode
+   * transitions. OKLCH preserves lightness when rotating hue, avoiding the
+   * "muddy" mid-tones common in HSL mixes.
+   */
   --app-navy: #0D2A4A;
   --app-navy-dark: #040920;
   --app-navy-accent: #0F172A;
-  --app-sky: #A0C8E4;
+  --app-sky: #5A8FBF;
   --app-sky-dark: #82B4D6;
   --app-ice: #E7EDF4;
   --app-slate: #374151;
@@ -46,13 +53,29 @@
 }
 
 html {
-  overflow-x: clip;
+  overflow-x: hidden;
+}
+
+@supports (overflow-x: clip) {
+  html {
+    overflow-x: clip;
+  }
+}
+
+@media (max-width: 767px) {
+  .ProseMirror {
+    resize: none !important;
+  }
 }
 
 input,
 select,
 textarea {
   font-size: 1rem;
+}
+
+a, button, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
 }
 
 @theme {
@@ -108,8 +131,32 @@ textarea {
   width: 55%;
   aspect-ratio: 1;
   border-radius: 9999px;
-  background: radial-gradient(circle, color-mix(in srgb, var(--app-sky) 35%, transparent), transparent 68%);
-  filter: blur(8px);
+  background: radial-gradient(circle, color-mix(in srgb, var(--app-sky) 30%, transparent), transparent 70%);
+  filter: blur(6px);
+}
+
+.auth-shell__hero-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--app-ice) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--app-ice) 10%, transparent) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 50% at 50% 50%, black, transparent 80%);
+}
+
+.auth-shell__card {
+  transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.auth-shell__card:hover {
+  transform: translateY(-2px);
+  will-change: transform, box-shadow;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--app-institutional-gold) 40%, transparent),
+    0 12px 32px -8px color-mix(in srgb, var(--app-navy-dark) 24%, transparent),
+    0 40px 80px -24px color-mix(in srgb, var(--app-navy-dark) 28%, transparent);
 }
 
 .auth-shell__main {
@@ -121,7 +168,8 @@ textarea {
   border: 1px solid color-mix(in srgb, var(--app-border-gray) 85%, transparent);
   box-shadow:
     0 1px 0 color-mix(in srgb, var(--app-institutional-gold) 35%, transparent),
-    0 24px 48px -32px color-mix(in srgb, var(--app-navy-dark) 28%, transparent);
+    0 8px 24px -8px color-mix(in srgb, var(--app-navy-dark) 18%, transparent),
+    0 32px 64px -24px color-mix(in srgb, var(--app-navy-dark) 22%, transparent);
   backdrop-filter: blur(10px);
   padding: clamp(1.5rem, 3vw, 2.25rem);
 }
@@ -137,21 +185,40 @@ textarea {
 }
 
 .auth-reveal {
-  animation: auth-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: auth-reveal 680ms cubic-bezier(0.23, 1, 0.32, 1) both;
+  will-change: transform, opacity;
 }
 
-.auth-reveal--1 { animation-delay: 80ms; }
-.auth-reveal--2 { animation-delay: 160ms; }
-.auth-reveal--3 { animation-delay: 280ms; }
+.auth-reveal--1 { animation-delay: 100ms; }
+.auth-reveal--2 { animation-delay: 220ms; }
+.auth-reveal--3 { animation-delay: 340ms; }
 
 @keyframes auth-reveal {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(16px) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Disable active transforms on touch devices to avoid repaints (P2) */
+@media (hover: none) {
+  button:active,
+  [type="button"]:active,
+  [type="submit"]:active,
+  [role="button"]:active {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -162,6 +229,21 @@ textarea {
   opacity: 0.4;
   pointer-events: none;
   height: 0;
+}
+
+@supports (content-visibility: auto) {
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+}
+
+.sidebar-contain {
+  contain: layout paint;
+}
+
+.modal-contain {
+  contain: layout paint style;
 }
 
 /* Respect reduced motion preferences (WCAG 2.3.3) */
@@ -175,3 +257,4 @@ textarea {
     scroll-behavior: auto !important;
   }
 }
+

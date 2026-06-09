@@ -46,20 +46,20 @@ export default function AdminModeration() {
       <Breadcrumb items={[{ label: 'Início', href: '/feed' }, { label: 'Admin', href: '/admin' }, { label: 'Moderação' }]} />
       <div>
         <PageTitle as="h1" size="xl">Moderação</PageTitle>
-        <p className="text-slate">Gerencie denúncias de conteúdo publicadas na plataforma.</p>
+        <p className="text-slate leading-relaxed">Gerencie denúncias de conteúdo publicadas na plataforma.</p>
       </div>
 
       <Card variant="elevated" className="flex h-[calc(100dvh-12rem)] min-h-[24rem] flex-col">
         {pendingReports.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-slate">
-            <ShieldAlert className="w-12 h-12 mb-4 opacity-50" />
+            <ShieldAlert className="w-12 h-12 mb-4 opacity-80" />
             <p>Nenhuma denúncia pendente.</p>
           </div>
         ) : (
           <div className="overflow-y-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-ice border-b border-border-gray text-xs font-bold uppercase tracking-wider text-slate">
+                <tr className="bg-ice border-b border-border-gray text-sm font-bold uppercase tracking-wider text-slate">
                   <th scope="col" className="p-4">Conteúdo</th>
                   <th scope="col" className="p-4">Motivo / Denunciante</th>
                   <th scope="col" className="p-4">Ação</th>
@@ -70,21 +70,21 @@ export default function AdminModeration() {
                   <tr key={rep.id} className="hover:bg-ice/30 transition-colors">
                     <td className="p-4">
                       <div className="flex flex-col">
-                        <span className="text-xs font-bold text-sky uppercase tracking-wider mb-1">{rep.type}</span>
-                        <p className="text-sm text-slate overflow-hidden text-ellipsis line-clamp-3">{rep.preview}</p>
+                        <span className="text-sm font-bold text-sky uppercase tracking-wider mb-1">{rep.type}</span>
+                        <p className="text-base text-slate overflow-hidden text-ellipsis line-clamp-3 leading-relaxed">{rep.preview}</p>
                       </div>
                     </td>
                     <td className="p-4">
-                      <p className="text-sm font-bold text-navy">{rep.reason}</p>
-                      <p className="text-xs text-slate opacity-70">Por: {rep.reportedBy}</p>
+                      <p className="text-base font-bold text-navy leading-relaxed">{rep.reason}</p>
+                      <p className="text-sm text-slate opacity-80 leading-relaxed">Por: {rep.reportedBy}</p>
                     </td>
                     <td className="p-4">
                       {resolvingId === rep.id ? (
                         <form onSubmit={(e) => handleResolve(rep.id, e)} className="bg-ice p-3 rounded-none border border-border-gray space-y-3 min-w-[250px]">
                           <div>
-                            <label className="block text-xs font-bold text-slate mb-1">Ação</label>
+                            <label className="block text-sm font-bold text-slate mb-1">Ação</label>
                             <select
-                              className="w-full h-9 border border-border-gray rounded text-sm px-2 focus:ring-1 focus:ring-navy focus:outline-none"
+                              className="w-full h-9 border border-border-gray rounded text-base px-2 focus:ring-1 focus:ring-navy focus:outline-none"
                               value={action}
                               onChange={e => setAction(e.target.value as any)}
                             >
@@ -94,10 +94,10 @@ export default function AdminModeration() {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-bold text-slate mb-1">Nota Interna (Obrigatório)</label>
+                            <label className="block text-sm font-bold text-slate mb-1">Nota Interna (Obrigatório)</label>
                             <textarea
                               required
-                              className="w-full min-h-[60px] border border-border-gray rounded text-sm p-2 focus:ring-1 focus:ring-navy focus:outline-none resize-none"
+                              className="w-full min-h-[60px] border border-border-gray rounded text-base p-2 focus:ring-1 focus:ring-navy focus:outline-none resize-none"
                               value={notes}
                               onChange={e => setNotes(e.target.value)}
                               placeholder="Descreva a razão da decisão..."
@@ -133,18 +133,18 @@ export default function AdminModeration() {
           <Card variant="elevated" className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-ice border-b border-border-gray text-xs font-bold uppercase tracking-wider text-slate">
+                <tr className="bg-ice border-b border-border-gray text-sm font-bold uppercase tracking-wider text-slate">
                   <th scope="col" className="p-4">Conteúdo</th>
                   <th scope="col" className="p-4">Resolução</th>
                   <th scope="col" className="p-4">Nota Interna</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border-gray text-sm text-slate">
+              <tbody className="divide-y divide-border-gray text-base text-slate">
                 {resolvedReports.map(rep => (
                   <tr key={rep.id}>
                     <td className="p-4">
-                      <span className="text-[10px] font-bold text-sky uppercase">{rep.type}</span>
-                      <p className="line-clamp-2 max-w-xs">{rep.preview}</p>
+                      <span className="text-xs font-bold text-sky uppercase">{rep.type}</span>
+                      <p className="line-clamp-2 max-w-xs leading-relaxed">{rep.preview}</p>
                     </td>
                     <td className="p-4">
                       {rep.status === 'RESOLVED_KEPT' && <StatusBadge status="neutral"><Check className="w-3 h-3" /> Mantido</StatusBadge>}
@@ -152,7 +152,7 @@ export default function AdminModeration() {
                       {rep.status === 'RESOLVED_REMOVED' && <StatusBadge status="error"><Trash2 className="w-3 h-3" /> Removido</StatusBadge>}
                     </td>
                     <td className="p-4 max-w-xs">
-                      <p className="line-clamp-2">{rep.notes}</p>
+                      <p className="line-clamp-2 leading-relaxed">{rep.notes}</p>
                     </td>
                   </tr>
                 ))}

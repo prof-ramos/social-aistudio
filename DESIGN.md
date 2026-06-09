@@ -2,6 +2,45 @@
 title: Social-ASOF Design System
 description: Design system for the Social-ASOF internal social network — a diplomatic-grade platform built for the ASOF community. Structured, authoritative, and calm.
 
+# Target Audience & Personas
+
+The Social-ASOF platform serves a membership base drawn from a sample of **1,750 records**, revealing two dominant personas that govern every design decision.
+
+## Persona 1: The Veteran Public Servant (Retired)
+- **Age:** 65-85 years old (born 1935-1955)
+- **Status:** Retired; possession dates from the 1970s-1980s
+- **Location:** Heavy concentration in Brasília (DF) and Rio de Janeiro (RJ)
+- **Marital status:** Mostly married, widowed, or divorced
+- **Digital behavior:** Accesses the internet primarily via mobile phone or tablet for news, benefits checks, and keeping in touch with former colleagues
+- **Goals on the platform:**
+  - Reconnect with former work colleagues
+  - Stay informed on official association communications
+  - Track pension, health plan, and benefit updates
+  - Participate in discussions, events, and votes
+- **Pain points:**
+  - Difficulty with complex interfaces, small fonts, poor contrast
+  - Low patience for confusing navigation flows or irrelevant notifications
+  - Deep distrust of digital scams; demands clear privacy indicators
+- **UX mandate:** Clean interface, legible large typography, high contrast, obvious navigation, zero technical jargon
+
+## Persona 2: The Senior Public Servant (Active)
+- **Age:** 50-65 years old (born 1960-1975)
+- **Status:** Mid-career or approaching retirement
+- **Location:** Mainly Brasília (DF), spread across state capitals
+- **Digital behavior:** Regular smartphone user for banking, WhatsApp, and social media; time-constrained
+- **Goals on the platform:**
+  - Quickly access health plan, dependent, and paycheck data
+  - Network with peers on career and association topics
+  - Resolve bureaucratic tasks 100% digitally and fast
+- **Pain points:**
+  - Rejects tools that require too many clicks for simple tasks
+  - Wants segmented, useful information — not a noisy "social feed"
+- **UX mandate:** Efficient search, clear filters, one-tap access to "Dependents" and "Benefits", impeccable responsive mobile design
+
+## Design Conclusion
+> The membership list (with birth dates reaching back to the 1930s and possession dates from the 1960s-1980s) reinforces the need for **Inclusive Design Focused on Accessibility**. Recent interface changes — simplified navigation, removal of redundancies, increased contrast, and better topic structuring — are perfectly aligned with the needs of this predominantly senior audience. The interface must continue prioritizing **clarity over purely aesthetic elements** that could cause cognitive confusion.
+
+
 # ---
 # PRIMITIVE TOKENS
 # ---
@@ -60,16 +99,20 @@ tokens:
       light: "#FFFFFF"
       dark: "#111827"
       description: "Card surfaces and elevated content. In dark mode, it becomes a deep charcoal."
+    muted:
+      light: "#4B5563"
+      dark: "#94A3B8"
+      description: "Secondary and metadata text. Meets WCAG AA contrast (≥4.5:1) on both white and ice backgrounds. Replaces opacity-based slate modifiers for readable secondary content."
 
   typography:
     font-sans:
-      family: '"Inter", ui-sans-serif, system-ui, sans-serif'
+      family: '"Source Sans 3", ui-sans-serif, system-ui, sans-serif'
       weights: [400, 500, 600, 700]
-      description: "Primary interface font. Clean, neutral, and highly legible at all sizes. Used for body text, buttons, labels, and navigation."
+      description: "Primary interface font. A humanist sans-serif with excellent readability at all sizes and a warm, professional feel. Used for body text, buttons, labels, and navigation."
     font-serif:
-      family: '"Playfair Display", ui-serif, Georgia, serif'
-      weights: [400, 700]
-      description: "Display font. Used exclusively for page titles and brand headers. Evokes a sense of formal authority and tradition."
+      family: '"Cormorant Garamond", ui-serif, Georgia, serif'
+      weights: [700]
+      description: "Display font. Used exclusively for page titles and brand headers. A high-contrast Garalde serif with dramatic weight variation that evokes formal authority and institutional gravitas."
     scale:
       display:
         size: "2.25rem"
@@ -90,25 +133,25 @@ tokens:
         weight: 700
         description: "Card titles, sub-headings (h3)."
       body:
-        size: "0.875rem"
-        line-height: "1.5rem"
+        size: "1rem"
+        line-height: "1.625rem"
         font: "font-sans"
         weight: 400
-        description: "Body copy, descriptions, and long-form text."
+        description: "Body copy, descriptions, and long-form text. Baseline is 16px (1rem) minimum, scaling to 18px (text-lg) in feed for senior accessibility."
       label:
-        size: "0.625rem"
-        line-height: "0.875rem"
+        size: "0.875rem"
+        line-height: "1.25rem"
         font: "font-sans"
         weight: 700
         letter-spacing: "0.1em"
         text-transform: "uppercase"
-        description: "Overlines, section labels, metadata, category tags. Always uppercase with wide tracking."
+        description: "Overlines, section labels, metadata, category tags. Always uppercase with wide tracking. Minimum 14px (0.875rem, text-sm) to ensure readability for the senior demographic."
       caption:
-        size: "0.75rem"
-        line-height: "1rem"
+        size: "0.875rem"
+        line-height: "1.25rem"
         font: "font-sans"
-        weight: 400
-        description: "Secondary metadata, timestamps, helper text."
+        weight: 500
+        description: "Secondary metadata, timestamps, helper text. Minimum 14px (text-sm) with high contrast (opacity >= 80% or medium weight)."
 
   spacing:
     unit: "0.25rem"
@@ -182,6 +225,15 @@ tokens:
       slow: "300ms"
     description: "Transitions are quick and functional. Emphasis is on responsiveness, not spectacle. Prefers-reduced-motion is fully respected via media query overrides."
 
+  z-index:
+    dropdown: 40
+    sticky: 50
+    modal-backdrop: 50
+    modal: 50
+    toast: 60
+    tooltip: 70
+    description: "Semantic z-index scale. Dropdowns sit above content, sticky nav and modals share the same layer, toasts sit above modals, tooltips above toasts. Never use arbitrary values like 999 or 9999."
+
   breakpoints:
     sm: "640px"
     md: "768px"
@@ -202,7 +254,7 @@ semantic:
   text:
     primary: "navy"
     secondary: "slate"
-    muted: "slate/60"
+    muted: "muted"
     inverted: "white"
     link: "navy"
     link-hover: "sky"
@@ -245,18 +297,33 @@ The dark mode is not an afterthought. Colors are inverted systematically: navy b
 
 The typographic pairing is the soul of the interface.
 
-- **Playfair Display** (serif) is used exclusively for display headings. It introduces a sense of heritage and gravitas — appropriate for a community with deep institutional history.
-- **Inter** (sans-serif) does everything else. Body text, buttons, labels, navigation. Its neutrality ensures the serif headlines feel intentional, not decorative.
+- **Cormorant Garamond** (serif) is used exclusively for display headings. A high-contrast Garalde serif with dramatic thin/thick transitions that introduces a sense of heritage and institutional gravitas.
+- **Source Sans 3** (sans-serif) does everything else. Body text, buttons, labels, navigation. A humanist sans with warm terminals and excellent readability that complements the serif without competing.
 
-Text sizing is conservative. There is no giant hero text. The largest heading is 2.25rem, keeping the interface compact and information-dense without feeling cramped.
+Text sizing is designed for accessibility, recognizing the senior demographic of the ASOF community (65-85 years old).
+- **Base font size is 16px** (`text-base`), scaling to 18px (`text-lg`) for primary reading areas like the feed.
+- **Small text is restricted:** 14px (`text-sm`) is the absolute minimum allowed size, used only for metadata with high contrast. 12px (`text-xs`) is banned.
+- **Line height:** Long-form text uses generous line spacing (`leading-relaxed`) to aid tracking for readers with presbyopia.
+- **Contrast:** Low opacity (`opacity-50`) is avoided on text. Secondary text relies on `opacity-80` or medium font weights to remain legible.
 
-Labels and metadata are set in **10px uppercase with wide letter-spacing** (`tracking-widest`). This creates a clear typographic separation between content and structure.
+Labels and metadata are set in **14px uppercase with wide letter-spacing** (`tracking-widest`). This creates a clear typographic separation between content and structure without compromising legibility.
 
 ### Shape & Elevation
 
-The interface is predominantly **rectilinear**. Cards, inputs, buttons, and modals all use `0px` border radius. This sharpness conveys structure and permanence. The only exceptions are avatars, spinners, and status indicators, which use full rounding (`9999px`) as a deliberate contrast.
+The interface is predominantly **rectilinear**. Cards, inputs, buttons, and modals all use `0px` border radius. This sharpness conveys structure and permanence. The only exceptions are avatars, spinners, status indicators (full rounding `9999px`), and **chat message bubbles** (`rounded-sm` at 2px), which use subtle rounding as a deliberate contrast to distinguish conversational content from structural elements.
 
 Elevation is achieved through **borders and subtle shadows**, not floating cards. A standard card has a 1px `border-gray` border. An elevated card adds a `shadow-sm`. There are no heavy drop shadows or glassmorphism effects.
+
+### Institutional Gold Accent
+
+The institutional gold (`#c4a35a` / `var(--app-institutional-gold)`) is a secondary brand accent used sparingly for active states and highlights. It appears in:
+
+- Active navigation item background (`bg-institutional-gold/10`)
+- Active filter pill highlight
+- Navbar bottom shadow line
+- Auth shell decorative elements
+
+Gold is reserved for active/selected states — never for body text (insufficient contrast on white) or error states.
 
 ### Spacing & Layout
 
@@ -325,14 +392,47 @@ Global notification system. Fixed to the bottom-right of the viewport. Toasts au
 
 ## Accessibility
 
-The design system is built with WCAG 2.1 AA as a baseline:
+The design system is built with **WCAG 2.1 AA as a baseline**, but operates with **AAA aspirations** where the senior demographic is concerned.
+
+### Visual Accessibility
 - All interactive elements have visible focus rings (`focus:ring-2 focus:ring-navy`).
-- Touch targets are minimum 44x44px.
-- Inputs use 16px font size to prevent iOS zoom.
+- Touch targets are minimum **44x44px**; primary CTAs should be **48px** or larger.
+- Inputs use **16px font size minimum** to prevent iOS zoom.
+- Body text is **16px (1rem) minimum**, scaling to **18px (text-lg)** in reading areas.
+- **Never use opacity below 80%** for text (`opacity-50`, `opacity-60` are banned); rely on `muted` token or `font-medium` for hierarchy.
+- Color contrast ratios must pass **WCAG AA (4.5:1)** for all body text; aim for **7:1** on critical reading surfaces.
+
+### Cognitive Accessibility
 - The Skip Link pattern is implemented for keyboard navigation.
+- **No jargon, acronyms, or technical IT terms** in UI copy. Use institutional, plain language.
+- Core actions (Benefits, Dependents, Search, Profile) must be reachable in **3 taps or fewer**.
+- Avoid "infinite scroll" feeds; use **paginated, categorized, or filterable** content lists.
 - Modals trap focus and close on Escape.
 - `aria-live` regions are used for dynamic content updates (chat, toasts).
+
+### Trust & Security Signals
+- Always explain **why** data is being requested when collecting input.
+- Display visible privacy indicators (lock icons, "seu dado não será compartilhado" labels) on every data-collection flow.
+- Provide a persistent, easy-to-find **"Fale Conosco"** or **"Ajuda"** entry point on every screen.
+- An offline indicator (`role="status"`, `aria-live="polite"`) appears when connectivity is lost.
+
+### Input & Interaction
 - Dark mode respects `prefers-color-scheme` and can be toggled manually.
+- Keyboard shortcuts are discoverable via a `?` overlay and include `/` (search), `n` (new post), `Esc` (close modals).
+- All form errors are inline and descriptive; never rely on color alone (use icons + text).
+
+## Keyboard Shortcuts
+
+The app supports keyboard shortcuts for power users:
+
+| Key | Action | Context |
+|-----|--------|---------|
+| `/` | Focus search | Global (not in inputs) |
+| `n` | New post | Feed page (not in inputs) |
+| `Esc` | Close modal/overlay | Global |
+| `?` | Toggle shortcut overlay | Global (not in inputs) |
+
+Shortcuts are discoverable via the `?` overlay and shown as hints in relevant UI elements (search placeholder, button titles).
 
 ## Dark Mode
 

@@ -1,0 +1,32 @@
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e7]:
+        - paragraph [ref=e8]: Associação de Oficiais de Chancelaria
+        - generic [ref=e9]:
+          - img "Logo da ASOF" [ref=e10]:
+            - img "Logo da ASOF" [ref=e36]
+          - generic [ref=e13]: Social
+          - paragraph [ref=e15]: Comunidade exclusiva dos associados da ASOF
+      - generic [ref=e16]:
+        - paragraph [ref=e17]: Um espaço reservado para diálogo, colaboração e pertencimento entre oficiais de chancelaria.
+        - generic [ref=e18]: Uso restrito a associados
+    - main [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - heading "Acesse a plataforma" [level=1] [ref=e23]
+          - paragraph [ref=e24]: Apenas associados da ASOF.
+        - generic [ref=e25]:
+          - generic [ref=e26]:
+            - generic [ref=e27]: E-mail
+            - textbox "E-mail" [ref=e28]
+          - generic [ref=e29]:
+            - generic [ref=e30]: Senha
+            - textbox "Senha" [ref=e31]
+          - button "Entrar" [ref=e32]
+        - generic [ref=e33]:
+          - link "Não tem uma conta? Solicitar acesso" [ref=e34] [cursor=pointer]:
+            - /url: /solicitar-acesso
+          - link "Esqueci minha senha" [ref=e35] [cursor=pointer]:
+            - /url: /recuperar-senha
+  - region "Notificações"

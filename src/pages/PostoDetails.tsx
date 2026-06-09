@@ -92,10 +92,10 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
         <div className="flex items-center gap-3 mb-2">
           <PageTitle className="mb-0">{posto.name}</PageTitle>
           {averageRating !== null && (
-            <div className="flex items-center gap-1">{renderStars(averageRating, 'w-5 h-5')}<span className="text-sm text-slate ml-1">({reviews.length})</span></div>
+            <div className="flex items-center gap-1">{renderStars(averageRating, 'w-5 h-5')}<span className="text-base text-slate ml-1">({reviews.length})</span></div>
           )}
         </div>
-        <p className="text-lg text-slate">{posto.country} • {posto.region}</p>
+        <p className="text-lg text-slate leading-relaxed">{posto.country} • {posto.region}</p>
       </Card>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -115,7 +115,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
            <form onSubmit={handleAddField}>
               <h3 className="font-bold text-navy mb-4">Novo Relato de Experiência</h3>
               <div className="mb-4">
-                <label htmlFor="field-type" className="block text-sm font-medium text-slate mb-1">Tópico</label>
+                <label htmlFor="field-type" className="block text-base font-medium text-slate mb-1">Tópico</label>
                 <select id="field-type" className="w-full h-11 border border-border-gray rounded-none bg-white px-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldType} onChange={e=>setNewFieldType(e.target.value)}>
                    <option value="GERAL">Geral</option>
                    <option value="SEGURANCA">Segurança</option>
@@ -127,9 +127,9 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                 </select>
               </div>
               <div className="mb-4">
-                <label htmlFor="field-body" className="block text-sm font-medium text-slate mb-1">Sua percepção</label>
+                <label htmlFor="field-body" className="block text-base font-medium text-slate mb-1">Sua percepção</label>
                 <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
-                <p className="text-xs text-slate mt-1 opacity-80">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
+                <p className="text-sm text-slate mt-1 opacity-80 leading-relaxed">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
               </div>
               <div className="flex justify-end gap-3">
                  <Button type="button" variant="ghost" size="md" onClick={()=>setIsAddingField(false)}>Cancelar</Button>
@@ -143,14 +143,14 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
         {fields.length === 0 ? (
           <Card variant="default" padding="none" className="flex flex-col items-center justify-center py-16 px-6 text-center border-dashed">
             <AlertTriangle className="w-12 h-12 mb-4 opacity-20 text-navy" />
-            <p className="font-serif text-xl text-navy mb-2">Ficha em Branco</p>
-            <p className="text-sm text-slate opacity-80 max-w-md mx-auto">Nenhuma contribuição nesta ficha ainda. Seja o primeiro a compartilhar sua experiência com os colegas!</p>
+            <p className="font-serif text-xl text-navy mb-2 leading-relaxed">Ficha em Branco</p>
+            <p className="text-base text-slate opacity-80 max-w-md mx-auto leading-relaxed">Nenhuma contribuição nesta ficha ainda. Seja o primeiro a compartilhar sua experiência com os colegas!</p>
           </Card>
         ) : (
           fields.map(field => (
              <Card key={field.id} variant="default" padding="md">
                 <div className="flex justify-between items-start mb-3">
-                  <span className="bg-sky text-navy text-xs font-bold px-2 py-1 uppercase">{field.fieldType}</span>
+                  <span className="bg-sky text-navy text-sm font-bold px-2 py-1 uppercase">{field.fieldType}</span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -162,7 +162,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                   </Button>
                 </div>
                 <p className="text-slate leading-relaxed mb-4">{field.body}</p>
-                <div className="text-xs text-slate opacity-70 border-t border-border-gray pt-3">
+                <div className="text-sm text-slate opacity-80 border-t border-border-gray pt-3">
                    Relato de {field.authorName ?? 'Membro'}
                 </div>
              </Card>
@@ -189,7 +189,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
           <form onSubmit={handleSubmitReview}>
             <h3 className="font-bold text-navy mb-4">Nova Avaliação</h3>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-slate mb-2">Nota</label>
+              <label className="block text-base font-medium text-slate mb-2">Nota</label>
               <div className="flex items-center gap-1">
                 {Array.from({ length: 5 }, (_, i) => {
                   const starValue = i + 1;
@@ -214,12 +214,12 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                   );
                 })}
                 {reviewRating > 0 && (
-                  <span className="text-sm text-slate ml-2">{reviewRating} de 5</span>
+                  <span className="text-base text-slate ml-2">{reviewRating} de 5</span>
                 )}
               </div>
             </div>
             <div className="mb-4">
-              <label htmlFor="review-body" className="block text-sm font-medium text-slate mb-1">Sua avaliação</label>
+              <label htmlFor="review-body" className="block text-base font-medium text-slate mb-1">Sua avaliação</label>
               <textarea
                 id="review-body"
                 required
@@ -240,8 +240,8 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
         {reviews.length === 0 ? (
           <Card variant="default" padding="none" className="flex flex-col items-center justify-center py-16 px-6 text-center border-dashed">
             <Star className="w-12 h-12 mb-4 opacity-20 text-navy" />
-            <p className="font-serif text-xl text-navy mb-2">Sem Avaliações</p>
-            <p className="text-sm text-slate opacity-80 max-w-md mx-auto">Nenhuma avaliação para este posto ainda. Seja o primeiro a compartilhar sua percepção!</p>
+            <p className="font-serif text-xl text-navy mb-2 leading-relaxed">Sem Avaliações</p>
+            <p className="text-base text-slate opacity-80 max-w-md mx-auto leading-relaxed">Nenhuma avaliação para este posto ainda. Seja o primeiro a compartilhar sua percepção!</p>
           </Card>
         ) : (
           reviews.map(review => (
@@ -249,13 +249,13 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               <div className="flex justify-between items-start mb-3">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-bold text-navy">{review.authorName ?? 'Membro'}</span>
+                    <span className="text-base font-bold text-navy">{review.authorName ?? 'Membro'}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     {renderStars(review.rating)}
                   </div>
                 </div>
-                <span className="text-xs text-slate opacity-70">
+                <span className="text-sm text-slate opacity-80">
                   {new Date(review.created_at).toLocaleDateString('pt-BR')}
                 </span>
               </div>
