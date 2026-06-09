@@ -52,7 +52,7 @@ export default function AdminModeration() {
       <Card variant="elevated" className="flex h-[calc(100dvh-12rem)] min-h-[24rem] flex-col">
         {pendingReports.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center p-8 text-slate">
-            <ShieldAlert className="w-12 h-12 mb-4 opacity-80" />
+            <ShieldAlert className="w-12 h-12 mb-4 text-slate" />
             <p>Nenhuma denúncia pendente.</p>
           </div>
         ) : (
@@ -76,7 +76,7 @@ export default function AdminModeration() {
                     </td>
                     <td className="p-4">
                       <p className="text-base font-bold text-navy leading-relaxed">{rep.reason}</p>
-                      <p className="text-sm text-slate opacity-80 leading-relaxed">Por: {rep.reportedBy}</p>
+                      <p className="text-sm text-slate font-medium leading-relaxed">Por: {rep.reportedBy}</p>
                     </td>
                     <td className="p-4">
                       {resolvingId === rep.id ? (

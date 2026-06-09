@@ -60,7 +60,7 @@ export function ReportDialog({ isOpen, onCancel, onSubmitted }: ReportDialogProp
         aria-modal="true"
         aria-labelledby="report-dialog-title"
         aria-describedby="report-dialog-message"
-        className="bg-white w-full max-w-md mx-auto shadow-2xl overflow-hidden flex flex-col"
+        className="bg-white w-full max-w-md mx-auto shadow-lg overflow-hidden flex flex-col"
       >
         <div className="flex items-start gap-4 p-6">
           <div className="shrink-0 mt-0.5 text-danger">

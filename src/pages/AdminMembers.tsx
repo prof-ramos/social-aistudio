@@ -33,7 +33,7 @@ export function AdminMembers() {
                 <tr><td colSpan={6}>
                   <div className="py-12 px-6 flex flex-col items-center text-center">
                     <div className="w-16 h-16 rounded-full bg-ice flex items-center justify-center mb-4">
-                      <Check className="w-6 h-6 text-success opacity-80" />
+                      <Check className="w-6 h-6 text-success" />
                     </div>
                     <p className="text-base font-medium text-navy mb-1 leading-relaxed">Nenhuma solicitação pendente</p>
                     <p className="text-sm text-slate max-w-sm leading-relaxed">Todas as solicitações de acesso foram processadas. Novas solicitações aparecerão aqui automaticamente.</p>
@@ -48,7 +48,7 @@ export function AdminMembers() {
                   </td>
                   <td className="py-4 px-6 text-base text-slate">
                     <p>{req.matricula}</p>
-                    <p className="text-sm opacity-80 leading-relaxed">{req.cpf}</p>
+                    <p className="text-sm text-slate font-medium leading-relaxed">{req.cpf}</p>
                   </td>
                   <td className="py-4 px-6">
                     <StatusBadge status={req.category === 'MEMBRO_ATIVO' ? 'info' : 'neutral'}>

@@ -48,7 +48,7 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="keyboard-shortcuts-title"
-        className="bg-white w-full max-w-md mx-auto shadow-2xl overflow-hidden flex flex-col"
+        className="bg-white w-full max-w-md mx-auto shadow-lg overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 pt-6 pb-4 border-b border-border-gray flex items-center justify-between">

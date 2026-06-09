@@ -49,7 +49,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
     return Array.from({ length: 5 }, (_, i) => (
       <Star
         key={i}
-        className={`${size} ${i < Math.round(rating) ? 'text-gold fill-gold' : 'text-slate/30'}`}
+        className={`${size} ${i < Math.round(rating) ? 'text-gold fill-gold' : 'text-slate'}`}
       />
     ));
   };
@@ -129,7 +129,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               <div className="mb-4">
                 <label htmlFor="field-body" className="block text-base font-medium text-slate mb-1">Sua percepção</label>
                 <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-2 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
-                <p className="text-sm text-slate/90 font-medium mt-1 leading-relaxed">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
+                <p className="text-sm text-slate font-medium mt-1 leading-relaxed">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
               </div>
               <div className="flex justify-end gap-3">
                  <Button type="button" variant="ghost" size="md" onClick={()=>setIsAddingField(false)}>Cancelar</Button>
@@ -142,9 +142,9 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
       <div className="space-y-6">
         {fields.length === 0 ? (
           <Card variant="default" padding="none" className="flex flex-col items-center justify-center py-16 px-6 text-center border-dashed">
-            <AlertTriangle className="w-12 h-12 mb-4 opacity-20 text-navy" />
+            <AlertTriangle className="w-12 h-12 mb-4 text-slate" />
             <p className="font-serif text-xl text-navy mb-2 leading-relaxed">Ficha em Branco</p>
-            <p className="text-base text-slate opacity-80 max-w-md mx-auto leading-relaxed">Nenhuma contribuição nesta ficha ainda. Seja o primeiro a compartilhar sua experiência com os colegas!</p>
+            <p className="text-base text-slate font-medium max-w-md mx-auto leading-relaxed">Nenhuma contribuição nesta ficha ainda. Seja o primeiro a compartilhar sua experiência com os colegas!</p>
           </Card>
         ) : (
           fields.map(field => (
@@ -154,7 +154,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-slate/30 hover:text-danger p-2 min-h-[44px] min-w-[44px]"
+                    className="text-slate hover:text-danger p-2 min-h-[44px] min-w-[44px]"
                     onClick={() => handleReport('POSTO_FIELD', field.id, field.body)}
                     title="Denunciar Relato"
                   >
@@ -162,7 +162,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                   </Button>
                 </div>
                 <p className="text-slate leading-relaxed mb-4">{field.body}</p>
-                <div className="text-sm text-slate opacity-80 border-t border-border-gray pt-3">
+                <div className="text-sm text-slate font-medium border-t border-border-gray pt-3">
                    Relato de {field.authorName ?? 'Membro'}
                 </div>
              </Card>
@@ -207,7 +207,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                         className={`w-7 h-7 transition-colors ${
                           starValue <= (hoverRating || reviewRating)
                             ? 'text-gold fill-gold'
-                            : 'text-slate/30'
+                            : 'text-slate'
                         }`}
                       />
                     </button>
@@ -239,9 +239,9 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
       <div className="space-y-6">
         {reviews.length === 0 ? (
           <Card variant="default" padding="none" className="flex flex-col items-center justify-center py-16 px-6 text-center border-dashed">
-            <Star className="w-12 h-12 mb-4 opacity-20 text-navy" />
+            <Star className="w-12 h-12 mb-4 text-slate" />
             <p className="font-serif text-xl text-navy mb-2 leading-relaxed">Sem Avaliações</p>
-            <p className="text-base text-slate opacity-80 max-w-md mx-auto leading-relaxed">Nenhuma avaliação para este posto ainda. Seja o primeiro a compartilhar sua percepção!</p>
+            <p className="text-base text-slate font-medium max-w-md mx-auto leading-relaxed">Nenhuma avaliação para este posto ainda. Seja o primeiro a compartilhar sua percepção!</p>
           </Card>
         ) : (
           reviews.map(review => (
@@ -255,7 +255,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                     {renderStars(review.rating)}
                   </div>
                 </div>
-                <span className="text-sm text-slate opacity-80">
+                <span className="text-sm text-slate font-medium">
                   {new Date(review.created_at).toLocaleDateString('pt-BR')}
                 </span>
               </div>

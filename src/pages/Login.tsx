@@ -68,7 +68,7 @@ export function Login() {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate/90 hover:text-navy focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-1 rounded-sm transition-all duration-200 ease-out active:scale-95"
+              className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate hover:text-navy focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-1 rounded-sm transition-all duration-200 ease-out active:scale-95"
               aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
             >
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}

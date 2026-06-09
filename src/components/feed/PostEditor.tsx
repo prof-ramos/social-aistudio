@@ -189,7 +189,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
         id="post-title"
         type="text"
         placeholder="Título da publicação"
-        className="w-full text-lg sm:text-xl font-bold text-navy focus:ring-2 focus:ring-navy focus:outline-none mb-6 placeholder:text-slate/40 px-4 py-3 border border-border-gray bg-white"
+        className="w-full text-lg sm:text-xl font-bold text-navy focus:ring-2 focus:ring-navy focus:outline-none mb-6 placeholder:text-slate px-4 py-3 border border-border-gray bg-white"
         value={title}
         onChange={handleTitleChange}
       />
@@ -321,7 +321,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
         </div>
       </div>
       {!isEditing && (
-        <p className="text-sm text-slate/90 mt-4 font-medium uppercase tracking-wider text-right">
+        <p className="text-sm text-slate mt-4 font-medium uppercase tracking-wider text-right">
           Rascunho salvo automaticamente
         </p>
       )}

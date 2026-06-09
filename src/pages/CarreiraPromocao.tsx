@@ -17,7 +17,7 @@ export function CarreiraPromocao({ profile }: { profile: UserProfile }) {
           <h2 className="font-serif text-xl font-bold text-navy">Editais Abertos</h2>
         </div>
         <div className="text-center py-8">
-          <Briefcase className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+          <Briefcase className="w-12 h-12 mx-auto text-slate mb-3" />
           <p className="text-navy font-bold leading-relaxed">Nenhum edital aberto no momento</p>
           <p className="text-base text-slate mt-1 leading-relaxed">Novos editais serão publicados aqui.</p>
         </div>
@@ -31,7 +31,7 @@ export function CarreiraPromocao({ profile }: { profile: UserProfile }) {
           <h2 className="font-serif text-xl font-bold text-navy">Regras de Promoção</h2>
         </div>
         <div className="text-center py-8">
-          <BookOpen className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+          <BookOpen className="w-12 h-12 mx-auto text-slate mb-3" />
           <p className="text-navy font-bold leading-relaxed">Regras em breve</p>
           <p className="text-base text-slate mt-1 leading-relaxed">As regras e critérios de promoção serão disponibilizados em breve.</p>
         </div>
@@ -45,7 +45,7 @@ export function CarreiraPromocao({ profile }: { profile: UserProfile }) {
           <h2 className="font-serif text-xl font-bold text-navy">Perguntas Frequentes</h2>
         </div>
         <div className="text-center py-8">
-          <HelpCircle className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+          <HelpCircle className="w-12 h-12 mx-auto text-slate mb-3" />
           <p className="text-navy font-bold leading-relaxed">FAQ em breve</p>
           <p className="text-base text-slate mt-1 leading-relaxed">As perguntas mais frequentes sobre promoção serão organizadas aqui.</p>
         </div>

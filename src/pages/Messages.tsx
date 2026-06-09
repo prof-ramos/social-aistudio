@@ -84,10 +84,10 @@ export function Messages({ profile }: { profile: UserProfile }) {
             {chats.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center p-8 text-center text-base text-slate">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-ice">
-                  <MessageSquare className="h-5 w-5 text-navy opacity-80" />
+                  <MessageSquare className="h-5 w-5 text-navy" />
                 </div>
                 <p className="font-medium text-navy leading-relaxed">Nenhuma conversa</p>
-                <p className="mt-1 opacity-80 leading-relaxed">Suas mensagens aparecerão aqui.</p>
+                <p className="mt-1 text-slate font-medium leading-relaxed">Suas mensagens aparecerão aqui.</p>
               </div>
             ) : (
               chats.map((chat) => {
@@ -110,7 +110,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                     <div className="min-w-0 flex-1">
                       <div className="mb-0.5 flex items-center justify-between">
                         <p className="truncate text-base font-bold text-navy leading-relaxed">{otherName}</p>
-                        <span className="ml-2 shrink-0 text-sm text-slate/90">
+                        <span className="ml-2 shrink-0 text-sm text-slate font-medium">
                           {chat.updatedAt ? formatTime(chat.updatedAt) : ''}
                         </span>
                       </div>
@@ -198,7 +198,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                       >
                         <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.body}</p>
                       </div>
-                      <span className="mt-1 px-1 text-sm text-slate/90">
+                      <span className="mt-1 px-1 text-sm text-slate font-medium">
                         {formatTime(msg.createdAt)}
                       </span>
                     </div>

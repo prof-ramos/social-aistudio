@@ -50,7 +50,7 @@ export function AuthShell({
 
           <div
             className={cn(
-              'auth-shell__card mx-auto w-full auth-reveal auth-reveal--2 shadow-2xl shadow-navy-dark/20',
+              'auth-shell__card mx-auto w-full auth-reveal auth-reveal--2 shadow-lg shadow-navy-dark/20',
               maxWidth === 'xl' ? 'max-w-xl' : 'max-w-md',
             )}
           >
