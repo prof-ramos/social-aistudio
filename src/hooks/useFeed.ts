@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { postService } from '../services/postService';
 import { Post, UserProfile } from '../types';
 import { useToast } from '../components/ui/Toast';
+import { supabase } from '../lib/supabase';
 
 export type FeedFilter = 'RECENTES' | 'MAIS_COMENTADOS' | 'MEUS_POSTOS';
 const PAGE_SIZE = 10;
@@ -21,18 +22,62 @@ export function useFeed(profile: UserProfile) {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const lastCreatedAtRef = useRef<string | null>(null);
+  const lastIdRef = useRef<string | null>(null);
 
-  // Real-time subscription for the most recent PAGE_SIZE posts
+  // Real-time subscription: listen only for new inserts, manual merge
   useEffect(() => {
-    const unsub = postService.subscribeToFeed(
-      (fetchedPosts) => {
-        setRecentPosts(fetchedPosts);
-        setHasMore(fetchedPosts.length >= PAGE_SIZE);
-      },
-      (error) => console.error('Error in feed snapshot:', error),
-      PAGE_SIZE
-    );
-    return () => unsub();
+    let initialLoaded = false;
+
+    const fetchInitial = async () => {
+      try {
+        const { posts: newPosts, lastCreatedAt, lastId } = await postService.fetchMorePosts(null, null, PAGE_SIZE);
+        setRecentPosts(newPosts);
+        lastCreatedAtRef.current = lastCreatedAt;
+        lastIdRef.current = lastId;
+        setHasMore(newPosts.length >= PAGE_SIZE);
+      } catch (e) {
+        console.error('Error loading initial feed:', e);
+      }
+      initialLoaded = true;
+    };
+
+    fetchInitial();
+
+    // Listen only to new inserts — merge into recentPosts without full re-fetch
+    const channel = supabase
+      .channel('posts-feed-inserts')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'posts',
+      }, (payload) => {
+        if (!initialLoaded) return;
+        // Fetch the new post with user info and reactions
+        postService.getPost(payload.new.id).then((post) => {
+          if (post) {
+            setRecentPosts((prev) => {
+              if (prev.some((p) => p.id === post.id)) return prev;
+              const next = [post, ...prev].sort((a, b) => {
+                if (a.pinned && !b.pinned) return -1;
+                if (!a.pinned && b.pinned) return 1;
+                const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                return tB - tA;
+              });
+              return next.slice(0, PAGE_SIZE);
+            });
+          }
+        }).catch(() => {});
+      })
+      .subscribe((status, err) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.error('Feed channel status:', status, err);
+        }
+      });
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Update search state if URL query param changes
@@ -83,10 +128,11 @@ export function useFeed(profile: UserProfile) {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     try {
-      const { posts: newPosts, lastCreatedAt } = await postService.fetchMorePosts(lastCreatedAtRef.current, PAGE_SIZE);
+      const { posts: newPosts, lastCreatedAt, lastId } = await postService.fetchMorePosts(lastCreatedAtRef.current, lastIdRef.current, PAGE_SIZE);
       if (newPosts.length > 0) {
         setOlderPosts(prev => [...prev, ...newPosts]);
         lastCreatedAtRef.current = lastCreatedAt;
+        lastIdRef.current = lastId;
       }
       if (newPosts.length < PAGE_SIZE) {
         setHasMore(false);
