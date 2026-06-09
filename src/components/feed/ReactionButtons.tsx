@@ -67,10 +67,10 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
             <button
               key={emoji}
               onClick={(e) => handleReact(e, emoji)}
-              aria-label={`${reacts.length} ${label.toLowerCase()}`}
+              aria-label={`${label} (${reacts.length})`}
               aria-pressed={hasReacted}
               className={`text-base font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
-                hasReacted ? 'text-sky' : 'text-slate/90 hover:text-navy'
+                hasReacted ? 'text-sky' : 'text-slate hover:text-navy'
               }`}
             >
               <Icon className="w-5 h-5" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} />
@@ -96,10 +96,10 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
       
       <button
         onClick={(e) => handleReact(e, REPORT_EMOJI.emoji)}
-        aria-label={`${reportReacts.length} ${REPORT_EMOJI.label.toLowerCase()}`}
+        aria-label={`${REPORT_EMOJI.label} (${reportReacts.length})`}
         aria-pressed={hasReported}
         className={`text-base font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
-          hasReported ? 'text-danger' : 'text-slate/40 hover:text-danger'
+          hasReported ? 'text-danger' : 'text-slate hover:text-danger'
         }`}
       >
         <REPORT_EMOJI.Icon className="w-5 h-5" strokeWidth={hasReported ? 2 : 1.5} fill={hasReported ? 'currentColor' : 'none'} />

@@ -54,3 +54,32 @@ Object.defineProperty(window, 'matchMedia', {
     dispatchEvent: vi.fn(),
   })),
 });
+
+// jsdom não implementa scrollTo — silenciar o warning
+Object.defineProperty(window, 'scrollTo', {
+  writable: true,
+  value: vi.fn(),
+});
+
+// Mock global de fetch para SVG assets (/logo.svg, /favicon.svg).
+// Testes que precisam de fetch real devem sobrescrever global.fetch no próprio beforeEach.
+const EMPTY_SVG = '<svg viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg"></svg>';
+const SVG_ASSETS = ['/logo.svg', '/favicon.svg'];
+
+global.fetch = vi.fn((input: RequestInfo | URL) => {
+  const url = String(input);
+  if (SVG_ASSETS.some(asset => url.includes(asset))) {
+    return Promise.resolve({
+      ok: true,
+      text: () => Promise.resolve(EMPTY_SVG),
+    } as Response);
+  }
+  // Para chamadas de API (ex: Supabase) — retornar JSON vazio para não quebrar testes
+  // que não mockam serviços individualmente.
+  return Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve([]),
+    text: () => Promise.resolve('[]'),
+  } as Response);
+}) as unknown as typeof fetch;
+

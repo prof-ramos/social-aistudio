@@ -39,7 +39,7 @@ export function PostoHighlightCard() {
   if (!posto || posto.reviewCount === 0) {
     return (
       <div className="bg-white border border-border-gray shadow-sm border-l-4 border-l-navy p-6 font-sans">
-        <p className="text-base text-slate/90 leading-relaxed">Nenhum posto avaliado ainda.</p>
+        <p className="text-base text-slate leading-relaxed">Nenhum posto avaliado ainda.</p>
         <Link
           to="/postos"
           className="block w-full min-h-[44px] border border-navy text-navy font-bold text-sm uppercase tracking-wider py-2.5 px-3 hover:bg-ice transition-colors focus:ring-2 focus:ring-navy focus:outline-none text-center mt-4"
@@ -55,7 +55,7 @@ export function PostoHighlightCard() {
       <div className="flex justify-between items-start mb-4">
         <h2 className="font-serif text-2xl text-navy">Posto: {posto.name}</h2>
       </div>
-      <div className="flex items-center gap-4 mb-4 text-base text-slate/90">
+      <div className="flex items-center gap-4 mb-4 text-base text-slate">
         <span>{posto.reviewCount} {posto.reviewCount === 1 ? 'avaliação' : 'avaliações'}</span>
         {posto.averageRating != null && (
           <span className="flex items-center gap-1 font-medium text-navy">

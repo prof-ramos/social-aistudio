@@ -17,7 +17,7 @@ export function Aposentadoria({ profile }: { profile: UserProfile }) {
           <h2 className="font-serif text-xl font-bold text-navy">Guias e Documentos</h2>
         </div>
         <div className="text-center py-8">
-          <FileText className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+          <FileText className="w-12 h-12 mx-auto text-slate mb-3" />
           <p className="text-navy font-bold leading-relaxed">Documentos em breve</p>
           <p className="text-base text-slate mt-1 leading-relaxed">Guias e documentos sobre o processo de aposentadoria serão publicados aqui.</p>
         </div>
@@ -31,7 +31,7 @@ export function Aposentadoria({ profile }: { profile: UserProfile }) {
           <h2 className="font-serif text-xl font-bold text-navy">Simulador</h2>
         </div>
         <div className="text-center py-8">
-          <Calculator className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+          <Calculator className="w-12 h-12 mx-auto text-slate mb-3" />
           <p className="text-navy font-bold leading-relaxed">Simulador em breve</p>
           <p className="text-base text-slate mt-1 leading-relaxed">O simulador de aposentadoria estará disponível em breve.</p>
         </div>
@@ -45,7 +45,7 @@ export function Aposentadoria({ profile }: { profile: UserProfile }) {
           <h2 className="font-serif text-xl font-bold text-navy">Notícias</h2>
         </div>
         <div className="text-center py-8">
-          <Newspaper className="w-12 h-12 mx-auto text-slate opacity-20 mb-3" />
+          <Newspaper className="w-12 h-12 mx-auto text-slate mb-3" />
           <p className="text-navy font-bold leading-relaxed">Notícias em breve</p>
           <p className="text-base text-slate mt-1 leading-relaxed">Notícias e atualizações sobre aposentadoria serão divulgadas aqui.</p>
         </div>

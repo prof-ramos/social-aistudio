@@ -168,14 +168,14 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         <div className="hidden md:flex flex-1 max-w-md mx-6">
           <div ref={searchRef} className="relative w-full">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-slate/90" strokeWidth={1.5} aria-hidden="true" />
+              <Search className="h-4 w-4 text-slate" strokeWidth={1.5} aria-hidden="true" />
             </div>
             <input
               type="text"
               ref={searchInputRef}
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className="block w-full pl-10 pr-4 py-2 bg-ice/50 border border-transparent rounded-full text-base placeholder-slate/80 focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy focus:bg-white transition-all text-navy"
+              className="block w-full pl-10 pr-4 py-2 bg-ice/50 border border-transparent rounded-none text-base placeholder-slate/80 focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy focus:bg-white transition-all text-navy"
               placeholder="Buscar membros, posts ou postos..."
               aria-label="Buscar membros, posts ou postos"
             />
@@ -258,7 +258,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
                 <p className="text-base font-bold text-navy group-hover:text-sky transition-colors">{profile.name.split(' ')[0]}</p>
                 <p className="text-sm text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : 'Admin'}</p>
               </div>
-              <div className="w-9 h-9 bg-ice border border-border-gray flex items-center justify-center text-navy font-bold uppercase overflow-hidden">
+              <div className="w-11 h-11 bg-ice border border-border-gray flex items-center justify-center text-navy font-bold uppercase overflow-hidden">
                 {profile.avatarUrl ? <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" /> : profile.name.charAt(0)}
               </div>
             </button>
@@ -267,7 +267,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
               <div className="absolute right-[max(0px,env(safe-area-inset-right))] top-full mt-0 w-48 bg-white text-slate shadow-md border border-border-gray z-50">
                 <div className="px-4 py-3 border-b border-border-gray bg-ice/30">
                   <p className="text-base font-bold text-navy">{profile.name}</p>
-                  <p className="text-sm text-slate opacity-80 truncate">{profile.email}</p>
+                  <p className="text-sm text-slate truncate">{profile.email}</p>
                 </div>
                 <Link to={`/perfil/${profile.id}`} className="block px-4 py-3 text-base hover:bg-ice transition-colors text-navy font-medium" onClick={() => setDropdownOpen(false)}>Meu Perfil</Link>
                 <button

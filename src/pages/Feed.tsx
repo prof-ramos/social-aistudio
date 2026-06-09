@@ -125,7 +125,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
             type="text" 
             placeholder="Buscar no feed..."
             aria-label="Buscar no feed"
-            className="flex-1 h-11 border border-border-gray px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-slate/60"
+            className="flex-1 h-11 border border-border-gray px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-slate"
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -169,9 +169,9 @@ export function Feed({ profile }: { profile: UserProfile }) {
         <div className="flex-1 space-y-8 min-w-0 tour-feed-main">
           {filteredPosts.length === 0 ? (
             <div className="py-16 px-6 text-center text-slate bg-white border border-dashed border-border-gray flex flex-col items-center justify-center">
-              <MessageSquare className="w-12 h-12 mb-4 opacity-20 text-navy" />
+              <MessageSquare className="w-12 h-12 mb-4 text-navy" />
               <p className="font-serif text-xl text-navy mb-2 leading-relaxed">Nenhum post encontrado</p>
-              <p className="text-base opacity-80 max-w-sm mx-auto leading-relaxed">Não encontramos publicações para sua busca ou categoria selecionada.</p>
+              <p className="text-base text-slate max-w-sm mx-auto leading-relaxed">Não encontramos publicações para sua busca ou categoria selecionada.</p>
             </div>
           ) : (
             filteredPosts.map(post => (

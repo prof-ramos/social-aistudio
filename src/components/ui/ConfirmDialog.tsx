@@ -89,7 +89,7 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby="confirm-dialog-message"
-        className="bg-white w-full max-w-md mx-auto shadow-2xl overflow-hidden flex flex-col"
+        className="bg-white w-full max-w-md mx-auto shadow-lg overflow-hidden flex flex-col"
       >
         <div className="flex items-start gap-4 p-6">
           <div className={`shrink-0 mt-0.5 ${variantStyles[variant]}`}>

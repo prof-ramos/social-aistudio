@@ -24,13 +24,13 @@ export const Button = ({
 
   const variants = {
     primary:
-      'bg-navy text-white hover:bg-asof-blue hover:shadow-md hover:-translate-y-px disabled:opacity-80 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:hover:bg-navy',
+      'bg-navy text-white hover:bg-navy-dark hover:shadow-md hover:-translate-y-px disabled:bg-border-gray disabled:text-navy-accent disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:hover:bg-border-gray disabled:font-medium',
     secondary:
-      'border border-navy text-navy bg-transparent hover:bg-ice disabled:opacity-80 disabled:cursor-not-allowed',
+      'border border-navy text-navy bg-transparent hover:bg-ice disabled:border-border-gray disabled:text-slate disabled:cursor-not-allowed disabled:font-medium',
     danger:
-      'bg-danger text-white-fixed hover:bg-danger/90 disabled:opacity-80 disabled:cursor-not-allowed',
+      'bg-danger text-white-fixed hover:bg-danger/90 disabled:bg-border-gray disabled:text-navy-accent disabled:cursor-not-allowed disabled:font-medium',
     ghost:
-      'text-slate hover:bg-ice hover:text-navy disabled:opacity-80 disabled:cursor-not-allowed',
+      'text-slate hover:bg-ice hover:text-navy disabled:text-border-gray disabled:cursor-not-allowed',
   };
 
   const sizes = {

@@ -117,7 +117,7 @@ export function AvatarUpload({ currentAvatarUrl, userName, userId, onUploadCompl
         type="button"
         onClick={handleClick}
         disabled={uploading}
-        className="relative group w-32 h-32 bg-ice border-4 border-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 disabled:opacity-80"
+        className="relative group w-32 h-32 bg-ice border-4 border-white shadow-sm flex items-center justify-center overflow-hidden shrink-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 disabled:bg-border-gray disabled:cursor-not-allowed"
         aria-label="Mudar foto de perfil"
       >
         {displayUrl ? (
@@ -135,7 +135,7 @@ export function AvatarUpload({ currentAvatarUrl, userName, userId, onUploadCompl
           </div>
         )}
       </button>
-      <p className="text-sm text-slate/90 font-medium leading-relaxed text-center">
+      <p className="text-sm text-slate font-medium leading-relaxed text-center">
         Clique ou arraste uma imagem (JPG, PNG ou WebP, até 2MB)
       </p>
       <input

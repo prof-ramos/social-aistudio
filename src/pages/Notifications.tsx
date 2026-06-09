@@ -29,9 +29,9 @@ export function Notifications({ profile }: { profile: UserProfile }) {
       <Card variant="elevated" padding="none">
         {notifications.length === 0 ? (
           <div className="py-16 px-6 text-center text-slate bg-white flex flex-col items-center justify-center">
-            <Bell className="w-12 h-12 mb-4 opacity-20 text-navy" />
+            <Bell className="w-12 h-12 mb-4 text-navy" />
             <p className="font-serif text-xl text-navy mb-2 leading-relaxed">Nenhuma notificação</p>
-            <p className="text-base opacity-80 max-w-sm mx-auto leading-relaxed">Você não possui novas atualizações no momento.</p>
+            <p className="text-base text-slate max-w-sm mx-auto leading-relaxed">Você não possui novas atualizações no momento.</p>
           </div>
         ) : (
           <div className="divide-y divide-border-gray">
@@ -42,7 +42,7 @@ export function Notifications({ profile }: { profile: UserProfile }) {
                 </div>
                 <div className="flex-1">
                   <p className="text-base text-slate mb-1 leading-relaxed">{n.message}</p>
-                  <div className="flex items-center gap-4 text-sm font-medium text-slate opacity-80">
+                  <div className="flex items-center gap-4 text-sm font-medium text-slate">
                      <span>{new Date(n.createdAt).toLocaleDateString()}</span>
                      {n.link && (
                        isExternalLink(n.link) ? (
