@@ -49,7 +49,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
     content: editPost?.body || '',
     editorProps: {
       attributes: {
-        class: 'prose prose-slate min-h-[200px] p-5 sm:p-6 text-slate focus:outline-none border-none resize-y text-pretty',
+        class: 'prose prose-slate max-w-none min-h-[200px] p-5 sm:p-6 text-slate focus:outline-none border-none resize-y text-pretty',
         'aria-label': 'Conteúdo da publicação',
       },
     },

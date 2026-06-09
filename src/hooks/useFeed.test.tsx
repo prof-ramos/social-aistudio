@@ -1,4 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
+import React from 'react';
 import { useFeed } from './useFeed';
 import { postService } from '../services/postService';
 import { ToastProvider } from '../components/ui/Toast';
@@ -16,6 +17,10 @@ vi.mock('../services/postService', () => ({
     }),
     createPost: vi.fn()
   }
+}));
+
+vi.mock('react-router-dom', () => ({
+  useLocation: vi.fn(() => ({ search: '' }))
 }));
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (

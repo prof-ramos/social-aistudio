@@ -51,13 +51,20 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
         className="bg-white w-full max-w-md mx-auto shadow-2xl overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 pt-6 pb-4 border-b border-border-gray">
+        <div className="px-6 pt-6 pb-4 border-b border-border-gray flex items-center justify-between">
           <h2
             id="keyboard-shortcuts-title"
             className="text-2xl font-bold text-navy font-serif"
           >
             Atalhos de Teclado
           </h2>
+          <button
+            onClick={onClose}
+            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-slate hover:text-navy transition-colors focus:outline-none focus:ring-2 focus:ring-navy rounded"
+            aria-label="Fechar atalhos"
+          >
+            <span aria-hidden="true" className="text-2xl leading-none">×</span>
+          </button>
         </div>
 
         <ul className="flex-1 py-2" role="list">
@@ -108,6 +115,9 @@ export function useKeyboardShortcutsOverlay() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== '?') return;
 
+      // Don't toggle if modal is already open
+      if (isOpen) return;
+
       const target = e.target as HTMLElement;
       const tagName = target.tagName;
       const isEditable =
@@ -124,7 +134,7 @@ export function useKeyboardShortcutsOverlay() {
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [toggle]);
+  }, [toggle, isOpen]);
 
   return { isOpen, close };
 }

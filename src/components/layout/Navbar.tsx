@@ -79,7 +79,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     function handleSlash(event: KeyboardEvent) {
       const target = event.target as HTMLElement;
       const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable;
-      if (event.key === '/' && !isInput) {
+      if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !isInput) {
         event.preventDefault();
         searchInputRef.current?.focus();
       }
@@ -253,7 +253,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
                  )}
                </button>
                {adminDropdownOpen && (
-                 <div className="absolute right-0 top-full mt-0 w-56 bg-white text-navy shadow-md border border-border-gray z-50">
+                 <div className="absolute right-[max(0px,env(safe-area-inset-right))] top-full mt-0 w-56 bg-white text-navy shadow-md border border-border-gray z-50">
                     <Link to="/admin/membros" className="block px-4 py-3 text-sm hover:bg-ice transition-colors border-b border-border-gray" onClick={() => setAdminDropdownOpen(false)}>Configurações & Membros</Link>
                     <Link to="/admin/moderacao" className="block px-4 py-3 text-sm hover:bg-ice transition-colors" onClick={() => setAdminDropdownOpen(false)}>Central de Moderação</Link>
                  </div>
@@ -281,7 +281,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
             </button>
 
             {dropdownOpen && (
-              <div className="absolute right-0 top-full mt-0 w-48 bg-white text-slate shadow-md border border-border-gray z-50">
+              <div className="absolute right-[max(0px,env(safe-area-inset-right))] top-full mt-0 w-48 bg-white text-slate shadow-md border border-border-gray z-50">
                 <div className="px-4 py-3 border-b border-border-gray bg-ice/30">
                   <p className="text-sm font-bold text-navy">{profile.name}</p>
                   <p className="text-xs text-slate opacity-70 truncate">{profile.email}</p>
