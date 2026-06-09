@@ -1,8 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 :root {
+  --page-max-width-narrow: 48rem;
+  --page-max-width-detail: 56rem;
+  --page-max-width-feed: 64rem;
+  --page-max-width-wide: 80rem;
+  --page-max-width-default: var(--page-max-width-feed);
+
   --app-navy: #0D2A4A;
   --app-navy-dark: #040920;
   --app-navy-accent: #0F172A;
@@ -12,7 +17,13 @@
   --app-slate: #374151;
   --app-border-gray: #D1D5DB;
   --app-danger: #DC2626;
+  --app-success: #16A34A;
+  --app-warning: #D97706;
+  --app-info: #0284C7;
   --app-white: #ffffff;
+  --app-white-fixed: #ffffff;
+  --app-institutional-gold: #c4a35a;
+  --app-asof-blue: #04528d;
 }
 
 .dark {
@@ -25,7 +36,23 @@
   --app-slate: #82B4D6;
   --app-border-gray: #1e293b;
   --app-danger: #ef4444;
+  --app-success: #22c55e;
+  --app-warning: #f59e0b;
+  --app-info: #38bdf8;
   --app-white: #111827;
+  --app-white-fixed: #ffffff;
+  --app-institutional-gold: #d4b76a;
+  --app-asof-blue: #2d82cc;
+}
+
+html {
+  overflow-x: clip;
+}
+
+input,
+select,
+textarea {
+  font-size: 1rem;
 }
 
 @theme {
@@ -38,8 +65,113 @@
   --color-slate: var(--app-slate);
   --color-border-gray: var(--app-border-gray);
   --color-danger: var(--app-danger);
-  --color-white: var(--app-white); /* override default white */
+  --color-success: var(--app-success);
+  --color-warning: var(--app-warning);
+  --color-info: var(--app-info);
+  --color-white: var(--app-white);
+  --color-white-fixed: var(--app-white-fixed);
+  --color-institutional-gold: var(--app-institutional-gold);
+  --color-asof-blue: var(--app-asof-blue);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Source Sans 3", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+}
+
+.auth-shell {
+  background:
+    radial-gradient(ellipse 80% 60% at 100% 0%, color-mix(in srgb, var(--app-sky) 28%, transparent), transparent 70%),
+    var(--app-ice);
+}
+
+.auth-shell__hero {
+  background:
+    linear-gradient(155deg, var(--app-navy-dark) 0%, var(--app-asof-blue) 48%, #0a3d6b 100%);
+  color: var(--app-ice);
+}
+
+.auth-shell__hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--app-ice) 14%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--app-ice) 14%, transparent) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at 30% 20%, black, transparent 78%);
+}
+
+.auth-shell__hero-glow {
+  position: absolute;
+  right: -12%;
+  top: 18%;
+  width: 55%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--app-sky) 35%, transparent), transparent 68%);
+  filter: blur(8px);
+}
+
+.auth-shell__main {
+  position: relative;
+}
+
+.auth-shell__card {
+  background: color-mix(in srgb, var(--app-white) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-border-gray) 85%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--app-institutional-gold) 35%, transparent),
+    0 24px 48px -32px color-mix(in srgb, var(--app-navy-dark) 28%, transparent);
+  backdrop-filter: blur(10px);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.dark .auth-shell__card {
+  background: color-mix(in srgb, var(--app-white) 96%, transparent);
+}
+
+@media (max-width: 767px) {
+  .auth-shell__card {
+    backdrop-filter: none;
+  }
+}
+
+.auth-reveal {
+  animation: auth-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.auth-reveal--1 { animation-delay: 80ms; }
+.auth-reveal--2 { animation-delay: 160ms; }
+.auth-reveal--3 { animation-delay: 280ms; }
+
+@keyframes auth-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--app-slate);
+  opacity: 0.4;
+  pointer-events: none;
+  height: 0;
+}
+
+/* Respect reduced motion preferences (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

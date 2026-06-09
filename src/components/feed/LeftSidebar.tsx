@@ -5,11 +5,12 @@ import { FileEdit, Bookmark, Compass } from 'lucide-react';
 
 interface LeftSidebarProps {
   profile: UserProfile;
+  postCount?: number;
 }
 
-export function LeftSidebar({ profile }: LeftSidebarProps) {
+export function LeftSidebar({ profile, postCount }: LeftSidebarProps) {
   return (
-    <div className="w-full lg:w-[280px] xl:w-[300px] flex-none flex flex-col gap-6 sticky top-24">
+    <div className="flex w-full flex-none flex-col gap-8 xl:w-[300px] xl:sticky xl:top-16">
       {/* Mini Profile Card */}
       <div className="bg-white border border-border-gray shadow-sm overflow-hidden flex flex-col items-center">
         <div className="h-24 bg-navy w-full relative">
@@ -20,7 +21,7 @@ export function LeftSidebar({ profile }: LeftSidebarProps) {
               profile.name.charAt(0)
             )}
             {/* Online Indicator */}
-            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-white shadow-sm transition-colors duration-500 z-10 ${profile.isOnline ? 'bg-green-500' : 'bg-slate-300'}`} 
+            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-white shadow-sm transition-colors duration-500 z-10 ${profile.isOnline ? 'bg-success' : 'bg-ice'}`} 
               title={profile.isOnline ? 'Online agora' : 'Offline'}
             />
           </Link>
@@ -33,11 +34,11 @@ export function LeftSidebar({ profile }: LeftSidebarProps) {
           
           <div className="mt-6 pt-4 border-t border-border-gray/50 flex gap-4 text-center w-full">
             <div className="flex-1">
-              <p className="text-[10px] uppercase font-bold text-slate/50">Posts</p>
-              <p className="font-serif text-lg text-navy">12</p>
+              <p className="text-[10px] uppercase font-bold text-slate/70">Posts</p>
+              <p className="font-serif text-lg text-navy">{postCount ?? 0}</p>
             </div>
             <div className="flex-1 border-l border-border-gray/50">
-              <p className="text-[10px] uppercase font-bold text-slate/50">Salvos</p>
+              <p className="text-[10px] uppercase font-bold text-slate/70">Salvos</p>
               <p className="font-serif text-lg text-navy">{profile.savedPosts?.length || 0}</p>
             </div>
           </div>
@@ -47,15 +48,15 @@ export function LeftSidebar({ profile }: LeftSidebarProps) {
       {/* Quick Links */}
       <div className="bg-white border border-border-gray shadow-sm font-sans">
         <Link to={`/perfil/${profile.id}#posts`} className="flex items-center gap-3 p-4 border-b border-border-gray/50 hover:bg-ice transition-colors text-sm font-medium text-slate hover:text-navy">
-          <FileEdit className="w-4 h-4 text-slate/50" strokeWidth={1.5} />
+          <FileEdit className="w-4 h-4 text-slate/70" strokeWidth={1.5} />
           Minhas Publicações
         </Link>
         <Link to={`/perfil/${profile.id}#salvos`} className="flex items-center gap-3 p-4 border-b border-border-gray/50 hover:bg-ice transition-colors text-sm font-medium text-slate hover:text-navy">
-          <Bookmark className="w-4 h-4 text-slate/50" strokeWidth={1.5} />
+          <Bookmark className="w-4 h-4 text-slate/70" strokeWidth={1.5} />
           Itens Salvos
         </Link>
         <Link to="/postos" className="flex items-center gap-3 p-4 hover:bg-ice transition-colors text-sm font-medium text-slate hover:text-navy">
-          <Compass className="w-4 h-4 text-slate/50" strokeWidth={1.5} />
+          <Compass className="w-4 h-4 text-slate/70" strokeWidth={1.5} />
           Explorar Postos
         </Link>
       </div>

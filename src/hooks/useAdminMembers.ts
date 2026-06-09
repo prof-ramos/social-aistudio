@@ -1,38 +1,36 @@
 import { useEffect, useState } from 'react';
 import { adminService } from '../services/adminService';
+import { useToast } from '../components/ui/Toast';
+import { MemberRequest } from '../types';
 
 export function useAdminMembers() {
-  const [requests, setRequests] = useState<any[]>([]);
+  const [requests, setRequests] = useState<MemberRequest[]>([]);
+  const { addToast } = useToast();
 
   useEffect(() => {
-    // Only pending requests usually, but let's grab all for admin view
     const unsub = adminService.subscribeToAllRequests((reqs) => {
       setRequests(reqs);
     });
     return () => unsub();
   }, []);
 
-  const handleApprove = async (req: any) => {
-    if (!window.confirm(`Aprovar ${req.name}?`)) return;
-    
+  const handleApprove = async (req: MemberRequest) => {
     try {
       await adminService.updateRequestStatus(req.id, 'APPROVED');
-      alert('Solicitação aprovada. O associado poderá se registrar com este e-mail.');
+      addToast('Solicitação aprovada. O associado poderá se registrar.', 'success');
     } catch (e) {
       console.error(e);
-      alert('Erro ao aprovar.');
+      addToast('Erro ao aprovar solicitação.', 'error');
     }
   };
 
-  const handleReject = async (id: string) => {
-    const reason = window.prompt("Justificativa da rejeição:");
-    if (reason === null) return;
-
+  const handleReject = async (id: string, reason?: string) => {
     try {
-      await adminService.rejectRequestWithReason(id, reason);
+      await adminService.rejectRequestWithReason(id, reason || 'Rejeitado pelo administrador');
+      addToast('Solicitação rejeitada.', 'success');
     } catch (e) {
       console.error(e);
-      alert('Erro ao rejeitar.');
+      addToast('Erro ao rejeitar solicitação.', 'error');
     }
   };
 

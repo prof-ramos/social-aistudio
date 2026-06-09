@@ -37,6 +37,9 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
+// Mock elementFromPoint for Tiptap/ProseMirror in jsdom
+document.elementFromPoint = vi.fn().mockReturnValue(null);
+
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

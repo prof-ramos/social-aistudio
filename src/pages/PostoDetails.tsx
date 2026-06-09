@@ -1,14 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
-import { ChevronLeft, Plus, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, Plus, AlertTriangle, Star } from 'lucide-react';
 import { usePostoDetails } from '../hooks/usePostoDetails';
+import { Card, PageTitle, Button, Alert } from '../components/ui';
+import { ReportDialog } from '../components/ui/ReportDialog';
+import { PageContainer } from '../components/layout/PageContainer';
 
 export function PostoDetails({ profile }: { profile: UserProfile }) {
   const { slug } = useParams();
   const {
     posto,
     fields,
+    reviews,
+    averageRating,
+    hasExistingReview,
     loading,
     isAddingField,
     setIsAddingField,
@@ -17,63 +23,100 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
     newFieldBody,
     setNewFieldBody,
     handleAddField,
-    handleReport
+    handleCreateReview,
+    handleReport,
+    reportTarget,
+    setReportTarget,
+    submitReport
   } = usePostoDetails(slug, profile.id);
+
+  const [isAddingReview, setIsAddingReview] = useState(false);
+  const [reviewBody, setReviewBody] = useState('');
+  const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (reviewRating === 0 || !reviewBody.trim()) return;
+    handleCreateReview(reviewBody.trim(), reviewRating);
+    setReviewBody('');
+    setReviewRating(0);
+    setHoverRating(0);
+    setIsAddingReview(false);
+  };
+
+  const renderStars = (rating: number, size: string = 'w-4 h-4') => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`${size} ${i < Math.round(rating) ? 'text-gold fill-gold' : 'text-slate/30'}`}
+      />
+    ));
+  };
+
+  const canReview = profile.role !== 'PENDENTE' && !hasExistingReview;
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto animate-pulse">
+      <PageContainer variant="detail" className="animate-pulse">
         <div className="w-40 h-5 bg-slate/10 mb-6" />
-        <div className="bg-white border border-border-gray shadow-sm p-8 mb-8">
+        <Card variant="elevated" padding="lg" className="mb-8">
           <div className="w-64 h-10 bg-slate/10 mb-3" />
           <div className="w-48 h-6 bg-slate/10" />
-        </div>
+        </Card>
         <div className="flex justify-between items-center mb-6">
           <div className="w-48 h-8 bg-slate/10" />
           <div className="w-40 h-10 bg-slate/10" />
         </div>
         <div className="space-y-6">
           {[1, 2].map(i => (
-            <div key={i} className="bg-white border border-border-gray p-6">
+            <Card key={i} variant="default" padding="md">
               <div className="w-24 h-6 bg-slate/10 mb-4" />
               <div className="w-full h-4 bg-slate/10 mb-2" />
               <div className="w-3/4 h-4 bg-slate/10" />
-            </div>
+            </Card>
           ))}
         </div>
-      </div>
+      </PageContainer>
     );
   }
-  if (!posto) return <div className="py-12 text-center text-slate">Posto não encontrado.</div>;
+  if (!posto) return <PageContainer variant="detail" className="py-12 text-center text-slate">Posto não encontrado.</PageContainer>;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <PageContainer variant="detail">
       <Link to="/postos" className="inline-flex items-center gap-2 text-navy hover:underline font-medium mb-6">
         <ChevronLeft className="w-4 h-4" /> Voltar para Postos
       </Link>
-      
-      <div className="bg-white border border-border-gray shadow-sm p-8 mb-8">
-        <h1 className="font-serif text-4xl font-bold text-navy mb-2">{posto.name}</h1>
+
+      <Card variant="elevated" padding="lg" className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <PageTitle className="mb-0">{posto.name}</PageTitle>
+          {averageRating !== null && (
+            <div className="flex items-center gap-1">{renderStars(averageRating, 'w-5 h-5')}<span className="text-sm text-slate ml-1">({reviews.length})</span></div>
+          )}
+        </div>
         <p className="text-lg text-slate">{posto.country} • {posto.region}</p>
-      </div>
+      </Card>
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h2 className="font-serif text-2xl font-bold text-navy">Ficha do Posto</h2>
-        <button 
+        <PageTitle as="h2" size="md">Ficha do Posto</PageTitle>
+        <Button
+          variant="primary"
+          size="md"
+          className="gap-2"
           onClick={() => setIsAddingField(!isAddingField)}
-          className="flex items-center gap-2 px-5 py-2.5 min-h-[44px] bg-navy text-white text-sm font-medium hover:bg-navy-dark transition-colors focus:ring-2 focus:ring-navy focus:outline-none"
         >
           <Plus className="w-4 h-4" /> Adicionar Relato
-        </button>
+        </Button>
       </div>
 
       {isAddingField && (
-        <div className="bg-ice border border-border-gray p-6 mb-8">
+        <Card variant="outlined" padding="md" className="mb-8">
            <form onSubmit={handleAddField}>
               <h3 className="font-bold text-navy mb-4">Novo Relato de Experiência</h3>
               <div className="mb-4">
                 <label htmlFor="field-type" className="block text-sm font-medium text-slate mb-1">Tópico</label>
-                <select id="field-type" className="w-full h-11 border border-border-gray rounded-md bg-white px-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldType} onChange={e=>setNewFieldType(e.target.value)}>
+                <select id="field-type" className="w-full h-11 border border-border-gray rounded-none bg-white px-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldType} onChange={e=>setNewFieldType(e.target.value)}>
                    <option value="GERAL">Geral</option>
                    <option value="SEGURANCA">Segurança</option>
                    <option value="CUSTO_VIDA">Custo de Vida</option>
@@ -85,46 +128,148 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               </div>
               <div className="mb-4">
                 <label htmlFor="field-body" className="block text-sm font-medium text-slate mb-1">Sua percepção</label>
-                <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-md p-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
+                <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
                 <p className="text-xs text-slate mt-1 opacity-80">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
               </div>
               <div className="flex justify-end gap-3">
-                 <button type="button" onClick={()=>setIsAddingField(false)} className="px-5 py-2.5 min-h-[44px] text-slate hover:bg-white transition-colors border border-transparent focus:ring-2 focus:ring-slate focus:outline-none">Cancelar</button>
-                 <button type="submit" className="px-5 py-2.5 min-h-[44px] bg-navy text-white font-medium hover:bg-navy-dark transition-colors border border-navy focus:ring-2 focus:ring-navy focus:outline-none">Salvar</button>
+                 <Button type="button" variant="ghost" size="md" onClick={()=>setIsAddingField(false)}>Cancelar</Button>
+                 <Button type="submit" variant="primary" size="md" isLoading={isAddingField}>Salvar</Button>
               </div>
            </form>
-        </div>
+        </Card>
       )}
 
       <div className="space-y-6">
         {fields.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-6 text-center bg-white border border-dashed border-border-gray">
+          <Card variant="default" padding="none" className="flex flex-col items-center justify-center py-16 px-6 text-center border-dashed">
             <AlertTriangle className="w-12 h-12 mb-4 opacity-20 text-navy" />
             <p className="font-serif text-xl text-navy mb-2">Ficha em Branco</p>
             <p className="text-sm text-slate opacity-80 max-w-md mx-auto">Nenhuma contribuição nesta ficha ainda. Seja o primeiro a compartilhar sua experiência com os colegas!</p>
-          </div>
+          </Card>
         ) : (
           fields.map(field => (
-             <div key={field.id} className="bg-white border border-border-gray p-6">
+             <Card key={field.id} variant="default" padding="md">
                 <div className="flex justify-between items-start mb-3">
                   <span className="bg-sky text-navy text-xs font-bold px-2 py-1 uppercase">{field.fieldType}</span>
-                  <button 
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-slate/30 hover:text-danger p-2 min-h-[44px] min-w-[44px]"
                     onClick={() => handleReport('POSTO_FIELD', field.id, field.body)}
-                    className="text-slate/30 hover:text-red-500 transition-colors p-2 focus:ring-2 focus:ring-red-500 focus:outline-none min-h-[44px]"
                     title="Denunciar Relato"
                   >
                     <AlertTriangle className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
                 <p className="text-slate leading-relaxed mb-4">{field.body}</p>
                 <div className="text-xs text-slate opacity-70 border-t border-border-gray pt-3">
-                   {/* We would fetch author details here. For now, just show placeholder */}
-                   Relato do Colega
+                   Relato de {field.authorName ?? 'Membro'}
                 </div>
-             </div>
+             </Card>
           ))
         )}
       </div>
-    </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 mt-12">
+        <PageTitle as="h2" size="md">Avaliações</PageTitle>
+        {canReview && (
+          <Button
+            variant="primary"
+            size="md"
+            className="gap-2"
+            onClick={() => setIsAddingReview(!isAddingReview)}
+          >
+            <Plus className="w-4 h-4" /> Avaliar Posto
+          </Button>
+        )}
+      </div>
+
+      {isAddingReview && (
+        <Card variant="outlined" padding="md" className="mb-8">
+          <form onSubmit={handleSubmitReview}>
+            <h3 className="font-bold text-navy mb-4">Nova Avaliação</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate mb-2">Nota</label>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }, (_, i) => {
+                  const starValue = i + 1;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                      onClick={() => setReviewRating(starValue)}
+                      onMouseEnter={() => setHoverRating(starValue)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      aria-label={`${starValue} estrela${starValue > 1 ? 's' : ''}`}
+                    >
+                      <Star
+                        className={`w-7 h-7 transition-colors ${
+                          starValue <= (hoverRating || reviewRating)
+                            ? 'text-gold fill-gold'
+                            : 'text-slate/30'
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+                {reviewRating > 0 && (
+                  <span className="text-sm text-slate ml-2">{reviewRating} de 5</span>
+                )}
+              </div>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="review-body" className="block text-sm font-medium text-slate mb-1">Sua avaliação</label>
+              <textarea
+                id="review-body"
+                required
+                className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-1 focus:ring-navy focus:outline-none"
+                value={reviewBody}
+                onChange={e => setReviewBody(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button type="button" variant="ghost" size="md" onClick={() => { setIsAddingReview(false); setReviewRating(0); setReviewBody(''); }}>Cancelar</Button>
+              <Button type="submit" variant="primary" size="md" disabled={reviewRating === 0 || !reviewBody.trim()}>Publicar Avaliação</Button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      <div className="space-y-6">
+        {reviews.length === 0 ? (
+          <Card variant="default" padding="none" className="flex flex-col items-center justify-center py-16 px-6 text-center border-dashed">
+            <Star className="w-12 h-12 mb-4 opacity-20 text-navy" />
+            <p className="font-serif text-xl text-navy mb-2">Sem Avaliações</p>
+            <p className="text-sm text-slate opacity-80 max-w-md mx-auto">Nenhuma avaliação para este posto ainda. Seja o primeiro a compartilhar sua percepção!</p>
+          </Card>
+        ) : (
+          reviews.map(review => (
+            <Card key={review.id} variant="default" padding="md">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-bold text-navy">{review.authorName ?? 'Membro'}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {renderStars(review.rating)}
+                  </div>
+                </div>
+                <span className="text-xs text-slate opacity-70">
+                  {new Date(review.created_at).toLocaleDateString('pt-BR')}
+                </span>
+              </div>
+              <p className="text-slate leading-relaxed">{review.body}</p>
+            </Card>
+          ))
+        )}
+      </div>
+
+      <ReportDialog
+        isOpen={reportTarget !== null}
+        onCancel={() => setReportTarget(null)}
+        onSubmitted={(reason, details) => submitReport(reason, details)}
+      />
+    </PageContainer>
   );
 }

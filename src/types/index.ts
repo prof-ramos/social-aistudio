@@ -17,6 +17,8 @@ export interface UserProfile {
   createdAt?: any;
   isOnline?: boolean;
   lastOnline?: any;
+  currentPost?: string;
+  interests?: string;
 }
 
 export type PostCategory = 'POSTOS' | 'CARREIRA' | 'VIDA_EXTERIOR' | 'APOSENTADORIA' | 'GERAL';
@@ -49,7 +51,7 @@ export interface ChatSession {
   participantNames?: Record<string, string>;
   updatedAt: any;
   lastMessage?: string;
-  unreadCount?: Record<string, number>;
+  unreadCount?: number;
 }
 
 export interface PostComment {
@@ -61,4 +63,30 @@ export interface PostComment {
   authorRole: UserRole | string;
   body: string;
   createdAt: any;
+}
+
+export interface MemberRequest {
+  id: string;
+  name: string;
+  email: string;
+  cpf?: string;
+  matricula?: string;
+  category: UserRole;
+  currentPost?: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  rejection_reason?: string;
+  created_at?: any;
+}
+
+export interface Report {
+  id: string;
+  type: string;
+  contentId: string;
+  preview?: string;
+  reportedBy: string;
+  reason: string;
+  status: 'PENDING' | 'RESOLVED_KEPT' | 'RESOLVED_WARNED' | 'RESOLVED_REMOVED';
+  notes?: string;
+  createdAt?: any;
+  resolvedAt?: any;
 }

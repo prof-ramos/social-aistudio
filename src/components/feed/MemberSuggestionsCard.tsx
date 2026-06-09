@@ -16,23 +16,11 @@ export function MemberSuggestionsCard({ profile }: MemberSuggestionsCardProps) {
     const fetchSuggestions = async () => {
       try {
         setLoading(true);
-        const allUsers = await userService.getAllUsers();
-        
         const myPostos = profile.postos || [];
-        
-        // Filter out the current user, and users that don't share any posto
-        const filtered = allUsers.filter(u => {
-          if (u.id === profile.id) return false;
-          
-          const theirPostos = u.postos || [];
-          const hasCommonPosto = theirPostos.some(p => myPostos.includes(p));
-          
-          return hasCommonPosto;
-        });
+        const matchedUsers = await userService.getUsersWithCommonPostos(profile.id, myPostos, 50);
 
-        // Optionally, randomize or sort by number of common postos
-        // For now, take up to 3 random suggestions
-        const shuffled = filtered.sort(() => 0.5 - Math.random());
+        // Take up to 3 random suggestions
+        const shuffled = matchedUsers.sort(() => 0.5 - Math.random());
         setSuggestions(shuffled.slice(0, 3));
       } catch (err) {
         console.error('Error fetching suggestions:', err);

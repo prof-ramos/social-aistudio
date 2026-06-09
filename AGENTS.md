@@ -248,3 +248,167 @@ Check the comprehensive troubleshooting section in `references/common_antipatter
 - Workflow Guide: `references/coding_standards.md`
 - Technical Guide: `references/common_antipatterns.md`
 - Tool Scripts: `scripts/` directory
+
+---
+name: supabase-database-guide
+description: Guide for interacting with the Supabase PostgreSQL database via CLI and SDK, covering local development and production workflows.
+---
+
+# Supabase Database Guide
+
+This project uses **Supabase** (PostgreSQL + Auth + Realtime) as the primary backend.
+
+## Environment Variables
+
+Create `.env.local` at the repo root:
+
+```bash
+VITE_SUPABASE_URL=https://xgghwjumuuxlppjspbhj.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+```
+
+> **Security:** `SUPABASE_SERVICE_ROLE_KEY` bypasses RLS. Only use it in server-side scripts or one-off CLI tools. Never expose it in client code.
+
+> **Never commit `.env.local`**. It is already in `.gitignore`.
+
+## Authentication (CLI)
+
+To run any `supabase db` command, the CLI must be authenticated:
+
+```bash
+supabase login --token <YOUR_ACCESS_TOKEN>
+```
+
+Then link to the remote project:
+
+```bash
+supabase link --project-ref xgghwjumuuxlppjspbhj
+```
+
+## Database Schema & Migrations
+
+### Creating a Migration
+
+```bash
+supabase migration new <name>
+```
+
+This creates a timestamped SQL file under `supabase/migrations/`.
+
+### Editing a Migration
+
+Open the generated `.sql` file and write raw PostgreSQL. Example:
+
+```sql
+CREATE TABLE example (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+### Pushing to Remote
+
+```bash
+supabase db push
+```
+
+This applies all pending migrations to the linked Supabase project. You will be prompted for confirmation.
+
+## Local Development
+
+### Option A: Direct Remote (default)
+
+The dev server connects directly to the remote Supabase database:
+
+```bash
+npm run dev
+```
+
+No local database needed. All reads/writes hit the remote Postgres instance.
+
+### Option B: Local Supabase Stack
+
+If you need an isolated local database (e.g., testing destructive schema changes):
+
+```bash
+supabase start
+```
+
+This starts a full local Supabase stack (Postgres, Auth, Storage, Realtime, etc.) via Docker.
+
+Update `.env.local` to point to local URLs (printed by `supabase start`).
+
+To stop:
+
+```bash
+supabase stop
+```
+
+### Resetting Local Data
+
+```bash
+supabase db reset
+```
+
+Re-runs all migrations on a fresh local database. Useful for consistent local state.
+
+## Production Workflows
+
+### Viewing Database Status
+
+```bash
+supabase migration list
+```
+
+Shows which migrations have been applied locally vs. remotely.
+
+### Seeding Data (Local Only)
+
+For reproducible test data:
+
+1. Create `supabase/seed.sql`
+2. Run:
+
+```bash
+supabase db reset
+```
+
+The `seed.sql` file is executed after migrations on local resets.
+
+### Running Raw SQL
+
+```bash
+supabase db query "SELECT * FROM users LIMIT 5;"
+```
+
+For complex or multi-line queries, create a `.sql` file and push it as a migration.
+
+## Type Generation (optional)
+
+Generate TypeScript types from your live database schema:
+
+```bash
+npx supabase gen types typescript --project-id xgghwjumuuxlppjspbhj --schema public > src/types/supabase.ts
+```
+
+Then import database types from `src/types/supabase.ts` for fully typed queries.
+
+## Troubleshooting
+
+| Issue | Solution |
+|---|---|
+| `Cannot find project ref` | Run `supabase link --project-ref <ref>` |
+| `Access token not provided` | Run `supabase login --token <token>` |
+| `infinite recursion detected in policy` | Avoid self-referencing subqueries in RLS; use a `SECURITY DEFINER` helper function |
+| `Database error saving new user` | Check trigger `handle_new_user` for missing schema prefixes (e.g., `public.user_role`) |
+| `Email not confirmed` | Update `auth.users.email_confirmed_at` via SQL or enable auto-confirm in Auth settings |
+
+## Scripts
+
+| Script | Purpose |
+|---|---|
+| `supabase/test-connection.ts` | Verify remote connectivity and schema presence |
+| `supabase/setup-admin.ts` | Create or ensure an admin user exists in `users` + `auth.users` |
+| `supabase/seed-data.ts` | Populate the database with test users, posts, comments, etc. Requires `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` |

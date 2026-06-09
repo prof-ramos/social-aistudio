@@ -6,6 +6,7 @@ import { vi } from 'vitest';
 describe('PostEditor', () => {
   const mockOnSubmit = vi.fn();
   const mockOnCancel = vi.fn();
+  const mockOnUpdate = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -24,7 +25,7 @@ describe('PostEditor', () => {
     };
     localStorage.setItem('social-asof-draft-post', JSON.stringify(draftData));
 
-    render(<PostEditor onSubmit={mockOnSubmit} onCancel={mockOnCancel} isPosting={false} />);
+    render(<PostEditor onSubmit={mockOnSubmit} onCancel={mockOnCancel} onUpdate={mockOnUpdate} isPosting={false} />);
 
     // Wait for Tiptap editor to sync and React state
     await waitFor(() => {
@@ -36,7 +37,7 @@ describe('PostEditor', () => {
 
   it('prevents submission if title is empty', async () => {
     const user = userEvent.setup();
-    render(<PostEditor onSubmit={mockOnSubmit} onCancel={mockOnCancel} isPosting={false} />);
+    render(<PostEditor onSubmit={mockOnSubmit} onCancel={mockOnCancel} onUpdate={mockOnUpdate} isPosting={false} />);
 
     // Try to select category and type in editor, but title is empty
     await user.selectOptions(screen.getByRole('combobox'), 'GERAL');
@@ -50,7 +51,7 @@ describe('PostEditor', () => {
 
   it('prevents submission if category is empty', async () => {
     const user = userEvent.setup();
-    render(<PostEditor onSubmit={mockOnSubmit} onCancel={mockOnCancel} isPosting={false} />);
+    render(<PostEditor onSubmit={mockOnSubmit} onCancel={mockOnCancel} onUpdate={mockOnUpdate} isPosting={false} />);
 
     await user.type(screen.getByPlaceholderText('Título da publicação'), 'Um título');
 

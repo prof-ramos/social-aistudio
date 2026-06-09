@@ -1,14 +1,26 @@
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../lib/firebase';
-
-const MEMBER_REQUESTS_COLLECTION = 'memberRequests';
+import { supabase } from '../lib/supabase';
 
 export const memberRequestService = {
   createRequest: async (data: any) => {
-    return await addDoc(collection(db, MEMBER_REQUESTS_COLLECTION), {
-      ...data,
-      status: 'PENDING',
-      createdAt: serverTimestamp()
-    });
+    const { data: inserted, error } = await supabase
+      .from('member_requests')
+      .insert({
+        name: data.name,
+        email: data.email,
+        cpf: data.cpf,
+        matricula: data.matricula,
+        category: data.category,
+        current_post: data.currentPost,
+        status: 'PENDING',
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating member request:', error);
+      throw error;
+    }
+
+    return inserted;
   }
 };

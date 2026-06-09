@@ -1,20 +1,65 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Social-ASOF
 
-# Run and deploy your AI Studio app
+Comunidade exclusiva para associados da ASOF. Conecte-se, compartilhe e colabore.
 
-This contains everything you need to run your app locally.
+## Stack
 
-View your app in AI Studio: https://ai.studio/apps/d8c03dc9-3871-47b0-a4d7-80f3b0dbe5d5
+- **Frontend:** React 19 + TypeScript + Tailwind CSS v4
+- **Backend:** Express (Vite middleware em dev, static em prod)
+- **Banco:** Supabase (PostgreSQL + Auth + Realtime)
+- **Testes:** Vitest + Testing Library
+- **Build:** Vite + esbuild
 
-## Run Locally
+## Desenvolvimento
 
-**Prerequisites:**  Node.js
+**Pré-requisitos:** Node.js 20+
 
+```bash
+# Instalar dependências
+npm install
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+# Configurar variáveis de ambiente
+cp .env.example .env.local
+# Edite .env.local com suas credenciais Supabase
+
+# Rodar em desenvolvimento
+npm run dev
+
+# Build de produção
+npm run build
+
+# Rodar produção local
+npm start
+```
+
+## Scripts úteis
+
+| Comando | Descrição |
+|---------|-----------|
+| `npm run dev` | Servidor de desenvolvimento (Vite + Express) |
+| `npm run build` | Build de produção |
+| `npm run lint` | TypeScript type-check (`tsc --noEmit`) |
+| `npm run test` | Rodar testes (Vitest) |
+| `npm run clean` | Limpar build |
+
+## Supabase
+
+Migrations estão em `supabase/migrations/`. Para aplicar no remoto:
+
+```bash
+npx supabase link --project-ref seu-ref
+npx supabase db push
+```
+
+### Scripts auxiliares
+
+```bash
+# Testar conexão
+npx tsx supabase/test-connection.ts
+
+# Seed de dados de teste
+npx tsx supabase/seed-data.ts
+
+# Configurar usuário admin
+npx tsx supabase/setup-admin.ts
+```

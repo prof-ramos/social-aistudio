@@ -92,7 +92,7 @@ describe('Feed', () => {
 
     renderWithRouter(<Feed profile={profile} />);
 
-    const saveButton = screen.getByTitle('Salvar Post');
+    const saveButton = screen.getByLabelText('Salvar post');
     
     await user.click(saveButton);
 

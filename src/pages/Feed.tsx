@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { UserProfile } from '../types';
 import { Pin, ThumbsUp, MessageSquare, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -8,8 +8,12 @@ import { PostoHighlightCard } from '../components/feed/PostoHighlightCard';
 import { AdminAlertCard } from '../components/feed/AdminAlertCard';
 import { LeftSidebar } from '../components/feed/LeftSidebar';
 import { MemberSuggestionsCard } from '../components/feed/MemberSuggestionsCard';
+import { Button } from '../components/ui/Button';
+import { PageTitle } from '../components/ui/PageTitle';
+import { PageContainer } from '../components/layout/PageContainer';
 import { useFeed, FeedFilter } from '../hooks/useFeed';
 import { userService } from '../services/userService';
+import { postService } from '../services/postService';
 
 export function Feed({ profile }: { profile: UserProfile }) {
   const {
@@ -28,7 +32,12 @@ export function Feed({ profile }: { profile: UserProfile }) {
     hasMore
   } = useFeed(profile);
 
+  const [postCount, setPostCount] = useState(0);
   const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    postService.getPostCountByAuthor(profile.id).then(setPostCount);
+  }, [profile.id]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -66,32 +75,40 @@ export function Feed({ profile }: { profile: UserProfile }) {
   };
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-end justify-between">
-        <h1 className="text-4xl text-navy font-serif">Feed da Comunidade</h1>
-        <button onClick={() => setShowEditor(!showEditor)} className="bg-navy text-white px-6 py-3 font-medium cursor-pointer transition-colors hover:bg-slate tour-new-post">
+    <PageContainer variant="feed" className="flex flex-col gap-8">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <PageTitle className="text-2xl sm:text-4xl">Feed da Comunidade</PageTitle>
+        <Button
+          onClick={() => setShowEditor(!showEditor)}
+          variant="primary"
+          size="md"
+          className="tour-new-post shrink-0 uppercase tracking-wider text-xs font-bold"
+        >
           NOVO POST
-        </button>
+        </Button>
       </div>
 
         {showEditor && (
-          <PostEditor 
-            onCancel={() => setShowEditor(false)} 
-            onSubmit={handleCreatePost} 
-            isPosting={isPosting} 
+          <PostEditor
+            onCancel={() => setShowEditor(false)}
+            onSubmit={handleCreatePost}
+            onUpdate={undefined}
+            isPosting={isPosting}
           />
         )}
 
-      <div className="flex flex-col sm:flex-row gap-4 mb-4">
+      <div className="flex flex-col gap-4 sm:flex-row">
         <input 
           type="text" 
           placeholder="Buscar no feed..."
-          className="flex-1 h-11 border border-border-gray px-3 text-sm text-slate focus:ring-1 focus:ring-navy focus:outline-none placeholder:text-slate/60"
+          aria-label="Buscar no feed"
+          className="flex-1 h-11 border border-border-gray px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-slate/60"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
         <select 
-          className="h-11 border border-border-gray px-3 text-sm text-slate bg-white focus:ring-1 focus:ring-navy focus:outline-none"
+          className="h-11 border border-border-gray bg-white px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none"
+          aria-label="Filtrar por categoria"
           value={filterCategory}
           onChange={e => setFilterCategory(e.target.value)}
         >
@@ -104,23 +121,23 @@ export function Feed({ profile }: { profile: UserProfile }) {
         </select>
       </div>
 
-      <div className="flex gap-2 mb-6 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
         {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
            <button 
              key={filterKey}
              onClick={() => setActiveFilter(filterKey)}
-             className={`px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors whitespace-nowrap ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-ice'}`}
+             className={`min-h-[44px] px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-ice'}`}
            >
              {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
            </button>
         ))}
       </div>
 
-      <div className="flex flex-col lg:flex-row items-start gap-8">
+      <div className="flex flex-col items-start gap-8 xl:flex-row">
         
         {/* Left Sidebar Arena */}
-        <div className="hidden lg:block">
-          <LeftSidebar profile={profile} />
+        <div className="hidden xl:block">
+          <LeftSidebar profile={profile} postCount={postCount} />
         </div>
 
         {/* Feed List */}
@@ -152,9 +169,9 @@ export function Feed({ profile }: { profile: UserProfile }) {
         </div>
         
         {/* Right Sidebar Area */}
-        <div className="w-full lg:w-[280px] xl:w-[300px] flex-none flex flex-col gap-8 sticky top-24">
+        <div className="flex w-full flex-none flex-col gap-8 lg:sticky lg:top-16 xl:w-[300px]">
           {/* Posto Highlight Card */}
-          <PostoHighlightCard />
+          <PostoHighlightCard profile={profile} />
 
           <MemberSuggestionsCard profile={profile} />
 
@@ -163,6 +180,6 @@ export function Feed({ profile }: { profile: UserProfile }) {
           )}
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

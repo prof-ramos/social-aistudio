@@ -6,3 +6,14 @@ coverage/
 *.log
 .env*
 !.env.example
+
+.claude/
+.omc/
+.omo/
+
+# Lighthouse
+.lighthouseci/
+lighthouse-reports/
+
+# Supabase local
+supabase/.temp/
