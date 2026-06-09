@@ -114,7 +114,7 @@ export function ConfirmDialog({
                 <textarea
                   ref={inputRef}
                   id="confirm-dialog-input"
-                  className="w-full min-h-[80px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none leading-loose resize-y transition-colors bg-white/50"
+                  className="w-full min-h-[80px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-2 focus:ring-navy focus:outline-none leading-loose resize-y transition-colors bg-white/50"
                   placeholder={inputPlaceholder}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}

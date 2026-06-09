@@ -2,6 +2,7 @@ export { Alert } from './Alert';
 export { AvatarUpload } from './AvatarUpload';
 export { Breadcrumb } from './Breadcrumb';
 export { Button } from './Button';
+export { Checkbox } from './Checkbox';
 export { Card } from './Card';
 export { ConfirmDialog } from './ConfirmDialog';
 export { PageTitle } from './PageTitle';

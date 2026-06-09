@@ -82,9 +82,10 @@ export default function AdminModeration() {
                       {resolvingId === rep.id ? (
                         <form onSubmit={(e) => handleResolve(rep.id, e)} className="bg-ice p-3 rounded-none border border-border-gray space-y-3 min-w-[250px]">
                           <div>
-                            <label className="block text-sm font-bold text-slate mb-1">Ação</label>
+                            <label htmlFor="acao" className="block text-sm font-bold text-slate mb-1">Ação</label>
                             <select
-                              className="w-full h-9 border border-border-gray rounded text-base px-2 focus:ring-1 focus:ring-navy focus:outline-none"
+                              id="acao"
+                              className="w-full min-h-[44px] border border-border-gray rounded text-base px-2 focus:ring-2 focus:ring-navy focus:outline-none"
                               value={action}
                               onChange={e => setAction(e.target.value as any)}
                             >
@@ -94,10 +95,11 @@ export default function AdminModeration() {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-sm font-bold text-slate mb-1">Nota Interna (Obrigatório)</label>
+                            <label htmlFor="nota-interna" className="block text-sm font-bold text-slate mb-1">Nota Interna (Obrigatório)</label>
                             <textarea
+                              id="nota-interna"
                               required
-                              className="w-full min-h-[60px] border border-border-gray rounded text-base p-2 focus:ring-1 focus:ring-navy focus:outline-none resize-none"
+                              className="w-full min-h-[60px] border border-border-gray rounded text-base p-2 focus:ring-2 focus:ring-navy focus:outline-none resize-none"
                               value={notes}
                               onChange={e => setNotes(e.target.value)}
                               placeholder="Descreva a razão da decisão..."
@@ -143,7 +145,7 @@ export default function AdminModeration() {
                 {resolvedReports.map(rep => (
                   <tr key={rep.id}>
                     <td className="p-4">
-                      <span className="text-xs font-bold text-sky uppercase">{rep.type}</span>
+                      <span className="text-sm font-bold text-sky uppercase">{rep.type}</span>
                       <p className="line-clamp-2 max-w-xs leading-relaxed">{rep.preview}</p>
                     </td>
                     <td className="p-4">

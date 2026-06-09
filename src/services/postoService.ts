@@ -107,6 +107,46 @@ export const postoService = {
     return data;
   },
 
+  getHighlightedPosto: async (): Promise<{
+    name: string;
+    slug: string;
+    reviewCount: number;
+    averageRating: number | null;
+  } | null> => {
+    const { data, error } = await supabase.rpc('get_highlighted_posto');
+
+    if (error) {
+      console.error('Error fetching highlighted posto:', error);
+      return null;
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) {
+      const { data: fallback, error: fallbackError } = await supabase
+        .from(POSTOS_TABLE)
+        .select('name, slug')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (fallbackError || !fallback) return null;
+
+      return {
+        name: fallback.name,
+        slug: fallback.slug,
+        reviewCount: 0,
+        averageRating: null,
+      };
+    }
+
+    return {
+      name: row.name,
+      slug: row.slug,
+      reviewCount: Number(row.review_count),
+      averageRating: row.average_rating != null ? Number(row.average_rating) : null,
+    };
+  },
+
   subscribeToPostoFields: (postoId: string, onUpdate: (fields: any[]) => void) => {
     const fetchFields = async () => {
       const { data, error } = await supabase

@@ -62,7 +62,7 @@ export default function ForgotPassword() {
               autoCapitalize="none"
               enterKeyHint="go"
               required
-              className="w-full h-11 rounded-none border border-border-gray bg-white/80 px-3 text-slate transition-colors focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy"
+              className="w-full h-11 rounded-none border border-border-gray bg-white/80 px-3 text-slate transition-colors focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />

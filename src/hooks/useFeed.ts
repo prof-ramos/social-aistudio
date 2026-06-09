@@ -2,16 +2,19 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { postService } from '../services/postService';
 import { Post, UserProfile } from '../types';
+import { useToast } from '../components/ui/Toast';
 
 export type FeedFilter = 'RECENTES' | 'MAIS_COMENTADOS' | 'MEUS_POSTOS';
 const PAGE_SIZE = 10;
 
 export function useFeed(profile: UserProfile) {
+  const { addToast } = useToast();
   const location = useLocation();
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [olderPosts, setOlderPosts] = useState<Post[]>([]);
   const [isPosting, setIsPosting] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [filterCategory, setFilterCategory] = useState('TODOS');
   const [search, setSearch] = useState(() => new URLSearchParams(location.search).get('q') || '');
   const [activeFilter, setActiveFilter] = useState<FeedFilter>('RECENTES');
@@ -107,16 +110,58 @@ export function useFeed(profile: UserProfile) {
     }
   }, [profile]);
 
+  const handleUpdatePost = useCallback(async (postId: string, title: string, bodyHTML: string, category: string) => {
+    try {
+      const updated = await postService.updatePost(postId, { title, body: bodyHTML, category });
+      setRecentPosts(prev => prev.map(p => (p.id === postId ? updated : p)));
+      setOlderPosts(prev => prev.map(p => (p.id === postId ? updated : p)));
+      setEditingPost(null);
+      setShowEditor(false);
+      return updated;
+    } catch (e) {
+      console.error(e);
+      addToast('Erro ao atualizar publicação.', 'error');
+      throw e;
+    }
+  }, [addToast]);
+
+  const handleDeletePost = useCallback(async (postId: string) => {
+    try {
+      await postService.softDeletePost(postId);
+      setRecentPosts(prev => prev.filter(p => p.id !== postId));
+      setOlderPosts(prev => prev.filter(p => p.id !== postId));
+    } catch (e) {
+      console.error(e);
+      addToast('Erro ao excluir publicação.', 'error');
+      throw e;
+    }
+  }, [addToast]);
+
+  const handleEditPost = useCallback((post: Post) => {
+    setEditingPost(post);
+    setShowEditor(true);
+  }, []);
+
+  const handleCloseEditor = useCallback(() => {
+    setShowEditor(false);
+    setEditingPost(null);
+  }, []);
+
   return {
     filteredPosts,
     isPosting,
     showEditor,
     setShowEditor,
+    editingPost,
     filterCategory,
     setFilterCategory,
     search,
     setSearch,
     handleCreatePost,
+    handleUpdatePost,
+    handleDeletePost,
+    handleEditPost,
+    handleCloseEditor,
     activeFilter,
     setActiveFilter,
     loadMore,

@@ -256,7 +256,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
             >
               <div className="text-right hidden sm:block">
                 <p className="text-base font-bold text-navy group-hover:text-sky transition-colors">{profile.name.split(' ')[0]}</p>
-                <p className="text-xs text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : 'Admin'}</p>
+                <p className="text-sm text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : 'Admin'}</p>
               </div>
               <div className="w-9 h-9 bg-ice border border-border-gray flex items-center justify-center text-navy font-bold uppercase overflow-hidden">
                 {profile.avatarUrl ? <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" /> : profile.name.charAt(0)}

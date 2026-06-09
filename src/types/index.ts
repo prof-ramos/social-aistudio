@@ -19,6 +19,10 @@ export interface UserProfile {
   lastOnline?: any;
   currentPost?: string;
   interests?: string;
+  phone?: string;
+  phoneIsWhatsapp?: boolean;
+  showPhone?: boolean;
+  showEmail?: boolean;
 }
 
 export type PostCategory = 'POSTOS' | 'CARREIRA' | 'VIDA_EXTERIOR' | 'APOSENTADORIA' | 'GERAL';

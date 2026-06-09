@@ -34,7 +34,7 @@ export const Button = ({
   };
 
   const sizes = {
-    sm: 'h-10 px-3 text-sm',
+    sm: 'h-[44px] px-3 text-sm',
     md: 'h-11 px-5 text-base',
     lg: 'h-12 px-6 text-base',
   };

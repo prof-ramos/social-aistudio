@@ -6,58 +6,78 @@ import { useToast } from '../components/ui/Toast';
 
 export function useProfile(id: string | undefined, currentProfile: UserProfile) {
   const { addToast } = useToast();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
+  const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [editForm, setEditForm] = useState({
     bio: '',
     avatarUrl: '',
     currentPost: '',
     interests: '',
+    phone: '',
+    phoneIsWhatsapp: false,
+    showPhone: false,
+    showEmail: false,
   });
   const [saving, setSaving] = useState(false);
 
-  const isOwnProfile = currentProfile.id === id || currentProfile.role === 'ADMIN';
+  const isOwnProfile = currentProfile.id === id;
+  const isViewingOwnProfile = currentProfile.id === id;
 
   useEffect(() => {
     if (!id) return;
     setLoading(true);
-    const unsubscribe = userService.subscribeToProfile(id, async (userData) => {
-      if (userData) {
-        setUser(userData);
-        // Only set the edit form values if they haven't been touched yet or aren't currently editing, 
-        // OR simply rely on the first fetch. Here we can update safely if not editing.
-        setEditForm(prev => {
-          if (!isEditing) {
-            return {
-              bio: userData.bio || '',
-              avatarUrl: userData.avatarUrl || '',
-              currentPost: userData.currentPost || '',
-              interests: userData.interests || '',
+    const unsubscribe = userService.subscribeToProfile(
+      id,
+      async (userData) => {
+        if (userData) {
+          setUser(userData);
+          setEditForm(prev => {
+            if (!isEditing) {
+              return {
+                bio: userData.bio || '',
+                avatarUrl: userData.avatarUrl || '',
+                currentPost: userData.currentPost || '',
+                interests: userData.interests || '',
+                phone: userData.phone || '',
+                phoneIsWhatsapp: userData.phoneIsWhatsapp || false,
+                showPhone: userData.showPhone || false,
+                showEmail: userData.showEmail || false,
+              };
             }
+            return prev;
+          });
+
+          if (userData.savedPosts && userData.savedPosts.length > 0) {
+            try {
+              const posts = await postService.getPostsByIds(userData.savedPosts);
+              setSavedPosts(posts);
+            } catch (e) {
+              console.error(e);
+            }
+          } else {
+            setSavedPosts([]);
           }
-          return prev;
-        });
-        
-        if (userData.savedPosts && userData.savedPosts.length > 0) {
+
           try {
-            const posts = await postService.getPostsByIds(userData.savedPosts);
-            setSavedPosts(posts);
+            const authored = await postService.getPostsByAuthor(id);
+            setUserPosts(authored);
           } catch (e) {
             console.error(e);
+            setUserPosts([]);
           }
         } else {
-          setSavedPosts([]);
+          setUser(null);
         }
-      } else {
-        setUser(null);
-      }
-      setLoading(false);
-    });
+        setLoading(false);
+      },
+      { includePrivate: isViewingOwnProfile }
+    );
 
     return () => unsubscribe();
-  }, [id, isEditing]);
+  }, [id, isEditing, isViewingOwnProfile]);
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
@@ -69,8 +89,12 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
         avatarUrl: editForm.avatarUrl,
         currentPost: editForm.currentPost,
         interests: editForm.interests,
+        phone: editForm.phone,
+        phoneIsWhatsapp: editForm.phoneIsWhatsapp,
+        showPhone: editForm.showPhone,
+        showEmail: editForm.showEmail,
       });
-      setUser({ ...user, ...editForm });
+      setUser(prev => (prev ? { ...prev, ...editForm } : prev));
       setIsEditing(false);
     } catch (err) {
       console.error(err);
@@ -91,5 +115,6 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
     isOwnProfile,
     handleSave,
     savedPosts,
+    userPosts,
   };
 }

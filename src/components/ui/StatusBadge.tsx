@@ -5,8 +5,16 @@ export interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> 
   status: 'success' | 'warning' | 'error' | 'info' | 'neutral';
 }
 
+const statusLabels: Record<StatusBadgeProps['status'], string> = {
+  success: 'Sucesso',
+  warning: 'Aviso',
+  error: 'Erro',
+  info: 'Informação',
+  neutral: 'Neutro',
+};
+
 export const StatusBadge = React.forwardRef<HTMLSpanElement, StatusBadgeProps>(
-  ({ status, className, children, ...props }, ref) => {
+  ({ status, className, children, 'aria-label': ariaLabel, ...props }, ref) => {
     const variants = {
       success: 'bg-success/10 text-success border-success/20',
       warning: 'bg-warning/10 text-warning border-warning/20',
@@ -18,6 +26,8 @@ export const StatusBadge = React.forwardRef<HTMLSpanElement, StatusBadgeProps>(
     return (
       <span
         ref={ref}
+        role="status"
+        aria-label={ariaLabel || statusLabels[status]}
         className={cn(
           'inline-flex items-center gap-1 px-2 py-1 text-sm font-semibold border rounded-sm',
           variants[status],

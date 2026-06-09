@@ -70,7 +70,7 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
               aria-label={`${reacts.length} ${label.toLowerCase()}`}
               aria-pressed={hasReacted}
               className={`text-base font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
-                hasReacted ? 'text-sky dark:text-asof-blue' : 'text-slate/90 hover:text-navy'
+                hasReacted ? 'text-sky' : 'text-slate/90 hover:text-navy'
               }`}
             >
               <Icon className="w-5 h-5" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} />

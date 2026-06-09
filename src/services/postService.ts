@@ -107,6 +107,23 @@ export const postService = {
     return attachReactions(posts);
   },
 
+  getPostsByAuthor: async (authorId: string): Promise<Post[]> => {
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*, users_public!author_id(name, role)')
+      .eq('author_id', authorId)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching posts by author:', error);
+      throw error;
+    }
+
+    const posts = (data || []).map(mapPostRow);
+    return attachReactions(posts);
+  },
+
   subscribeToFeed: (onUpdate: (posts: Post[]) => void, onError: (error: Error) => void, limitCount: number = 10) => {
     const fetchFeed = async () => {
       try {

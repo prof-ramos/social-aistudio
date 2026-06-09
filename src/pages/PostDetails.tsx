@@ -150,9 +150,9 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
               <div>
                 <h3 className="font-bold text-lg text-slate flex items-center gap-2">
                   <Link to={`/perfil/${post.authorId}`} className="hover:text-sky transition-colors">{post.authorName || 'Usuário'}</Link>
-                  <span className="text-sm font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
+                  <span className="text-sm font-normal text-slate/90">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
                 </h3>
-                <p className="text-xs uppercase text-slate/90 font-medium leading-relaxed">Postado em #{post.category}</p>
+                <p className="text-sm uppercase text-slate/90 font-medium leading-relaxed">Postado em #{post.category}</p>
               </div>
               <div className="flex items-center gap-1">
                 {canModify && (
@@ -163,6 +163,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                       onClick={() => setIsEditing(true)}
                       className="min-h-[44px] min-w-[44px] text-slate hover:text-navy"
                       title="Editar publicação"
+                      aria-label="Editar publicação"
                     >
                       <Pencil className="w-4 h-4" />
                     </Button>
@@ -172,6 +173,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                       onClick={() => setShowDeleteConfirm(true)}
                       className="min-h-[44px] min-w-[44px] text-slate hover:text-danger"
                       title="Excluir publicação"
+                      aria-label="Excluir publicação"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -230,7 +232,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
             <label htmlFor="comment-body" className="sr-only">Seu comentário</label>
             <textarea
               id="comment-body"
-              className="w-full min-h-[100px] border border-border-gray p-3 text-base text-slate focus:ring-1 focus:ring-navy focus:outline-none resize-y mb-4"
+              className="w-full min-h-[100px] border border-border-gray p-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none resize-y mb-4"
               placeholder="Adicione um comentário à discussão..."
               value={newCommentBody}
               onChange={e => setNewCommentBody(e.target.value)}
@@ -269,7 +271,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                        setNewCommentBody(prev => prev ? `${prev}\n@${c.authorName} ` : `@${c.authorName} `);
                        document.getElementById('comment-body')?.focus();
                      }}
-                     className="text-xs font-bold text-slate/90 hover:text-navy min-h-[44px]"
+                      className="text-sm font-bold text-slate/90 hover:text-navy min-h-[44px]"
                    >
                      <MessageSquare className="w-3 h-3" /> RESPONDER
                    </Button>

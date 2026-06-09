@@ -46,7 +46,7 @@ export function Login() {
             autoCapitalize="none"
             enterKeyHint="next"
             required
-            className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:outline-none bg-white/80 transition-all duration-200 ease-out focus:shadow-[0_0_0_3px_rgba(5,82,141,0.12)]"
+            className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 bg-white/80 transition-all duration-200 ease-out focus:shadow-[0_0_0_3px_rgba(5,82,141,0.12)]"
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
@@ -61,7 +61,7 @@ export function Login() {
               autoComplete="current-password"
               enterKeyHint="go"
               required
-              className="w-full h-11 border border-border-gray rounded-none px-3 pr-10 text-slate focus:border-navy focus:outline-none bg-white/80 transition-all duration-200 ease-out focus:shadow-[0_0_0_3px_rgba(5,82,141,0.12)]"
+              className="w-full h-11 border border-border-gray rounded-none px-3 pr-10 text-slate focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 bg-white/80 transition-all duration-200 ease-out focus:shadow-[0_0_0_3px_rgba(5,82,141,0.12)]"
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
@@ -89,10 +89,10 @@ export function Login() {
       </form>
 
       <div className="mt-6 flex flex-col gap-2 border-t border-border-gray/80 pt-4">
-        <Link to="/solicitar-acesso" className="text-center text-sm font-semibold text-navy transition-colors hover:text-asof-blue hover:underline underline-offset-2">
+        <Link to="/solicitar-acesso" className="flex items-center justify-center min-h-[44px] text-center text-base font-semibold text-navy transition-colors hover:text-asof-blue hover:underline underline-offset-2">
           Não tem uma conta? Solicitar acesso
         </Link>
-        <Link to="/recuperar-senha" className="text-center text-sm font-semibold text-navy transition-colors hover:text-asof-blue hover:underline underline-offset-2">
+        <Link to="/recuperar-senha" className="flex items-center justify-center min-h-[44px] text-center text-base font-semibold text-navy transition-colors hover:text-asof-blue hover:underline underline-offset-2">
           Esqueci minha senha
         </Link>
       </div>

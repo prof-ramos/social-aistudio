@@ -5,7 +5,7 @@ import { FileEdit, Bookmark, Compass } from 'lucide-react';
 
 interface LeftSidebarProps {
   profile: UserProfile;
-  postCount?: number;
+  postCount?: number | null;
 }
 
 export function LeftSidebar({ profile, postCount }: LeftSidebarProps) {
@@ -34,11 +34,11 @@ export function LeftSidebar({ profile, postCount }: LeftSidebarProps) {
           
           <div className="mt-6 pt-4 border-t border-border-gray/50 flex gap-4 text-center w-full">
             <div className="flex-1">
-              <p className="text-xs uppercase font-bold text-slate/90">Posts</p>
-              <p className="font-serif text-lg text-navy">{postCount ?? 0}</p>
+              <p className="text-sm uppercase font-bold text-slate/90">Posts</p>
+              <p className="font-serif text-lg text-navy">{postCount === null ? '--' : postCount}</p>
             </div>
             <div className="flex-1 border-l border-border-gray/50">
-              <p className="text-xs uppercase font-bold text-slate/90">Salvos</p>
+              <p className="text-sm uppercase font-bold text-slate/90">Salvos</p>
               <p className="font-serif text-lg text-navy">{profile.savedPosts?.length || 0}</p>
             </div>
           </div>

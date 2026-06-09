@@ -110,7 +110,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                     <div className="min-w-0 flex-1">
                       <div className="mb-0.5 flex items-center justify-between">
                         <p className="truncate text-base font-bold text-navy leading-relaxed">{otherName}</p>
-                        <span className="ml-2 shrink-0 text-xs text-slate/90">
+                        <span className="ml-2 shrink-0 text-sm text-slate/90">
                           {chat.updatedAt ? formatTime(chat.updatedAt) : ''}
                         </span>
                       </div>
@@ -119,7 +119,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                       </p>
                     </div>
                     {chat.unreadCount > 0 && (
-                      <span className="ml-auto shrink-0 bg-navy text-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      <span className="ml-auto shrink-0 bg-navy text-white text-sm font-bold rounded-full min-w-[24px] min-h-[24px] flex items-center justify-center px-1">
                         {chat.unreadCount}
                       </span>
                     )}
@@ -198,7 +198,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                       >
                         <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.body}</p>
                       </div>
-                      <span className="mt-1 px-1 text-xs text-slate/90">
+                      <span className="mt-1 px-1 text-sm text-slate/90">
                         {formatTime(msg.createdAt)}
                       </span>
                     </div>

@@ -321,7 +321,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
         </div>
       </div>
       {!isEditing && (
-        <p className="text-xs text-slate/90 mt-4 font-medium uppercase tracking-wider text-right">
+        <p className="text-sm text-slate/90 mt-4 font-medium uppercase tracking-wider text-right">
           Rascunho salvo automaticamente
         </p>
       )}

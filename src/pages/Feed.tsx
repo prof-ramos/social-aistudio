@@ -26,17 +26,25 @@ export function Feed({ profile }: { profile: UserProfile }) {
     search,
     setSearch,
     handleCreatePost,
+    handleUpdatePost,
+    handleDeletePost,
+    handleEditPost,
+    handleCloseEditor,
+    editingPost,
     activeFilter,
     setActiveFilter,
     loadMore,
     hasMore
   } = useFeed(profile);
 
-  const [postCount, setPostCount] = useState(0);
+  const [postCount, setPostCount] = useState<number | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    postService.getPostCountByAuthor(profile.id).then(setPostCount);
+    setPostCount(null);
+    postService.getPostCountByAuthor(profile.id)
+      .then(setPostCount)
+      .catch(() => setPostCount(null));
   }, [profile.id]);
 
   useEffect(() => {
@@ -103,10 +111,11 @@ export function Feed({ profile }: { profile: UserProfile }) {
 
         {showEditor && (
           <PostEditor
-            onCancel={() => setShowEditor(false)}
+            onCancel={handleCloseEditor}
             onSubmit={handleCreatePost}
-            onUpdate={undefined}
+            onUpdate={handleUpdatePost}
             isPosting={isPosting}
+            editPost={editingPost ?? undefined}
           />
         )}
 
@@ -139,8 +148,9 @@ export function Feed({ profile }: { profile: UserProfile }) {
           {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
              <button 
                key={filterKey}
-               onClick={() => setActiveFilter(filterKey)}
-               className={`min-h-[44px] px-4 py-2 text-sm font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-slate/5'}`}
+                onClick={() => setActiveFilter(filterKey)}
+                aria-pressed={activeFilter === filterKey}
+                className={`min-h-[44px] px-4 py-2 text-sm font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-slate/5'}`}
              >
                {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
              </button>
@@ -169,7 +179,9 @@ export function Feed({ profile }: { profile: UserProfile }) {
                 key={post.id} 
                 post={post} 
                 profile={profile} 
-                onToggleSaved={toggleSaved} 
+                onToggleSaved={toggleSaved}
+                onEdit={handleEditPost}
+                onDelete={handleDeletePost}
               />
           )))}
           
@@ -192,7 +204,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
         {/* Right Sidebar Area */}
         <div className="flex w-full flex-none flex-col gap-8 lg:sticky lg:top-16 xl:w-[300px]">
           {/* Posto Highlight Card */}
-          <PostoHighlightCard profile={profile} />
+          <PostoHighlightCard />
 
           <MemberSuggestionsCard profile={profile} />
 

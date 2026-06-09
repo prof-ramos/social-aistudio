@@ -25,7 +25,7 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
     <>
     <Card variant="default" padding="md" className={`relative transition-colors font-sans content-visibility-auto ${post.pinned ? 'border-sky shadow-sm bg-sky/5' : ''}`}>
        {post.pinned && (
-       <div className="absolute top-0 right-0 bg-sky text-navy px-3 py-1 flex items-center gap-1 text-xs font-bold uppercase tracking-wider">
+       <div className="absolute top-0 right-0 bg-sky text-navy px-3 py-1 flex items-center gap-1 text-sm font-bold uppercase tracking-wider">
          <Pin className="w-3 h-3" strokeWidth={1.5} /> Fixado
        </div>
      )}
@@ -39,7 +39,7 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
              {post.authorName || 'Usuário'} <span className="text-sm font-normal text-slate/90">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador'}</span>
            </span>
            <div className="flex items-center">
-             <p className="text-xs uppercase text-slate/90 font-bold tracking-wider mt-0.5">#{post.category}</p>
+              <p className="text-sm uppercase text-slate/90 font-bold tracking-wider mt-0.5">#{post.category}</p>
            </div>
          </div>
          <div className="flex items-center gap-1">
@@ -82,7 +82,7 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
        </div>
      </div>
      <Link to={`/feed/${post.id}`}>
-       <h3 className="font-bold text-navy text-xl mb-3 hover:text-sky transition-colors">{post.title}</h3>
+        <h3 className="font-bold text-navy text-xl mb-3 hover:text-sky transition-colors">{post.title}</h3>
      </Link>
      <div
        className="text-base leading-loose mb-6 text-slate/90 line-clamp-3 prose prose-slate prose-sm"

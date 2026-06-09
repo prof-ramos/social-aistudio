@@ -116,7 +116,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               <h3 className="font-bold text-navy mb-4">Novo Relato de Experiência</h3>
               <div className="mb-4">
                 <label htmlFor="field-type" className="block text-base font-medium text-slate mb-1">Tópico</label>
-                <select id="field-type" className="w-full h-11 border border-border-gray rounded-none bg-white px-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldType} onChange={e=>setNewFieldType(e.target.value)}>
+                <select id="field-type" className="w-full h-11 border border-border-gray rounded-none bg-white px-3 focus:ring-2 focus:ring-navy focus:outline-none" value={newFieldType} onChange={e=>setNewFieldType(e.target.value)}>
                    <option value="GERAL">Geral</option>
                    <option value="SEGURANCA">Segurança</option>
                    <option value="CUSTO_VIDA">Custo de Vida</option>
@@ -128,8 +128,8 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               </div>
               <div className="mb-4">
                 <label htmlFor="field-body" className="block text-base font-medium text-slate mb-1">Sua percepção</label>
-                <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-1 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
-                <p className="text-sm text-slate mt-1 opacity-80 leading-relaxed">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
+                <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-2 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
+                <p className="text-sm text-slate/90 font-medium mt-1 leading-relaxed">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
               </div>
               <div className="flex justify-end gap-3">
                  <Button type="button" variant="ghost" size="md" onClick={()=>setIsAddingField(false)}>Cancelar</Button>
@@ -223,7 +223,7 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               <textarea
                 id="review-body"
                 required
-                className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-1 focus:ring-navy focus:outline-none"
+                className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-2 focus:ring-navy focus:outline-none"
                 value={reviewBody}
                 onChange={e => setReviewBody(e.target.value)}
               />

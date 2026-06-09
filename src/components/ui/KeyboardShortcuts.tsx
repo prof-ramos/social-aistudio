@@ -78,9 +78,9 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
                 {shortcut.keys.map((key, i) => (
                   <React.Fragment key={key}>
                     {i > 0 && (
-                      <span className="text-xs text-muted mx-0.5">+</span>
+                      <span className="text-sm text-muted mx-0.5">+</span>
                     )}
-                    <kbd className="inline-flex items-center justify-center min-w-[2rem] h-8 px-2 bg-ice border border-border-gray font-mono text-xs text-navy leading-none select-none">
+                    <kbd className="inline-flex items-center justify-center min-w-[2rem] h-8 px-2 bg-ice border border-border-gray font-mono text-sm text-navy leading-none select-none">
                       {key}
                     </kbd>
                   </React.Fragment>
@@ -91,8 +91,8 @@ export function KeyboardShortcuts({ isOpen, onClose }: KeyboardShortcutsProps) {
         </ul>
 
         <div className="px-6 py-4 border-t border-border-gray bg-ice/30">
-          <p className="text-xs text-muted text-center">
-            Pressione <kbd className="inline-flex items-center justify-center min-w-[1.5rem] h-5 px-1 bg-white border border-border-gray font-mono text-xs text-navy leading-none select-none">?</kbd> para abrir ou fechar
+          <p className="text-sm text-muted text-center">
+            Pressione <kbd className="inline-flex items-center justify-center min-w-[1.5rem] h-5 px-1 bg-white border border-border-gray font-mono text-sm text-navy leading-none select-none">?</kbd> para abrir ou fechar
           </p>
         </div>
       </div>

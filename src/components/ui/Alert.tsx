@@ -17,7 +17,7 @@ export const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
     };
 
     const variants = {
-      error: 'bg-danger/5 border-danger/20 text-danger',
+      error: 'bg-danger/5 border-danger/20 text-danger font-medium',
       success: 'bg-success/5 border-success/20 text-success',
       warning: 'bg-warning/5 border-warning/20 text-warning',
       info: 'bg-info/5 border-info/20 text-info',

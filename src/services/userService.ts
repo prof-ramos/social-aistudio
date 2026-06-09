@@ -16,6 +16,10 @@ function mapUser(data: any): UserProfile {
     lastOnline: data.last_online,
     currentPost: data.current_post,
     interests: data.interests,
+    phone: data.phone,
+    phoneIsWhatsapp: data.phone_is_whatsapp,
+    showPhone: data.show_phone,
+    showEmail: data.show_email,
   } as UserProfile;
 }
 
@@ -29,25 +33,37 @@ function camelToSnake(obj: Record<string, any>): Record<string, any> {
   return result;
 }
 
+type ProfileReadOptions = { includePrivate?: boolean };
+
 export const userService = {
-  getUserProfile: async (id: string): Promise<UserProfile | null> => {
-    const { data, error } = await supabase.from('users_public').select('*').eq('id', id).single();
+  getUserProfile: async (id: string, options?: ProfileReadOptions): Promise<UserProfile | null> => {
+    const table = options?.includePrivate ? 'users' : 'users_public';
+    const { data, error } = await supabase.from(table).select('*').eq('id', id).single();
     if (error || !data) return null;
     return mapUser(data);
   },
 
-  subscribeToProfile: (id: string, onUpdate: (profile: UserProfile | null) => void) => {
+  subscribeToProfile: (
+    id: string,
+    onUpdate: (profile: UserProfile | null) => void,
+    options?: ProfileReadOptions
+  ) => {
+    const table = options?.includePrivate ? 'users' : 'users_public';
+
+    const fetchProfile = async () => {
+      const profile = await userService.getUserProfile(id, options);
+      onUpdate(profile);
+    };
+
+    fetchProfile();
+
     const channel = supabase
-      .channel('users')
+      .channel(`profile-${table}-${id}`)
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'users_public', filter: 'id=eq.' + id },
-        (payload) => {
-          if (payload.new) {
-            onUpdate(mapUser(payload.new));
-          } else {
-            onUpdate(null);
-          }
+        { event: '*', schema: 'public', table, filter: 'id=eq.' + id },
+        () => {
+          fetchProfile();
         }
       )
       .subscribe((status) => {

@@ -27,7 +27,7 @@ export function AuthShell({
           <div className="auth-shell__hero-glow" aria-hidden="true" />
           <div className="auth-shell__hero-grid" aria-hidden="true" />
           <div className="relative z-10 flex flex-col items-start gap-10 auth-reveal auth-reveal--1">
-            <p className="font-sans text-xs font-bold uppercase tracking-[0.32em] text-white/90">
+            <p className="font-sans text-sm font-bold uppercase tracking-[0.32em] text-white/90">
               Associação de Oficiais de Chancelaria
             </p>
             <BrandLockup theme="dark" size="panel" align="start" showSocialBadge showTagline />
