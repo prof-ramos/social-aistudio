@@ -196,14 +196,19 @@ export const postService = {
     };
   },
 
-  fetchMorePosts: async (lastCreatedAt: string | null, pageSize: number = 10): Promise<{ posts: Post[]; lastCreatedAt: string | null }> => {
+  fetchMorePosts: async (lastCreatedAt: string | null, lastId: string | null, pageSize: number = 10): Promise<{ posts: Post[]; lastCreatedAt: string | null; lastId: string | null }> => {
     let query = supabase
       .from('posts')
       .select('*, users_public!author_id(name, role)')
       .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
       .limit(pageSize);
 
-    if (lastCreatedAt) {
+    if (lastCreatedAt && lastId) {
+      // Cursor composed (created_at, id) — handles identical timestamps
+      query = query
+        .or(`and(created_at.lt.${lastCreatedAt}),and(created_at.eq.${lastCreatedAt},id.lt.${lastId})`);
+    } else if (lastCreatedAt) {
       query = query.lt('created_at', lastCreatedAt);
     }
 
@@ -216,9 +221,13 @@ export const postService = {
     const rows = data || [];
     let posts = rows.map(mapPostRow);
     posts = await attachReactions(posts);
-    const newLastCreatedAt = rows.length > 0 ? rows[rows.length - 1].created_at : null;
+    const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
 
-    return { posts, lastCreatedAt: newLastCreatedAt };
+    return {
+      posts,
+      lastCreatedAt: lastRow ? lastRow.created_at : null,
+      lastId: lastRow ? lastRow.id : null,
+    };
   },
 
   createPost: async (title: string, bodyHTML: string, category: PostCategory | string, profile: UserProfile) => {
