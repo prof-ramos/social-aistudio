@@ -5,9 +5,10 @@ import { FileEdit, Bookmark, Compass } from 'lucide-react';
 
 interface LeftSidebarProps {
   profile: UserProfile;
+  postCount?: number;
 }
 
-export function LeftSidebar({ profile }: LeftSidebarProps) {
+export function LeftSidebar({ profile, postCount }: LeftSidebarProps) {
   return (
     <div className="flex w-full flex-none flex-col gap-8 xl:w-[300px] xl:sticky xl:top-16">
       {/* Mini Profile Card */}
@@ -20,7 +21,7 @@ export function LeftSidebar({ profile }: LeftSidebarProps) {
               profile.name.charAt(0)
             )}
             {/* Online Indicator */}
-            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-white shadow-sm transition-colors duration-500 z-10 ${profile.isOnline ? 'bg-success' : 'bg-slate-300'}`} 
+            <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-[3px] border-white shadow-sm transition-colors duration-500 z-10 ${profile.isOnline ? 'bg-success' : 'bg-ice'}`} 
               title={profile.isOnline ? 'Online agora' : 'Offline'}
             />
           </Link>
@@ -34,7 +35,7 @@ export function LeftSidebar({ profile }: LeftSidebarProps) {
           <div className="mt-6 pt-4 border-t border-border-gray/50 flex gap-4 text-center w-full">
             <div className="flex-1">
               <p className="text-[10px] uppercase font-bold text-slate/70">Posts</p>
-              <p className="font-serif text-lg text-navy">12</p>
+              <p className="font-serif text-lg text-navy">{postCount ?? 0}</p>
             </div>
             <div className="flex-1 border-l border-border-gray/50">
               <p className="text-[10px] uppercase font-bold text-slate/70">Salvos</p>

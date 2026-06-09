@@ -1,5 +1,4 @@
 import { supabase } from '../lib/supabase';
-import { UserProfile } from '../types';
 
 const POSTOS_TABLE = 'postos';
 const REVIEWS_TABLE = 'reviews';
@@ -43,8 +42,9 @@ export const postoService = {
     const fetchReviews = async () => {
       const { data, error } = await supabase
         .from(REVIEWS_TABLE)
-        .select('*')
+        .select('*, users_public!author_id(name, role)')
         .eq('posto_id', postoId)
+        .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) {
@@ -52,7 +52,13 @@ export const postoService = {
         return;
       }
 
-      onUpdate(data ?? []);
+      const mapped = (data ?? []).map((r: any) => ({
+        ...r,
+        authorName: r.users_public?.name ?? null,
+        authorRole: r.users_public?.role ?? null,
+      }));
+
+      onUpdate(mapped);
     };
 
     fetchReviews();
@@ -73,14 +79,12 @@ export const postoService = {
     };
   },
 
-  createReview: async (postoId: string, profile: UserProfile, category: string, bodyText: string) => {
+  createReview: async (postoId: string, authorId: string, body: string, rating: number) => {
     const { data, error } = await supabase.from(REVIEWS_TABLE).insert({
       posto_id: postoId,
-      author_id: profile.id,
-      author_name: profile.name,
-      author_role: profile.role,
-      category,
-      body: bodyText,
+      author_id: authorId,
+      body,
+      rating,
     });
 
     if (error) {
@@ -107,7 +111,7 @@ export const postoService = {
     const fetchFields = async () => {
       const { data, error } = await supabase
         .from(POSTO_FIELDS_TABLE)
-        .select('*')
+        .select('*, users_public!author_id(name, role)')
         .eq('posto_id', postoId)
         .limit(50);
 
@@ -116,7 +120,13 @@ export const postoService = {
         return;
       }
 
-      onUpdate(data ?? []);
+      const mapped = (data ?? []).map((f: any) => ({
+        ...f,
+        authorName: f.users_public?.name ?? null,
+        authorRole: f.users_public?.role ?? null,
+      }));
+
+      onUpdate(mapped);
     };
 
     fetchFields();

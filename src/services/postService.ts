@@ -373,5 +373,58 @@ export const postService = {
         throw error;
       }
     }
-  }
+  },
+
+  softDeletePost: async (postId: string) => {
+    const { error } = await supabase
+      .from('posts')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', postId);
+    if (error) {
+      console.error('Error soft-deleting post:', error);
+      throw error;
+    }
+  },
+
+  softDeleteComment: async (commentId: string) => {
+    const { error } = await supabase
+      .from('comments')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', commentId);
+    if (error) {
+      console.error('Error soft-deleting comment:', error);
+      throw error;
+    }
+  },
+
+  updatePost: async (postId: string, data: { title: string; body: string; category: string }) => {
+    const { data: updated, error } = await supabase
+      .from('posts')
+      .update({ title: data.title, body: data.body, category: data.category })
+      .eq('id', postId)
+      .select('*, users_public!author_id(name, role)')
+      .single();
+
+    if (error) {
+      console.error('Error updating post:', error);
+      throw error;
+    }
+
+    return mapPostRow(updated);
+  },
+
+  getPostCountByAuthor: async (authorId: string): Promise<number> => {
+    const { count, error } = await supabase
+      .from('posts')
+      .select('*', { count: 'exact', head: true })
+      .is('deleted_at', null)
+      .eq('author_id', authorId);
+
+    if (error) {
+      console.error('Error fetching post count:', error);
+      return 0;
+    }
+
+    return count ?? 0;
+  },
 };

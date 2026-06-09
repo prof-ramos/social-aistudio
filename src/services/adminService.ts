@@ -136,8 +136,10 @@ export const adminService = {
     };
   },
 
-  updateReportStatus: async (reportId: string, status: string) => {
-    const { error } = await supabase.from('reports').update({ status }).eq('id', reportId);
+  updateReportStatus: async (reportId: string, status: string, notes?: string) => {
+    const payload: Record<string, unknown> = { status };
+    if (notes !== undefined) payload.notes = notes;
+    const { error } = await supabase.from('reports').update(payload).eq('id', reportId);
     if (error) throw error;
   },
 };

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
-import { ChevronLeft, Plus, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, Plus, AlertTriangle, Star } from 'lucide-react';
 import { usePostoDetails } from '../hooks/usePostoDetails';
 import { Card, PageTitle, Button, Alert } from '../components/ui';
+import { ReportDialog } from '../components/ui/ReportDialog';
 import { PageContainer } from '../components/layout/PageContainer';
 
 export function PostoDetails({ profile }: { profile: UserProfile }) {
@@ -11,6 +12,9 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
   const {
     posto,
     fields,
+    reviews,
+    averageRating,
+    hasExistingReview,
     loading,
     isAddingField,
     setIsAddingField,
@@ -19,8 +23,38 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
     newFieldBody,
     setNewFieldBody,
     handleAddField,
-    handleReport
+    handleCreateReview,
+    handleReport,
+    reportTarget,
+    setReportTarget,
+    submitReport
   } = usePostoDetails(slug, profile.id);
+
+  const [isAddingReview, setIsAddingReview] = useState(false);
+  const [reviewBody, setReviewBody] = useState('');
+  const [reviewRating, setReviewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (reviewRating === 0 || !reviewBody.trim()) return;
+    handleCreateReview(reviewBody.trim(), reviewRating);
+    setReviewBody('');
+    setReviewRating(0);
+    setHoverRating(0);
+    setIsAddingReview(false);
+  };
+
+  const renderStars = (rating: number, size: string = 'w-4 h-4') => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        className={`${size} ${i < Math.round(rating) ? 'text-gold fill-gold' : 'text-slate/30'}`}
+      />
+    ));
+  };
+
+  const canReview = profile.role !== 'PENDENTE' && !hasExistingReview;
 
   if (loading) {
     return (
@@ -55,7 +89,12 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
       </Link>
 
       <Card variant="elevated" padding="lg" className="mb-8">
-        <PageTitle className="mb-2">{posto.name}</PageTitle>
+        <div className="flex items-center gap-3 mb-2">
+          <PageTitle className="mb-0">{posto.name}</PageTitle>
+          {averageRating !== null && (
+            <div className="flex items-center gap-1">{renderStars(averageRating, 'w-5 h-5')}<span className="text-sm text-slate ml-1">({reviews.length})</span></div>
+          )}
+        </div>
         <p className="text-lg text-slate">{posto.country} • {posto.region}</p>
       </Card>
 
@@ -124,13 +163,113 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                 </div>
                 <p className="text-slate leading-relaxed mb-4">{field.body}</p>
                 <div className="text-xs text-slate opacity-70 border-t border-border-gray pt-3">
-                   {/* We would fetch author details here. For now, just show placeholder */}
-                   Relato do Colega
+                   Relato de {field.authorName ?? 'Membro'}
                 </div>
              </Card>
           ))
         )}
       </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 mt-12">
+        <PageTitle as="h2" size="md">Avaliações</PageTitle>
+        {canReview && (
+          <Button
+            variant="primary"
+            size="md"
+            className="gap-2"
+            onClick={() => setIsAddingReview(!isAddingReview)}
+          >
+            <Plus className="w-4 h-4" /> Avaliar Posto
+          </Button>
+        )}
+      </div>
+
+      {isAddingReview && (
+        <Card variant="outlined" padding="md" className="mb-8">
+          <form onSubmit={handleSubmitReview}>
+            <h3 className="font-bold text-navy mb-4">Nova Avaliação</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate mb-2">Nota</label>
+              <div className="flex items-center gap-1">
+                {Array.from({ length: 5 }, (_, i) => {
+                  const starValue = i + 1;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      className="p-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                      onClick={() => setReviewRating(starValue)}
+                      onMouseEnter={() => setHoverRating(starValue)}
+                      onMouseLeave={() => setHoverRating(0)}
+                      aria-label={`${starValue} estrela${starValue > 1 ? 's' : ''}`}
+                    >
+                      <Star
+                        className={`w-7 h-7 transition-colors ${
+                          starValue <= (hoverRating || reviewRating)
+                            ? 'text-gold fill-gold'
+                            : 'text-slate/30'
+                        }`}
+                      />
+                    </button>
+                  );
+                })}
+                {reviewRating > 0 && (
+                  <span className="text-sm text-slate ml-2">{reviewRating} de 5</span>
+                )}
+              </div>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="review-body" className="block text-sm font-medium text-slate mb-1">Sua avaliação</label>
+              <textarea
+                id="review-body"
+                required
+                className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-1 focus:ring-navy focus:outline-none"
+                value={reviewBody}
+                onChange={e => setReviewBody(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button type="button" variant="ghost" size="md" onClick={() => { setIsAddingReview(false); setReviewRating(0); setReviewBody(''); }}>Cancelar</Button>
+              <Button type="submit" variant="primary" size="md" disabled={reviewRating === 0 || !reviewBody.trim()}>Publicar Avaliação</Button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      <div className="space-y-6">
+        {reviews.length === 0 ? (
+          <Card variant="default" padding="none" className="flex flex-col items-center justify-center py-16 px-6 text-center border-dashed">
+            <Star className="w-12 h-12 mb-4 opacity-20 text-navy" />
+            <p className="font-serif text-xl text-navy mb-2">Sem Avaliações</p>
+            <p className="text-sm text-slate opacity-80 max-w-md mx-auto">Nenhuma avaliação para este posto ainda. Seja o primeiro a compartilhar sua percepção!</p>
+          </Card>
+        ) : (
+          reviews.map(review => (
+            <Card key={review.id} variant="default" padding="md">
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-bold text-navy">{review.authorName ?? 'Membro'}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {renderStars(review.rating)}
+                  </div>
+                </div>
+                <span className="text-xs text-slate opacity-70">
+                  {new Date(review.created_at).toLocaleDateString('pt-BR')}
+                </span>
+              </div>
+              <p className="text-slate leading-relaxed">{review.body}</p>
+            </Card>
+          ))
+        )}
+      </div>
+
+      <ReportDialog
+        isOpen={reportTarget !== null}
+        onCancel={() => setReportTarget(null)}
+        onSubmitted={(reason, details) => submitReport(reason, details)}
+      />
     </PageContainer>
   );
 }

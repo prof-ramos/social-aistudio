@@ -8,8 +8,10 @@ import { adminService } from '../../services/adminService';
 import { cn } from '../../lib/utils';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
+import { useGlobalSearch } from '../../hooks/useGlobalSearch';
 import { NavbarBrand } from '../brand/NavbarBrand';
 import { BrandLockup } from '../brand/BrandLockup';
+import { GlobalSearchDropdown } from './GlobalSearchDropdown';
 
 export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdminView?: boolean }) {
   const navigate = useNavigate();
@@ -21,9 +23,12 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   const [pendingRequests, setPendingRequests] = useState(0);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const { query, setQuery, results, isSearching, clearQuery } = useGlobalSearch();
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const adminDropdownRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
   const logoutDialogRef = useRef<HTMLDivElement>(null);
   const logoutButtonRef = useRef<HTMLButtonElement>(null);
@@ -56,15 +61,27 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
       if (adminDropdownRef.current && !adminDropdownRef.current.contains(event.target as Node)) {
         setAdminDropdownOpen(false);
       }
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        clearQuery();
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [clearQuery]);
+
+  // Clear search on navigation
+  useEffect(() => {
+    clearQuery();
+  }, [location.pathname, clearQuery]);
 
   // Escape key handling
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
+        if (query) {
+          clearQuery();
+          return;
+        }
         setDropdownOpen(false);
         setAdminDropdownOpen(false);
         setMobileMenuOpen(false);
@@ -75,7 +92,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     }
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [showLogoutDialog]);
+  }, [showLogoutDialog, query, clearQuery]);
 
   useFocusTrap(mobileMenuRef, mobileMenuOpen);
   useFocusTrap(logoutDialogRef, showLogoutDialog);
@@ -152,16 +169,28 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
 
         {/* Global Search Bar */}
         <div className="hidden md:flex flex-1 max-w-md mx-6">
-          <div className="relative w-full">
+          <div ref={searchRef} className="relative w-full">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-slate/70" strokeWidth={1.5} aria-hidden="true" />
             </div>
             <input
               type="text"
+              ref={searchInputRef}
+              value={query}
+              onChange={e => setQuery(e.target.value)}
               className="block w-full pl-10 pr-4 py-2 bg-ice/50 border border-transparent rounded-full text-base placeholder-slate/50 focus:outline-none focus:ring-2 focus:ring-navy focus:border-navy focus:bg-white transition-all text-navy"
               placeholder="Buscar membros, posts ou postos..."
               aria-label="Buscar membros, posts ou postos"
             />
+            {query.length >= 2 && (
+              <GlobalSearchDropdown
+                query={query}
+                results={results}
+                isSearching={isSearching}
+                onClose={() => clearQuery()}
+                inputRef={searchInputRef}
+              />
+            )}
           </div>
         </div>
 

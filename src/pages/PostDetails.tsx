@@ -1,27 +1,42 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import { UserProfile } from '../types';
-import { ArrowLeft, MessageSquare, ThumbsUp, AlertTriangle, Bookmark } from 'lucide-react';
+import { UserProfile, Post } from '../types';
+import { ArrowLeft, MessageSquare, ThumbsUp, AlertTriangle, Bookmark, Pencil, Trash2 } from 'lucide-react';
 import { usePostDetails } from '../hooks/usePostDetails';
+import { postService } from '../services/postService';
+import { PostEditor } from '../components/feed/PostEditor';
 import { ReactionButtons } from '../components/feed/ReactionButtons';
 import { userService } from '../services/userService';
 import { Card, PageTitle, Button, Alert, Breadcrumb } from '../components/ui';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
+import { ReportDialog } from '../components/ui/ReportDialog';
 import { PageContainer } from '../components/layout/PageContainer';
+import { useToast } from '../components/ui/Toast';
 
 export default function PostDetails({ profile }: { profile: UserProfile }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const {
     post,
+    setPost,
     comments,
     newCommentBody,
     setNewCommentBody,
     loading,
     isPosting,
     handleAddComment,
-    handleReport
+    handleReport,
+    reportTarget,
+    setReportTarget,
+    submitReport,
+    handleDeletePost
   } = usePostDetails(id, profile);
+
+  const canModify = post && (post.authorId === profile.id || profile.role === 'ADMIN');
 
   const toggleSaved = async () => {
     if (!post) return;
@@ -36,6 +51,26 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
     } catch(err) {
       console.error(err);
     }
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await handleDeletePost();
+      navigate('/feed');
+    } catch (e) {
+      // Error toast already shown by handleDeletePost
+    } finally {
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const handleEditCancel = () => {
+    setIsEditing(false);
+  };
+
+  const handleEditComplete = (updatedPost?: Post) => {
+    if (updatedPost) setPost(updatedPost);
+    setIsEditing(false);
   };
 
   useEffect(() => {
@@ -95,61 +130,96 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
         <ArrowLeft className="w-4 h-4" /> Voltar ao feed
       </Link>
 
-      <Card variant="elevated" padding="lg">
-        <div className="flex gap-4 mb-6">
-          <div className="w-12 h-12 bg-ice flex items-center justify-center font-bold text-navy shrink-0 uppercase">
-             {post.authorName ? post.authorName.charAt(0) : 'U'}
-          </div>
-          <div className="flex-1 flex items-center justify-between">
-            <div>
-              <h3 className="font-bold text-lg text-slate flex items-center gap-2">
-                <Link to={`/perfil/${post.authorId}`} className="hover:text-sky transition-colors">{post.authorName || 'Usuário'}</Link>
-                <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
-              </h3>
-              <p className="text-[10px] uppercase text-slate/70 font-medium">Postado em #{post.category}</p>
+      {isEditing ? (
+        <PostEditor
+          editPost={post}
+          onCancel={handleEditCancel}
+          onEditComplete={handleEditComplete}
+          onSubmit={async () => {}}
+          onUpdate={async (postId, title, bodyHTML, category) => postService.updatePost(postId, { title, body: bodyHTML, category })}
+          isPosting={false}
+        />
+      ) : (
+        <Card variant="elevated" padding="lg">
+          <div className="flex gap-4 mb-6">
+            <div className="w-12 h-12 bg-ice flex items-center justify-center font-bold text-navy shrink-0 uppercase">
+               {post.authorName ? post.authorName.charAt(0) : 'U'}
             </div>
-            {profile.id !== post.authorId && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/mensagens', { state: { targetUserId: post.authorId, targetUserName: post.authorName } })}
-                title="Mandar Mensagem Direta"
-                className="text-xs font-semibold text-slate/70 hover:text-navy"
-              >
-                <MessageSquare className="w-4 h-4" /> MENSAGEM
-              </Button>
-            )}
+            <div className="flex-1 flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-lg text-slate flex items-center gap-2">
+                  <Link to={`/perfil/${post.authorId}`} className="hover:text-sky transition-colors">{post.authorName || 'Usuário'}</Link>
+                  <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
+                </h3>
+                <p className="text-[10px] uppercase text-slate/70 font-medium">Postado em #{post.category}</p>
+              </div>
+              <div className="flex items-center gap-1">
+                {canModify && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsEditing(true)}
+                      className="min-h-[44px] min-w-[44px] text-slate hover:text-navy"
+                      title="Editar publicação"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="min-h-[44px] min-w-[44px] text-slate hover:text-danger"
+                      title="Excluir publicação"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </>
+                )}
+                {profile.id !== post.authorId && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => navigate('/mensagens', { state: { targetUserId: post.authorId, targetUserName: post.authorName } })}
+                    title="Mandar Mensagem Direta"
+                    className="text-xs font-semibold text-slate/70 hover:text-navy"
+                  >
+                    <MessageSquare className="w-4 h-4" /> MENSAGEM
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleSaved}
+                  className={`min-h-[44px] min-w-[44px] ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate/30 hover:text-navy'}`}
+                  title="Salvar Post"
+                >
+                  <Bookmark className="w-5 h-5" fill={profile.savedPosts?.includes(post.id) ? 'currentColor' : 'none'} />
+                </Button>
+              </div>
+            </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={toggleSaved}
-              className={`min-h-[44px] min-w-[44px] ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate/30 hover:text-navy'}`}
-              title="Salvar Post"
+              onClick={() => handleReport('POST', post.id, post.title + ' ' + post.body)}
+              className="min-h-[44px] min-w-[44px] text-slate/40 hover:text-danger"
+              title="Denunciar Publicação"
             >
-              <Bookmark className="w-5 h-5" fill={profile.savedPosts?.includes(post.id) ? 'currentColor' : 'none'} />
+              <AlertTriangle className="w-4 h-4" />
             </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => handleReport('POST', post.id, post.title + ' ' + post.body)}
-            className="min-h-[44px] min-w-[44px] text-slate/40 hover:text-danger"
-            title="Denunciar Publicação"
-          >
-            <AlertTriangle className="w-4 h-4" />
-          </Button>
-        </div>
 
-        <PageTitle as="h1" size="lg" className="mb-4">{post.title}</PageTitle>
-        <div
-          className="text-base leading-relaxed text-slate mb-8 prose prose-sm max-w-none prose-slate break-words"
-          dangerouslySetInnerHTML={{ __html: post.body }}
-        />
+          <PageTitle as="h1" size="lg" className="mb-4">{post.title}</PageTitle>
+          <div
+            className="text-base leading-relaxed text-slate mb-8 prose prose-sm max-w-none prose-slate break-words"
+            dangerouslySetInnerHTML={{ __html: post.body }}
+          />
 
-        <div className="flex gap-4 border-t border-border-gray pt-6">
-          <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
-        </div>
-      </Card>
+          <div className="flex gap-4 border-t border-border-gray pt-6">
+            <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
+          </div>
+        </Card>
+      )}
 
       <div>
         <PageTitle as="h2" size="lg" className="mb-6">Comentários ({comments.length})</PageTitle>
@@ -225,6 +295,21 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
           )}
         </div>
       </div>
+      <ReportDialog
+        isOpen={reportTarget !== null}
+        onCancel={() => setReportTarget(null)}
+        onSubmitted={(reason, details) => submitReport(reason, details)}
+      />
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Excluir publicação"
+        message="Tem certeza que deseja excluir esta publicação? Esta ação não pode ser desfeita."
+        confirmLabel="Excluir"
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
     </PageContainer>
   );
 }

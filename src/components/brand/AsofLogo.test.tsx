@@ -1,5 +1,5 @@
 import { render, waitFor } from '@testing-library/react';
-import { AsofLogo } from './AsofLogo';
+import { AsofLogo, _resetSvgCache } from './AsofLogo';
 
 const LOGO_SVG = '<svg viewBox="0 0 508 304" class="asof-logo"><title>Logo</title></svg>';
 const MARK_SVG = '<svg viewBox="248 -2 156 159" class="asof-logo"><title>Mark</title></svg>';
@@ -7,6 +7,7 @@ const MARK_SVG = '<svg viewBox="248 -2 156 159" class="asof-logo"><title>Mark</t
 let originalFetch: typeof global.fetch;
 
 beforeEach(() => {
+  _resetSvgCache();
   originalFetch = global.fetch;
   global.fetch = vi.fn((input: RequestInfo) => {
     const url = String(input);

@@ -119,5 +119,29 @@ export const userService = {
         .insert({ user_id: userId, post_id: postId });
       if (error) throw error;
     }
+  },
+
+  uploadAvatar: async (userId: string, file: File): Promise<string> => {
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${userId}/${Date.now()}.${ext}`;
+
+    // Clean up old avatar files
+    const { data: existing } = await supabase.storage.from('avatars').list(userId);
+    if (existing && existing.length > 0) {
+      const oldPaths = existing.map(f => `${userId}/${f.name}`);
+      await supabase.storage.from('avatars').remove(oldPaths).catch(() => {});
+    }
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      console.error('Error uploading avatar:', uploadError);
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+    return data.publicUrl;
   }
 };

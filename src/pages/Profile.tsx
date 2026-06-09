@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { Camera, Save, MapPin, BookOpen, MessageSquare, Bookmark, X, Star } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
-import { Card, PageTitle, Button, Alert, StatusBadge, Breadcrumb } from '../components/ui';
+import { Card, PageTitle, Button, Alert, StatusBadge, Breadcrumb, AvatarUpload } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 
@@ -35,6 +35,13 @@ export function Profile({ profile }: { profile: UserProfile }) {
   }, [isEditing, setIsEditing]);
 
   useFocusTrap(editDialogRef, isEditing);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      setTimeout(() => document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' }), 100);
+    }
+  }, []);
 
   if (loading) {
     return (
@@ -77,7 +84,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
     <PageContainer variant="narrow" className="space-y-6">
       <Breadcrumb items={[{ label: 'Início', href: '/feed' }, { label: 'Perfil' }]} />
       <div className="flex items-end justify-between mb-2">
-        <PageTitle as="h1" size="xl">Perfil do Usuário</PageTitle>
+        <PageTitle as="h1" size="xl" id="posts">Perfil do Usuário</PageTitle>
       </div>
 
       <Card variant="elevated" padding="lg">
@@ -93,7 +100,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
              {/* Online Indicator */}
              {!isEditing && (
-               <div className={`absolute bottom-2 right-2 w-5 h-5 rounded-full border-4 border-white shadow-sm transition-colors duration-500 z-10 ${user.isOnline ? 'bg-success' : 'bg-slate-300'}`}
+               <div className={`absolute bottom-2 right-2 w-5 h-5 rounded-full border-4 border-white shadow-sm transition-colors duration-500 z-10 ${user.isOnline ? 'bg-success' : 'bg-ice'}`}
                  title={user.isOnline ? 'Online agora' : 'Offline'}
                />
              )}
@@ -130,12 +137,12 @@ export function Profile({ profile }: { profile: UserProfile }) {
                 <p className="text-sm text-slate italic opacity-70">Nenhum detalhe de biografia ou trajetória profissional foi adicionado.</p>
               )}
 
-              {(user as any).interests && (
+              {user.interests && (
                 <div>
                    <span className="text-[10px] uppercase font-bold tracking-widest text-navy flex items-center gap-1 mb-2">
                      <Star className="w-3 h-3" /> Áreas de Interesse
                    </span>
-                   <p className="text-slate text-sm leading-relaxed whitespace-pre-wrap break-words">{(user as any).interests}</p>
+                   <p className="text-slate text-sm leading-relaxed whitespace-pre-wrap break-words">{user.interests}</p>
                 </div>
               )}
 
@@ -190,15 +197,12 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
             <div className="p-6 overflow-y-auto">
               <form id="edit-profile-form" onSubmit={handleSave} className="space-y-6">
-                <div className="space-y-1 text-left">
-                  <label htmlFor="profile-avatar" className="block text-xs uppercase tracking-widest font-bold text-navy">URL da Foto de Perfil</label>
-                  <input
-                    id="profile-avatar"
-                    type="url"
-                    className="w-full h-11 border border-border-gray px-3 text-base text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-colors bg-white/50"
-                    placeholder="https://sua-imagem.com/foto.jpg"
-                    value={editForm.avatarUrl}
-                    onChange={e => setEditForm({ ...editForm, avatarUrl: e.target.value })}
+                <div className="flex flex-col items-center gap-2 text-left">
+                  <AvatarUpload
+                    currentAvatarUrl={editForm.avatarUrl || user.avatarUrl}
+                    userName={user.name}
+                    userId={user.id}
+                    onUploadComplete={(url) => setEditForm({ ...editForm, avatarUrl: url })}
                   />
                 </div>
                 <div className="space-y-1 text-left">
@@ -253,7 +257,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
 
       {isOwnProfile && (
         <Card variant="elevated" padding="lg" className="mt-6">
-          <div className="flex items-center gap-2 mb-6 border-b border-border-gray/50 pb-4">
+          <div id="salvos" className="flex items-center gap-2 mb-6 border-b border-border-gray/50 pb-4">
             <Bookmark className="w-5 h-5 text-navy" />
             <PageTitle as="h2" size="lg">Salvos</PageTitle>
           </div>

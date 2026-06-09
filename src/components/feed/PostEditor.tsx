@@ -5,25 +5,32 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Bold, Italic, List, ListOrdered, Code, Quote } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Alert } from '../ui/Alert';
+import { Post } from '../../types';
 
 interface PostEditorProps {
   onCancel: () => void;
   onSubmit: (title: string, bodyHTML: string, category: string) => Promise<void>;
+  onUpdate?: (postId: string, title: string, bodyHTML: string, category: string) => Promise<Post>;
   isPosting: boolean;
+  editPost?: Post;
+  onEditComplete?: (updatedPost: Post) => void;
 }
 
-export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
+export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, onEditComplete }: PostEditorProps) {
+  const [title, setTitle] = useState(() => editPost?.title || '');
+  const [category, setCategory] = useState(() => editPost?.category || '');
   const [error, setError] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
   const DRAFT_KEY = 'social-asof-draft-post';
   const debounceTimeout = useRef<any>(null);
+  const isEditing = !!editPost;
 
   const saveDraft = (t: string, c: string, b: string) => {
     localStorage.setItem(DRAFT_KEY, JSON.stringify({ t, c, b }));
   };
 
   const debouncedSaveDraft = (t: string, c: string, b: string) => {
+    if (isEditing) return;
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
     debounceTimeout.current = setTimeout(() => {
       saveDraft(t, c, b);
@@ -37,7 +44,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
         placeholder: 'Escreva o conteúdo da sua publicação...',
       }),
     ],
-    content: '',
+    content: editPost?.body || '',
     editorProps: {
       attributes: {
         class: 'prose prose-slate max-w-none min-h-[200px] p-5 sm:p-6 text-slate focus:outline-none border-none resize-y',
@@ -51,6 +58,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
   });
 
   useEffect(() => {
+    if (isEditing) return;
     const draft = localStorage.getItem(DRAFT_KEY);
     if (draft) {
       try {
@@ -64,7 +72,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
         // ignore
       }
     }
-  }, [editor]);
+  }, [editor, isEditing]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -97,6 +105,24 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
 
     setError('');
     const bodyHTML = editor.getHTML();
+
+    if (isEditing && editPost) {
+      if (!onUpdate) {
+        setError('Função de atualização não disponível.');
+        return;
+      }
+      setIsUpdating(true);
+      try {
+        const updated = await onUpdate(editPost.id, title, bodyHTML, category);
+        if (updated) onEditComplete?.(updated);
+        onCancel();
+      } catch (err) {
+        setError('Erro ao salvar alterações. Tente novamente.');
+      } finally {
+        setIsUpdating(false);
+      }
+      return;
+    }
 
     await onSubmit(title, bodyHTML, category);
 
@@ -140,7 +166,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
       />
 
       <div className="border border-border-gray mb-6 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-navy transition-shadow">
-        <div className="flex flex-wrap gap-1.5 border-b border-border-gray p-2 sm:p-3 bg-slate-50">
+        <div className="flex flex-wrap gap-1.5 border-b border-border-gray p-2 sm:p-3 bg-ice/50">
           <button
             type="button"
             onClick={() => editor.chain().focus().toggleBold().run()}
@@ -226,7 +252,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-          {title.trim() || editor?.getText().trim() ? (
+          {!isEditing && (title.trim() || editor?.getText().trim()) && (
             <Button
               type="button"
               variant="danger"
@@ -236,7 +262,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
             >
               DESCARTAR
             </Button>
-          ) : null}
+          )}
           <Button
             type="button"
             variant="secondary"
@@ -250,16 +276,18 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
             type="submit"
             variant="primary"
             size="md"
-            isLoading={isPosting}
+            isLoading={isEditing ? isUpdating : isPosting}
             className="flex-1 sm:flex-none"
           >
-            PUBLICAR
+            {isEditing ? 'SALVAR ALTERAÇÕES' : 'PUBLICAR'}
           </Button>
         </div>
       </div>
-      <p className="text-[10px] text-slate/70 mt-4 font-medium uppercase tracking-wider text-right">
-        Rascunho salvo automaticamente
-      </p>
+      {!isEditing && (
+        <p className="text-[10px] text-slate/70 mt-4 font-medium uppercase tracking-wider text-right">
+          Rascunho salvo automaticamente
+        </p>
+      )}
     </form>
   );
 }

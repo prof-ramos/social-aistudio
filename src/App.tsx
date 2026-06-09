@@ -19,6 +19,8 @@ const AdminHub = lazy(() => import('./pages/AdminHub'));
 const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
 const Notifications = lazy(() => import('./pages/Notifications').then(m => ({ default: m.Notifications })));
 const Messages = lazy(() => import('./pages/Messages').then(m => ({ default: m.Messages })));
+const CarreiraPromocao = lazy(() => import('./pages/CarreiraPromocao').then(m => ({ default: m.CarreiraPromocao })));
+const Aposentadoria = lazy(() => import('./pages/Aposentadoria').then(m => ({ default: m.Aposentadoria })));
 import { Home, Building2, Briefcase, Archive, MessageSquare } from 'lucide-react';
 import { Tour } from './components/Tour';
 import { ToastProvider } from './components/ui/Toast';
@@ -103,6 +105,8 @@ function AppRoutes() {
           <Route path="/postos/:slug" element={<PostoDetails profile={profile!} />} />
           <Route path="/notificacoes" element={<Notifications profile={profile!} />} />
           <Route path="/perfil/:id" element={<Profile profile={profile!} />} />
+          <Route path="/carreira" element={<CarreiraPromocao profile={profile!} />} />
+          <Route path="/aposentadoria" element={<Aposentadoria profile={profile!} />} />
         </Route>
 
         {/* Admin Routes */}
@@ -163,29 +167,16 @@ function Layout({ profile, isAdminView }: { profile: UserProfile, isAdminView?: 
                 </Link>
               </li>
               <li>
-                <div 
-                  className="flex items-center gap-3 text-slate/40 py-3 px-4 rounded-none cursor-not-allowed"
-                  title="Em breve: Acompanhe informações, editais e regras sobre carreira e promoção."
-                >
+                <Link to="/carreira" className="flex items-center gap-3 text-slate hover:text-navy py-3 px-4 rounded-none hover:bg-ice/50 transition-colors">
                   <Briefcase className="w-4 h-4" /> Carreira e Promoção
-                </div>
+                </Link>
               </li>
               <li>
-                <div 
-                  className="flex items-center gap-3 text-slate/40 py-3 px-4 rounded-none cursor-not-allowed"
-                  title="Em breve: Visualize guias, simuladores e notícias sobre os processos de aposentadoria."
-                >
+                <Link to="/aposentadoria" className="flex items-center gap-3 text-slate hover:text-navy py-3 px-4 rounded-none hover:bg-ice/50 transition-colors">
                   <Archive className="w-4 h-4" /> Aposentadoria
-                </div>
+                </Link>
               </li>
             </ul>
-          </div>
-          <div className="mt-auto">
-            <div className="p-4 bg-ice border border-border-gray rounded-none shadow-sm">
-              <p className="text-[10px] uppercase font-bold tracking-wider text-slate/60 mb-1">Próximo Plantão</p>
-              <p className="text-sm font-bold text-navy">Brasília, DF</p>
-              <p className="text-xs text-slate mt-1">12 Out • 08:00 - 18:00</p>
-            </div>
           </div>
         </aside>
 

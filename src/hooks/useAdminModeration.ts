@@ -1,5 +1,6 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { adminService } from '../services/adminService';
+import { postService } from '../services/postService';
 import { useToast } from '../components/ui/Toast';
 
 // Extract this interface to types if needed, but for now keeping it self-contained
@@ -39,17 +40,33 @@ export function useAdminModeration() {
       addToast('É necessário inserir uma nota de moderação.', 'warning');
       return;
     }
-    
+
     setLoading(true);
     try {
-      await adminService.updateReportStatus(id, action);
-      
-      setResolvingId(null);
-      setNotes('');
+      if (action === 'RESOLVED_REMOVED') {
+        const report = reports.find(r => r.id === id);
+        if (report) {
+          if (report.type === 'POST') {
+            await postService.softDeletePost(report.contentId);
+          } else if (report.type === 'COMMENT') {
+            await postService.softDeleteComment(report.contentId);
+          } else {
+            addToast(`Tipo de denúncia "${report.type}" não suportado para remoção automática.`, 'warning');
+          }
+        } else {
+          addToast('Denúncia não encontrada. Tente recarregar a página.', 'warning');
+          setLoading(false);
+          return;
+        }
+      }
+
+      await adminService.updateReportStatus(id, action, notes);
     } catch (e) {
       console.error(e);
       addToast('Erro ao resolver denúncia.', 'error');
     } finally {
+      setResolvingId(null);
+      setNotes('');
       setLoading(false);
     }
   };

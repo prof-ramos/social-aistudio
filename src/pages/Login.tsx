@@ -20,7 +20,7 @@ export function Login() {
       await authService.signIn(email, password);
     } catch (err: any) {
       console.error(err);
-      setError('Credenciais inválidas. Verifique seu e-mail e senha, ou crie uma conta usando Firebase Console e cadastre o perfil na coleção "users". Se preferir, vá em Solicitar Acesso.');
+      setError('Credenciais inválidas. Verifique seu e-mail e senha. Se ainda não tem acesso, solicite em "Solicitar Acesso".');
     } finally {
       setLoading(false);
     }

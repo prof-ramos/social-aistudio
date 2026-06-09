@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { UserProfile } from '../types';
 import { Pin, ThumbsUp, MessageSquare, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -13,6 +13,7 @@ import { PageTitle } from '../components/ui/PageTitle';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useFeed, FeedFilter } from '../hooks/useFeed';
 import { userService } from '../services/userService';
+import { postService } from '../services/postService';
 
 export function Feed({ profile }: { profile: UserProfile }) {
   const {
@@ -31,7 +32,12 @@ export function Feed({ profile }: { profile: UserProfile }) {
     hasMore
   } = useFeed(profile);
 
+  const [postCount, setPostCount] = useState(0);
   const observerTarget = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    postService.getPostCountByAuthor(profile.id).then(setPostCount);
+  }, [profile.id]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -83,10 +89,11 @@ export function Feed({ profile }: { profile: UserProfile }) {
       </div>
 
         {showEditor && (
-          <PostEditor 
-            onCancel={() => setShowEditor(false)} 
-            onSubmit={handleCreatePost} 
-            isPosting={isPosting} 
+          <PostEditor
+            onCancel={() => setShowEditor(false)}
+            onSubmit={handleCreatePost}
+            onUpdate={undefined}
+            isPosting={isPosting}
           />
         )}
 
@@ -130,7 +137,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
         
         {/* Left Sidebar Arena */}
         <div className="hidden xl:block">
-          <LeftSidebar profile={profile} />
+          <LeftSidebar profile={profile} postCount={postCount} />
         </div>
 
         {/* Feed List */}
@@ -164,7 +171,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
         {/* Right Sidebar Area */}
         <div className="flex w-full flex-none flex-col gap-8 lg:sticky lg:top-16 xl:w-[300px]">
           {/* Posto Highlight Card */}
-          <PostoHighlightCard />
+          <PostoHighlightCard profile={profile} />
 
           <MemberSuggestionsCard profile={profile} />
 

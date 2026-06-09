@@ -41,7 +41,7 @@ export function AdminMembers() {
                 </td></tr>
               )}
               {requests.map(req => (
-                <tr key={req.id} className="border-b border-border-gray hover:bg-slate-50 transition-colors">
+                <tr key={req.id} className="border-b border-border-gray hover:bg-ice/50 transition-colors">
                   <td className="py-4 px-6">
                     <p className="font-medium text-navy">{req.name}</p>
                     <p className="text-xs text-slate">{req.email}</p>

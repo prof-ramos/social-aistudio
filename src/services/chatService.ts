@@ -6,7 +6,7 @@ export const chatService = {
     const fetchChats = async () => {
       const { data, error } = await supabase
         .from('chat_participants')
-        .select('chat_id, chat_sessions(*)')
+        .select('chat_id, unread_count, chat_sessions(*)')
         .eq('user_id', userId);
 
       if (error) {
@@ -22,7 +22,7 @@ export const chatService = {
           participantNames: session.participant_names || {},
           updatedAt: session.updated_at,
           lastMessage: session.last_message,
-          unreadCount: session.unread_count,
+          unreadCount: row.unread_count || 0,
         } as ChatSession;
       });
 

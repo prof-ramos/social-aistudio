@@ -33,8 +33,8 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
             return {
               bio: userData.bio || '',
               avatarUrl: userData.avatarUrl || '',
-              currentPost: (userData as any).currentPost || '',
-              interests: (userData as any).interests || '',
+              currentPost: userData.currentPost || '',
+              interests: userData.interests || '',
             }
           }
           return prev;
@@ -67,7 +67,8 @@ export function useProfile(id: string | undefined, currentProfile: UserProfile) 
       await userService.updateUserProfile(id, {
         bio: editForm.bio,
         avatarUrl: editForm.avatarUrl,
-        ...({ currentPost: editForm.currentPost, interests: editForm.interests } as any),
+        currentPost: editForm.currentPost,
+        interests: editForm.interests,
       });
       setUser({ ...user, ...editForm });
       setIsEditing(false);

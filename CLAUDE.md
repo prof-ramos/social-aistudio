@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Social-ASOF is an internal social network built with React 19, Firebase (Auth + Firestore), and Express. It was originally exported from Google AI Studio. The app supports role-based access (ADMIN, MEMBRO_ATIVO, MEMBRO_APOSENTADO, PENDENTE), real-time feeds, direct messaging, notifications, and admin moderation.
+Social-ASOF is an internal social network built with React 19, Supabase (Auth + Postgres + Realtime + Storage), and Express. It supports role-based access (ADMIN, MEMBRO_ATIVO, MEMBRO_APOSENTADO, PENDENTE), real-time feeds, direct messaging, notifications, and admin moderation.
 
 ## Commands
 
@@ -22,7 +22,8 @@ Social-ASOF is an internal social network built with React 19, Firebase (Auth + 
 
 Create `.env.local` at the repo root for local secrets:
 
-- `GEMINI_API_KEY` — Google AI Studio / Gemini API key
+- `VITE_SUPABASE_URL` — Supabase project URL
+- `VITE_SUPABASE_ANON_KEY` — Supabase anonymous key
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `ADMIN_EMAIL` — Used by the Express `/api/admin/notify-request` route to send access-request emails
 
 The Vite dev server respects `DISABLE_HMR=true` (set by AI Studio during agent edits) to disable HMR and file watching.
@@ -43,22 +44,25 @@ Uses `BrowserRouter` with a shared `Layout` component that renders the `Navbar` 
 
 **Auth Flow** (`src/services/authService.ts`)
 
-Firebase Auth with email/password. `authService.onAuthStateChanged` listens for Firebase auth changes, then fetches the corresponding user profile document from Firestore (`users/{uid}`). If the profile document does not exist, the user is automatically signed out.
+Supabase Auth with email/password. `authService.onAuthStateChanged` listens for Supabase auth changes, then fetches the corresponding user profile from the `users` table. If the profile does not exist, the user is automatically signed out.
 
 **Services** (`src/services/*`)
 
-Services are plain objects that encapsulate all Firebase interactions. Key services:
-- `authService` — Firebase Auth sign-in, sign-out, password reset, auth-state listener
-- `postService` — Firestore CRUD for posts, real-time feed subscription (`onSnapshot`), reactions, comments, and mention notifications
-- `chatService` — Firestore real-time messaging and chat sessions
-- `notificationService` — Firestore notifications with unread counts
-- `userService` — User profile lookups and presence updates
+Services are plain objects that encapsulate all Supabase interactions. Key services:
+- `authService` — Supabase Auth sign-in, sign-out, password reset, auth-state listener
+- `postService` — Supabase CRUD for posts, real-time feed subscription, reactions, comments, and mention notifications
+- `chatService` — Supabase real-time messaging and chat sessions
+- `notificationService` — Supabase notifications with unread counts
+- `userService` — User profile lookups, presence updates, and saved posts
 - `adminService` — Admin-only operations (member approvals, moderation)
-- `postoService` — Static and dynamic data for "postos do exterior" (embassy posts)
+- `postoService` — Data for "postos do exterior" (embassy posts), reviews, and field reports
+- `memberRequestService` — Access request management
+- `reportService` — Content reporting
+- `systemService` — Connectivity checks
 
 **Hooks** (`src/hooks/*`)
 
-Hooks wrap services and expose component-ready state. They typically subscribe to Firestore snapshots and clean up on unmount. For example, `useFeed` subscribes to `postService.subscribeToFeed` and manages pagination, filters, and the editor modal state.
+Hooks wrap services and expose component-ready state. They typically subscribe to Supabase Realtime channels and clean up on unmount. For example, `useFeed` subscribes to `postService.subscribeToFeed` and manages pagination, filters, and the editor modal state.
 
 **Pages** (`src/pages/*`)
 
@@ -68,7 +72,8 @@ Route components. Most receive the authenticated `profile` prop from the Layout.
 
 - `layout/Navbar.tsx` — Top navigation with admin links conditionally rendered
 - `feed/` — Feed-specific components: `PostCard`, `PostEditor` (TipTap rich text), `ReactionButtons`, `LeftSidebar`, etc.
-- `ui/Skeleton.tsx` — Loading skeletons
+- `ui/` — Reusable UI components: `Button`, `Card`, `ConfirmDialog`, `ReportDialog`, `Toast`, etc.
+- `brand/` — Brand components: `AsofLogo`, `AuthShell`, `BrandLockup`
 - `Tour.tsx` — Onboarding tour using `react-joyride`
 - `ErrorBoundary.tsx` — Error boundary
 
@@ -82,9 +87,9 @@ Central type definitions:
 
 `@/` resolves to the repository root (configured in `vite.config.ts` and `tsconfig.json`).
 
-### Firebase
+### Supabase
 
-Firebase is initialized in `src/lib/firebase.ts` using credentials from `firebase-applet-config.json` at the repo root. Firestore uses the database ID specified in that config.
+Supabase is initialized in `src/lib/supabase.ts` using credentials from `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` environment variables. The database uses PostgreSQL with Row Level Security (RLS) policies for all access control. Realtime is used for live updates on posts, messages, and notifications. Storage is used for avatars and file uploads. Migrations are in `supabase/migrations/`.
 
 ### Testing
 

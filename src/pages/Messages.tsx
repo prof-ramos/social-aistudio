@@ -1,72 +1,60 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { UserProfile, ChatSession, ChatMessage } from '../types';
+import { UserProfile } from '../types';
 import { chatService } from '../services/chatService';
 import { ChevronLeft, Send, MessageSquare } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Button, Card, PageTitle } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useVisualViewportOffset } from '../hooks/useVisualViewportOffset';
+import { useChatList } from '../hooks/useChatList';
+import { useChatConversation } from '../hooks/useChatConversation';
 
 export function Messages({ profile }: { profile: UserProfile }) {
-  const [chats, setChats] = useState<ChatSession[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [sending, setSending] = useState(false);
   const location = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const keyboardOffset = useVisualViewportOffset();
+  const isCreatingChatRef = useRef(false);
+  const locationStateRef = useRef(location.state);
 
+  const { chats } = useChatList(profile.id);
+  const { messages, newMessage, setNewMessage, sending, handleSendMessage, activeChat } = useChatConversation(activeChatId, profile.id, chats);
+
+  // Capture location.state once on mount to avoid re-triggering on chat updates
   useEffect(() => {
-    const unsub = chatService.subscribeToUserChats(profile.id, (fetchedChats) => {
-      setChats(fetchedChats);
+    locationStateRef.current = location.state;
+  }, [location.state]);
 
-      const state = location.state as { targetUserId?: string; targetUserName?: string } | null;
-      if (state?.targetUserId && state.targetUserId !== profile.id) {
-        const existingChat = fetchedChats.find((c) => c.participants.includes(state.targetUserId!));
-        if (existingChat) {
-          setActiveChatId(existingChat.id);
+  // Handle navigation from profile page (targetUserId in location.state)
+  useEffect(() => {
+    const state = locationStateRef.current as { targetUserId?: string; targetUserName?: string } | null;
+    if (!state?.targetUserId || state.targetUserId === profile.id || isCreatingChatRef.current) return;
+    const existingChat = chats.find((c) => c.participants.includes(state.targetUserId!));
+    if (existingChat) {
+      setActiveChatId(existingChat.id);
+      window.history.replaceState({}, document.title);
+      locationStateRef.current = null;
+    } else {
+      isCreatingChatRef.current = true;
+      chatService
+        .getOrCreateChat(profile.id, state.targetUserId, profile.name, state.targetUserName || 'Usuário')
+        .then((id) => {
+          setActiveChatId(id);
           window.history.replaceState({}, document.title);
-        } else {
-          chatService
-            .getOrCreateChat(profile.id, state.targetUserId, profile.name, state.targetUserName || 'Usuário')
-            .then((id) => {
-              setActiveChatId(id);
-              window.history.replaceState({}, document.title);
-            });
-        }
-      }
-    });
-    return () => unsub();
-  }, [profile.id, location.state, profile.name]);
-
-  useEffect(() => {
-    if (!activeChatId) {
-      setMessages([]);
-      return;
+          locationStateRef.current = null;
+        })
+        .finally(() => { isCreatingChatRef.current = false; });
     }
-    const unsub = chatService.subscribeToChatMessages(activeChatId, (msgs) => {
-      setMessages(msgs);
+  }, [chats, profile.id, profile.name]);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messages.length > 0) {
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
-    });
-    return () => unsub();
-  }, [activeChatId]);
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !activeChatId) return;
-    setSending(true);
-    try {
-      await chatService.sendMessage(activeChatId, profile.id, newMessage);
-      setNewMessage('');
-    } finally {
-      setSending(false);
     }
-  };
-
-  const activeChat = chats.find((c) => c.id === activeChatId);
+  }, [messages]);
 
   const formatTime = (timestamp: any) => {
     if (!timestamp) return '';
@@ -130,6 +118,11 @@ export function Messages({ profile }: { profile: UserProfile }) {
                         {chat.lastMessage || 'Envie a primeira mensagem...'}
                       </p>
                     </div>
+                    {chat.unreadCount > 0 && (
+                      <span className="ml-auto shrink-0 bg-navy text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                        {chat.unreadCount}
+                      </span>
+                    )}
                   </button>
                 );
               })

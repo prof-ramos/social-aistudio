@@ -31,6 +31,10 @@ const ASPECT: Record<AsofLogoVariant, string> = {
 
 const svgCache = new Map<string, Promise<string>>();
 
+export function _resetSvgCache() {
+  svgCache.clear();
+}
+
 function fetchSvg(path: string): Promise<string> {
   if (!svgCache.has(path)) {
     svgCache.set(
@@ -84,8 +88,11 @@ export function AsofLogo({
       .then((markup) => {
         if (!cancelled) setSvgSource(markup);
       })
-      .catch(() => {
-        if (!cancelled) setLoadError(true);
+      .catch((err) => {
+        if (!cancelled) {
+          console.error(err);
+          setLoadError(true);
+        }
       });
 
     return () => {
