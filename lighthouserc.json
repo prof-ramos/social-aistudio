@@ -3,7 +3,8 @@
     "collect": {
       "numberOfRuns": 2,
       "startServerCommand": "npm run preview -- --host 127.0.0.1 --port 4173",
-      "startServerReadyPattern": "Local:",
+      "startServerReadyPattern": "(Local|http://127\\.0\\.0\\.1)",
+      "startServerReadyTimeout": 30000,
       "url": [
         "http://127.0.0.1:4173/login",
         "http://127.0.0.1:4173/solicitar-acesso"
