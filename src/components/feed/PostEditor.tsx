@@ -41,6 +41,7 @@ export function PostEditor({ onCancel, onSubmit, isPosting }: PostEditorProps) {
     editorProps: {
       attributes: {
         class: 'prose prose-slate max-w-none min-h-[200px] p-5 sm:p-6 text-slate focus:outline-none border-none resize-y',
+        'aria-label': 'Conteúdo da publicação',
       },
     },
     onUpdate: ({ editor }) => {

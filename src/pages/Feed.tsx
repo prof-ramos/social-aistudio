@@ -94,12 +94,14 @@ export function Feed({ profile }: { profile: UserProfile }) {
         <input 
           type="text" 
           placeholder="Buscar no feed..."
+          aria-label="Buscar no feed"
           className="flex-1 h-11 border border-border-gray px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-slate/60"
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
         <select 
           className="h-11 border border-border-gray bg-white px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none"
+          aria-label="Filtrar por categoria"
           value={filterCategory}
           onChange={e => setFilterCategory(e.target.value)}
         >

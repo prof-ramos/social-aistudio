@@ -79,10 +79,10 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
   };
 
   const styles = {
-    success: 'bg-success/10 border-success/20 text-success',
-    error: 'bg-danger/5 border-danger/20 text-danger',
-    info: 'bg-info/5 border-info/20 text-info',
-    warning: 'bg-warning/5 border-warning/20 text-warning',
+    success: 'bg-white border-success/30 text-success',
+    error: 'bg-white border-danger/30 text-danger',
+    info: 'bg-white border-info/30 text-info',
+    warning: 'bg-white border-warning/30 text-warning',
   };
 
   const Icon = icons[toast.type];

@@ -234,6 +234,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                     size="lg"
                     disabled={!newMessage.trim() || sending}
                     className="h-12 w-12 shrink-0 rounded-full p-0"
+                    aria-label="Enviar mensagem"
                   >
                     <Send className="ml-0.5 h-5 w-5" />
                   </Button>

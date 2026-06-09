@@ -21,6 +21,7 @@
   --app-warning: #D97706;
   --app-info: #0284C7;
   --app-white: #ffffff;
+  --app-white-fixed: #ffffff;
   --app-institutional-gold: #c4a35a;
   --app-asof-blue: #04528d;
 }
@@ -39,6 +40,7 @@
   --app-warning: #f59e0b;
   --app-info: #38bdf8;
   --app-white: #111827;
+  --app-white-fixed: #ffffff;
   --app-institutional-gold: #d4b76a;
   --app-asof-blue: #2d82cc;
 }
@@ -67,6 +69,7 @@ textarea {
   --color-warning: var(--app-warning);
   --color-info: var(--app-info);
   --color-white: var(--app-white);
+  --color-white-fixed: var(--app-white-fixed);
   --color-institutional-gold: var(--app-institutional-gold);
   --color-asof-blue: var(--app-asof-blue);
 
