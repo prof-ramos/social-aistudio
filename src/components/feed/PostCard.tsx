@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { sanitizeHtml } from '../../lib/sanitize';
 import { Post, UserProfile } from '../../types';
+import { canEdit, canDelete } from '../../policies/postPolicy';
 import { Pin, MessageSquare, Bookmark, Pencil, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ReactionButtons } from './ReactionButtons';
@@ -18,7 +19,8 @@ interface PostCardProps {
 
 function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: PostCardProps) {
   const isSaved = profile.savedPosts?.includes(post.id);
-  const canEdit = post.authorId === profile.id || profile.role === 'ADMIN';
+  const canEditPost = canEdit(profile, post);
+  const canDeletePost = canDelete(profile, post);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   return (
@@ -43,7 +45,7 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
            </div>
          </div>
          <div className="flex items-center gap-1">
-           {canEdit && (onEdit || onDelete) && (
+           {canEditPost && (onEdit || onDelete) && (
              <div className="flex items-center gap-1">
                {onEdit && (
                  <Button

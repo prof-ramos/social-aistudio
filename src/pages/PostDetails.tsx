@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { sanitizeHtml } from '../lib/sanitize';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserProfile, Post } from '../types';
+import { canEdit } from '../policies/postPolicy';
 import { ArrowLeft, MessageSquare, ThumbsUp, AlertTriangle, Bookmark, Pencil, Trash2 } from 'lucide-react';
 import { usePostDetails } from '../hooks/usePostDetails';
 import { postService } from '../services/postService';
@@ -37,7 +38,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
     handleDeletePost
   } = usePostDetails(id, profile);
 
-  const canModify = post && (post.authorId === profile.id || profile.role === 'ADMIN');
+  const canModify = post && canEdit(profile, post);
 
   const toggleSaved = async () => {
     if (!post) return;
