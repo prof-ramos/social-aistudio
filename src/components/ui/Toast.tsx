@@ -93,10 +93,10 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
       role="alert"
     >
       <Icon className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
-      <p className="text-sm font-medium flex-1">{toast.message}</p>
+      <p className="text-base font-medium flex-1">{toast.message}</p>
       <button
         onClick={() => onRemove(toast.id)}
-        className="flex min-h-[44px] min-w-[44px] items-center justify-center text-current opacity-50 transition-opacity hover:opacity-100"
+        className="flex min-h-[44px] min-w-[44px] items-center justify-center text-current opacity-80 transition-opacity hover:opacity-100"
         aria-label="Fechar notificação"
       >
         <X className="w-4 h-4" aria-hidden="true" />

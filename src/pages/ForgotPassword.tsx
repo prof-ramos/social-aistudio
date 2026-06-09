@@ -39,11 +39,11 @@ export default function ForgotPassword() {
             <Mail className="h-8 w-8" />
           </div>
           <h2 className="font-serif text-lg font-bold text-navy">E-mail enviado</h2>
-          <p className="text-sm text-slate">
+          <p className="text-base text-slate leading-relaxed">
             Se houver uma conta associada ao e-mail informado, você receberá um link para redefinir sua senha em instantes.
           </p>
           <div className="border-t border-border-gray/80 pt-6">
-            <Link to="/login" className="inline-flex items-center justify-center gap-2 text-sm font-medium text-navy transition-colors hover:text-asof-blue">
+            <Link to="/login" className="inline-flex items-center justify-center gap-2 text-base font-medium text-navy transition-colors hover:text-asof-blue">
               <ArrowLeft className="h-4 w-4" /> Voltar para o login
             </Link>
           </div>
@@ -53,10 +53,14 @@ export default function ForgotPassword() {
           {error && <Alert variant="error">{error}</Alert>}
 
           <div>
-            <label htmlFor="email" className="mb-1 block text-sm font-medium text-slate">E-mail</label>
+            <label htmlFor="email" className="mb-1 block text-base font-medium text-slate">E-mail</label>
             <input
               id="email"
               type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              enterKeyHint="go"
               required
               className="w-full h-11 rounded-none border border-border-gray bg-white/80 px-3 text-slate transition-colors focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy"
               value={email}
@@ -75,7 +79,7 @@ export default function ForgotPassword() {
             {loading ? 'Enviando...' : 'Enviar link de recuperação'}
           </Button>
 
-          <div className="border-t border-border-gray/80 pt-6 text-center text-sm">
+          <div className="border-t border-border-gray/80 pt-6 text-center text-base">
             <Link to="/login" className="font-medium text-slate transition-colors hover:text-navy">
               Lembrei minha senha
             </Link>

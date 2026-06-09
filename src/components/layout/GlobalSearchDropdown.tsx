@@ -69,7 +69,7 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
 
   if (query.length < 2) {
     return (
-      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-gray shadow-lg z-50 rounded-sm py-3 px-4 text-sm text-slate">
+      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-gray shadow-lg z-50 rounded-sm py-3 px-4 text-base text-slate">
         Digite pelo menos 2 caracteres...
       </div>
     );
@@ -77,7 +77,7 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
 
   if (isSearching) {
     return (
-      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-gray shadow-lg z-50 rounded-sm py-3 px-4 text-sm text-slate">
+      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-gray shadow-lg z-50 rounded-sm py-3 px-4 text-base text-slate">
         Buscando...
       </div>
     );
@@ -85,7 +85,7 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
 
   if (!hasResults) {
     return (
-      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-gray shadow-lg z-50 rounded-sm py-3 px-4 text-sm text-slate">
+      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-border-gray shadow-lg z-50 rounded-sm py-3 px-4 text-base text-slate">
         Nenhum resultado encontrado.
       </div>
     );
@@ -97,7 +97,7 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
     if (items.length === 0) return null;
     return (
       <div key={type}>
-        <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-slate/60 border-b border-border-gray/50">
+        <div className="px-3 py-2 text-sm font-bold uppercase tracking-wider text-slate/90 border-b border-border-gray/50">
           {icon}<span className="ml-1.5">{label}</span>
         </div>
         {items.map(item => {
@@ -109,7 +109,7 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
               key={`${item.type}-${item.id}`}
               data-index={idx}
               className={cn(
-                'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-left transition-colors min-h-[44px]',
+                'w-full flex items-center gap-3 px-3 py-2.5 text-base text-left transition-colors min-h-[44px]',
                 isActive ? 'bg-ice text-navy' : 'text-navy hover:bg-ice/50'
               )}
               onClick={() => { navigate(item.navigateTo); onClose(); }}
@@ -117,7 +117,7 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
               {item.type === 'user' && (item.avatarUrl ? (
                 <img src={item.avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
               ) : (
-                <div className="w-7 h-7 bg-ice rounded-full flex items-center justify-center text-navy font-bold text-xs flex-shrink-0">
+                <div className="w-7 h-7 bg-ice rounded-full flex items-center justify-center text-navy font-bold text-sm flex-shrink-0">
                   {item.label.charAt(0)}
                 </div>
               ))}
@@ -125,7 +125,7 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
               {item.type === 'posto' && <Compass className="w-4 h-4 text-slate flex-shrink-0" strokeWidth={1.5} aria-hidden="true" />}
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{item.label}</p>
-                {item.sub && <p className="text-xs text-slate truncate">{item.sub}</p>}
+                {item.sub && <p className="text-sm text-slate truncate">{item.sub}</p>}
               </div>
             </button>
           );

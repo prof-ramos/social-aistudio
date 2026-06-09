@@ -82,7 +82,7 @@ export function ConfirmDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4 modal-contain">
       <div
         ref={dialogRef}
         role="alertdialog"
@@ -102,19 +102,19 @@ export function ConfirmDialog({
             >
               {title}
             </h2>
-            <p id="confirm-dialog-message" className="text-sm text-slate leading-relaxed">
+            <p id="confirm-dialog-message" className="text-base text-slate leading-loose">
               {message}
             </p>
 
             {inputLabel && (
               <div className="mt-4">
-                <label htmlFor="confirm-dialog-input" className="block text-xs uppercase tracking-widest font-bold text-navy mb-1">
+                <label htmlFor="confirm-dialog-input" className="block text-sm uppercase tracking-widest font-bold text-navy mb-1">
                   {inputLabel}
                 </label>
                 <textarea
                   ref={inputRef}
                   id="confirm-dialog-input"
-                  className="w-full min-h-[80px] border border-border-gray p-3 text-sm text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none leading-relaxed resize-y transition-colors bg-white/50"
+                  className="w-full min-h-[80px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none leading-loose resize-y transition-colors bg-white/50"
                   placeholder={inputPlaceholder}
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}

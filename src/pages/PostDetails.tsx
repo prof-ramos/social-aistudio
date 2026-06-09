@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { sanitizeHtml } from '../lib/sanitize';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserProfile, Post } from '../types';
 import { ArrowLeft, MessageSquare, ThumbsUp, AlertTriangle, Bookmark, Pencil, Trash2 } from 'lucide-react';
@@ -125,7 +126,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
 
       <Link
         to="/feed"
-        className="inline-flex items-center gap-2 text-sm font-medium text-slate hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]"
+        className="inline-flex items-center gap-2 text-base font-medium text-slate hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]"
       >
         <ArrowLeft className="w-4 h-4" /> Voltar ao feed
       </Link>
@@ -149,9 +150,9 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
               <div>
                 <h3 className="font-bold text-lg text-slate flex items-center gap-2">
                   <Link to={`/perfil/${post.authorId}`} className="hover:text-sky transition-colors">{post.authorName || 'Usuário'}</Link>
-                  <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
+                  <span className="text-sm font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Membro'}</span>
                 </h3>
-                <p className="text-[10px] uppercase text-slate/70 font-medium">Postado em #{post.category}</p>
+                <p className="text-xs uppercase text-slate/90 font-medium leading-relaxed">Postado em #{post.category}</p>
               </div>
               <div className="flex items-center gap-1">
                 {canModify && (
@@ -182,7 +183,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                     size="sm"
                     onClick={() => navigate('/mensagens', { state: { targetUserId: post.authorId, targetUserName: post.authorName } })}
                     title="Mandar Mensagem Direta"
-                    className="text-xs font-semibold text-slate/70 hover:text-navy"
+                    className="text-sm font-semibold text-slate/90 hover:text-navy"
                   >
                     <MessageSquare className="w-4 h-4" /> MENSAGEM
                   </Button>
@@ -212,7 +213,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
           <PageTitle as="h1" size="lg" className="mb-4">{post.title}</PageTitle>
           <div
             className="text-base leading-relaxed text-slate mb-8 prose prose-sm max-w-none prose-slate break-words"
-            dangerouslySetInnerHTML={{ __html: post.body }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.body) }}
           />
 
           <div className="flex gap-4 border-t border-border-gray pt-6">
@@ -253,11 +254,11 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
             <Card key={c.id} variant="default" padding="md">
                <div className="flex justify-between items-start mb-3">
                  <div className="flex items-center gap-3">
-                   <div className="w-8 h-8 bg-ice flex items-center justify-center font-bold text-navy text-xs uppercase">
+                   <div className="w-8 h-8 bg-ice flex items-center justify-center font-bold text-navy text-sm uppercase">
                      {c.authorName ? c.authorName.charAt(0) : 'U'}
                    </div>
                    <div>
-                     <p className="text-xs font-bold text-slate">{c.authorName}</p>
+                     <p className="text-sm font-bold text-slate leading-relaxed">{c.authorName}</p>
                    </div>
                  </div>
                  <div className="flex items-center gap-4">
@@ -268,7 +269,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                        setNewCommentBody(prev => prev ? `${prev}\n@${c.authorName} ` : `@${c.authorName} `);
                        document.getElementById('comment-body')?.focus();
                      }}
-                     className="text-[10px] font-bold text-slate/70 hover:text-navy min-h-[44px]"
+                     className="text-xs font-bold text-slate/90 hover:text-navy min-h-[44px]"
                    >
                      <MessageSquare className="w-3 h-3" /> RESPONDER
                    </Button>
@@ -283,14 +284,14 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                    </Button>
                  </div>
                </div>
-               <p className="text-sm text-slate whitespace-pre-wrap break-words">{c.body}</p>
+               <p className="text-base text-slate whitespace-pre-wrap break-words leading-relaxed">{c.body}</p>
             </Card>
           ))}
           {comments.length === 0 && (
             <Card variant="outlined" padding="lg" className="flex flex-col items-center justify-center text-center text-slate border-dashed">
               <MessageSquare className="w-12 h-12 mb-4 opacity-20 text-navy" />
               <PageTitle as="h3" size="md" className="mb-2">Seja o primeiro a participar</PageTitle>
-              <p className="text-sm opacity-80 max-w-sm mx-auto">Esta publicação ainda não possui comentários. Contribua com a discussão adicionando o seu!</p>
+              <p className="text-base opacity-80 max-w-sm mx-auto leading-relaxed">Esta publicação ainda não possui comentários. Contribua com a discussão adicionando o seu!</p>
             </Card>
           )}
         </div>

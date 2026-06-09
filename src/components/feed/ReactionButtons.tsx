@@ -69,8 +69,8 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
               onClick={(e) => handleReact(e, emoji)}
               aria-label={`${reacts.length} ${label.toLowerCase()}`}
               aria-pressed={hasReacted}
-              className={`text-sm font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
-                hasReacted ? 'text-sky dark:text-asof-blue' : 'text-slate/70 hover:text-navy'
+              className={`text-base font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
+                hasReacted ? 'text-sky dark:text-asof-blue' : 'text-slate/90 hover:text-navy'
               }`}
             >
               <Icon className="w-5 h-5" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} />
@@ -98,7 +98,7 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
         onClick={(e) => handleReact(e, REPORT_EMOJI.emoji)}
         aria-label={`${reportReacts.length} ${REPORT_EMOJI.label.toLowerCase()}`}
         aria-pressed={hasReported}
-        className={`text-sm font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
+        className={`text-base font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
           hasReported ? 'text-danger' : 'text-slate/40 hover:text-danger'
         }`}
       >

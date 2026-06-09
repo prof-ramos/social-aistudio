@@ -21,23 +21,24 @@ export function AuthShell({
   className,
 }: AuthShellProps) {
   return (
-    <div className={cn('auth-shell min-h-dvh min-h-screen font-sans', className)}>
-      <div className="auth-shell__grid min-h-dvh min-h-screen lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
-        <aside className="auth-shell__hero relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-between lg:px-12 lg:py-14 xl:px-16">
+    <div className={cn('auth-shell min-h-dvh font-sans', className)}>
+      <div className="auth-shell__grid min-h-dvh lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <aside className="auth-shell__hero relative hidden overflow-hidden lg:flex lg:flex-col lg:justify-center lg:px-12 lg:py-14 xl:px-16">
           <div className="auth-shell__hero-glow" aria-hidden="true" />
-          <div className="relative z-10 auth-reveal auth-reveal--1">
-            <p className="mb-6 font-sans text-[0.625rem] font-bold uppercase tracking-[0.32em] text-sky/80">
+          <div className="auth-shell__hero-grid" aria-hidden="true" />
+          <div className="relative z-10 flex flex-col items-start gap-10 auth-reveal auth-reveal--1">
+            <p className="font-sans text-xs font-bold uppercase tracking-[0.32em] text-white/90">
               Associação de Oficiais de Chancelaria
             </p>
             <BrandLockup theme="dark" size="panel" align="start" showSocialBadge showTagline />
-          </div>
-          <div className="relative z-10 space-y-4 auth-reveal auth-reveal--3">
-            <p className="max-w-md font-serif text-lg leading-relaxed text-ice/90">
-              Um espaço reservado para diálogo, colaboração e pertencimento entre oficiais de chancelaria.
-            </p>
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-sky/60">
-              <span className="h-px w-8 bg-institutional-gold" />
-              Uso restrito a associados
+            <div className="space-y-5">
+              <p className="max-w-md font-serif text-lg leading-loose text-white/95 text-balance">
+                Um espaço reservado para diálogo, colaboração e pertencimento entre oficiais de chancelaria.
+              </p>
+              <div className="flex items-center gap-3 text-sm uppercase tracking-[0.2em] text-white/90">
+                <span className="h-px w-8 bg-institutional-gold" />
+                Uso restrito a associados
+              </div>
             </div>
           </div>
         </aside>
@@ -49,14 +50,14 @@ export function AuthShell({
 
           <div
             className={cn(
-              'auth-shell__card mx-auto w-full auth-reveal auth-reveal--2',
+              'auth-shell__card mx-auto w-full auth-reveal auth-reveal--2 shadow-2xl shadow-navy-dark/20',
               maxWidth === 'xl' ? 'max-w-xl' : 'max-w-md',
             )}
           >
             <header className="mb-8 border-b border-border-gray/80 pb-6">
-              <h1 className="font-serif text-2xl font-bold text-navy sm:text-[1.75rem]">{title}</h1>
+              <h1 className="font-serif text-2xl font-bold text-navy text-balance tracking-tight sm:text-[1.75rem]">{title}</h1>
               {description && (
-                <p className="mt-2 text-sm leading-relaxed text-slate">{description}</p>
+                <p className="mt-2 text-base leading-loose text-slate text-balance">{description}</p>
               )}
             </header>
             {children}
@@ -64,7 +65,7 @@ export function AuthShell({
               <div className="mt-8 border-t border-border-gray/80 pt-6 text-center">
                 <Link
                   to={backLink.to}
-                  className="text-sm font-medium text-slate transition-colors hover:text-navy"
+                  className="text-base font-medium text-slate transition-colors hover:text-navy"
                 >
                   {backLink.label}
                 </Link>

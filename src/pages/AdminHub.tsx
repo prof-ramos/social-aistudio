@@ -17,7 +17,7 @@ export default function AdminHub() {
     <PageContainer variant="feed" className="space-y-8 pb-12">
       <div>
         <PageTitle as="h1" size="xl">Painel Administrativo</PageTitle>
-        <p className="text-slate">Gerencie membros e modere conteúdo da plataforma.</p>
+        <p className="text-slate leading-relaxed">Gerencie membros e modere conteúdo da plataforma.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -33,10 +33,10 @@ export default function AdminHub() {
               )}
             </div>
             <PageTitle as="h2" size="lg" className="mb-2">Gerenciar Membros</PageTitle>
-            <p className="text-sm text-slate mb-4">
+            <p className="text-base text-slate mb-4 leading-relaxed">
               Aprove ou rejeite solicitações de acesso de novos associados.
             </p>
-            <div className="flex items-center text-sm font-medium text-navy group-hover:text-sky-dark transition-colors">
+            <div className="flex items-center text-base font-medium text-navy group-hover:text-sky-dark transition-colors">
               Acessar <ChevronRight className="w-4 h-4 ml-1" />
             </div>
           </Card>
@@ -54,10 +54,10 @@ export default function AdminHub() {
               )}
             </div>
             <PageTitle as="h2" size="lg" className="mb-2">Moderação de Conteúdo</PageTitle>
-            <p className="text-sm text-slate mb-4">
+            <p className="text-base text-slate mb-4 leading-relaxed">
               Analise e resolva denúncias de conteúdo publicado na plataforma.
             </p>
-            <div className="flex items-center text-sm font-medium text-navy group-hover:text-sky-dark transition-colors">
+            <div className="flex items-center text-base font-medium text-navy group-hover:text-sky-dark transition-colors">
               Acessar <ChevronRight className="w-4 h-4 ml-1" />
             </div>
           </Card>

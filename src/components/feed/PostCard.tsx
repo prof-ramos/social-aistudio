@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { sanitizeHtml } from '../../lib/sanitize';
 import { Post, UserProfile } from '../../types';
 import { Pin, MessageSquare, Bookmark, Pencil, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -22,9 +23,9 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
 
   return (
     <>
-    <Card variant="default" padding="md" className={`relative transition-colors font-sans ${post.pinned ? 'border-sky shadow-sm bg-sky/5' : ''}`}>
+    <Card variant="default" padding="md" className={`relative transition-colors font-sans content-visibility-auto ${post.pinned ? 'border-sky shadow-sm bg-sky/5' : ''}`}>
        {post.pinned && (
-       <div className="absolute top-0 right-0 bg-sky text-navy px-3 py-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
+       <div className="absolute top-0 right-0 bg-sky text-navy px-3 py-1 flex items-center gap-1 text-xs font-bold uppercase tracking-wider">
          <Pin className="w-3 h-3" strokeWidth={1.5} /> Fixado
        </div>
      )}
@@ -34,11 +35,11 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
        </div>
        <div className="flex-1 flex justify-between items-start">
          <div>
-           <h3 className="font-bold text-lg text-slate">
-             {post.authorName || 'Usuário'} <span className="text-xs font-normal text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador'}</span>
-           </h3>
+           <span className="font-bold text-lg text-slate block">
+             {post.authorName || 'Usuário'} <span className="text-sm font-normal text-slate/90">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador'}</span>
+           </span>
            <div className="flex items-center">
-             <p className="text-[10px] uppercase text-slate/70 font-bold tracking-wider mt-0.5">#{post.category}</p>
+             <p className="text-xs uppercase text-slate/90 font-bold tracking-wider mt-0.5">#{post.category}</p>
            </div>
          </div>
          <div className="flex items-center gap-1">
@@ -81,17 +82,17 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
        </div>
      </div>
      <Link to={`/feed/${post.id}`}>
-       <h4 className="font-bold text-navy text-xl mb-3 hover:text-sky transition-colors">{post.title}</h4>
+       <h3 className="font-bold text-navy text-xl mb-3 hover:text-sky transition-colors">{post.title}</h3>
      </Link>
      <div
-       className="text-sm leading-relaxed mb-6 text-slate/80 line-clamp-3 prose prose-slate prose-sm"
-       dangerouslySetInnerHTML={{ __html: post.body }}
+       className="text-base leading-loose mb-6 text-slate/90 line-clamp-3 prose prose-slate prose-sm"
+       dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.body) }}
      />
 
      <div className="flex items-center justify-between border-t border-border-gray/50 pt-4">
        <div className="flex items-center gap-6">
          <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
-         <Link to={`/feed/${post.id}#comment`} className="text-sm font-medium text-slate/70 flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
+         <Link to={`/feed/${post.id}#comment`} className="text-base font-medium text-slate/90 flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
            <MessageSquare className="w-5 h-5" strokeWidth={1.5} /> Responder
          </Link>
        </div>

@@ -20,23 +20,23 @@ export const Button = ({
   ...props
 }: ButtonProps & { ref?: React.Ref<HTMLButtonElement> }) => {
   const base =
-    'inline-flex items-center justify-center transition-colors focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 font-medium';
+    'inline-flex items-center justify-center transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 font-medium active:scale-[0.97]';
 
   const variants = {
     primary:
-      'bg-navy text-white hover:bg-navy-dark disabled:opacity-50 disabled:cursor-not-allowed',
+      'bg-navy text-white hover:bg-asof-blue hover:shadow-md hover:-translate-y-px disabled:opacity-80 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none disabled:hover:bg-navy',
     secondary:
-      'border border-navy text-navy bg-transparent hover:bg-ice disabled:opacity-50 disabled:cursor-not-allowed',
+      'border border-navy text-navy bg-transparent hover:bg-ice disabled:opacity-80 disabled:cursor-not-allowed',
     danger:
-      'bg-danger text-white-fixed hover:bg-danger/90 disabled:opacity-50 disabled:cursor-not-allowed',
+      'bg-danger text-white-fixed hover:bg-danger/90 disabled:opacity-80 disabled:cursor-not-allowed',
     ghost:
-      'text-slate hover:bg-ice hover:text-navy disabled:opacity-50 disabled:cursor-not-allowed',
+      'text-slate hover:bg-ice hover:text-navy disabled:opacity-80 disabled:cursor-not-allowed',
   };
 
   const sizes = {
-    sm: 'h-9 px-3 text-xs',
-    md: 'h-11 px-5 text-sm',
-    lg: 'h-12 px-6 text-sm',
+    sm: 'h-10 px-3 text-sm',
+    md: 'h-11 px-5 text-base',
+    lg: 'h-12 px-6 text-base',
   };
 
   return (

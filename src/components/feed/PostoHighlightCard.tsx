@@ -32,7 +32,7 @@ export function PostoHighlightCard({ profile }: PostoHighlightCardProps) {
       </div>
       <Link
         to={`/postos/${posto.slug}`}
-        className="block w-full min-h-[44px] border border-navy text-navy font-bold text-xs uppercase tracking-wider py-2.5 px-3 hover:bg-ice transition-colors focus:ring-2 focus:ring-navy focus:outline-none text-center mt-2"
+        className="block w-full min-h-[44px] border border-navy text-navy font-bold text-sm uppercase tracking-wider py-2.5 px-3 hover:bg-ice transition-colors focus:ring-2 focus:ring-navy focus:outline-none text-center mt-2"
       >
         Ver Ficha do Posto
       </Link>

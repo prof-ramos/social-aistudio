@@ -53,7 +53,7 @@ export function ReportDialog({ isOpen, onCancel, onSubmitted }: ReportDialogProp
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4 modal-contain">
       <div
         ref={dialogRef}
         role="alertdialog"
@@ -73,17 +73,17 @@ export function ReportDialog({ isOpen, onCancel, onSubmitted }: ReportDialogProp
             >
               Denunciar Conteúdo
             </h2>
-            <p id="report-dialog-message" className="text-sm text-slate leading-relaxed">
+            <p id="report-dialog-message" className="text-base text-slate leading-loose">
               Sua denúncia será enviada à moderação para análise.
             </p>
 
             <div className="mt-4">
-              <label htmlFor="report-reason" className="block text-xs uppercase tracking-widest font-bold text-navy mb-1">
+              <label htmlFor="report-reason" className="block text-sm uppercase tracking-widest font-bold text-navy mb-1">
                 Motivo
               </label>
               <select
                 id="report-reason"
-                className="w-full h-11 border border-border-gray bg-white px-3 text-sm text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none"
+                className="w-full h-11 border border-border-gray bg-white px-3 text-base text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 required
@@ -96,12 +96,12 @@ export function ReportDialog({ isOpen, onCancel, onSubmitted }: ReportDialogProp
             </div>
 
             <div className="mt-4">
-              <label htmlFor="report-details" className="block text-xs uppercase tracking-widest font-bold text-navy mb-1">
+              <label htmlFor="report-details" className="block text-sm uppercase tracking-widest font-bold text-navy mb-1">
                 Detalhes
               </label>
               <textarea
                 id="report-details"
-                className="w-full min-h-[80px] border border-border-gray p-3 text-sm text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none leading-relaxed resize-y transition-colors bg-white/50"
+                className="w-full min-h-[80px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none leading-loose resize-y transition-colors bg-white/50"
                 placeholder="Descreva o problema..."
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}

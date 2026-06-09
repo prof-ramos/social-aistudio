@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
@@ -11,6 +12,7 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,27 +37,43 @@ export function Login() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-slate mb-1">E-mail</label>
+          <label htmlFor="email" className="block text-base font-medium text-slate mb-1">E-mail</label>
           <input
             id="email"
             type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            enterKeyHint="next"
             required
-            className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-colors bg-white/80"
+            className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:outline-none bg-white/80 transition-all duration-200 ease-out focus:shadow-[0_0_0_3px_rgba(5,82,141,0.12)]"
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-slate mb-1">Senha</label>
-          <input
-            id="password"
-            type="password"
-            required
-            className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-colors bg-white/80"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          <label htmlFor="password" className="block text-base font-medium text-slate mb-1">Senha</label>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              autoComplete="current-password"
+              enterKeyHint="go"
+              required
+              className="w-full h-11 border border-border-gray rounded-none px-3 pr-10 text-slate focus:border-navy focus:outline-none bg-white/80 transition-all duration-200 ease-out focus:shadow-[0_0_0_3px_rgba(5,82,141,0.12)]"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-1 top-1/2 -translate-y-1/2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate/90 hover:text-navy focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-1 rounded-sm transition-all duration-200 ease-out active:scale-95"
+              aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
 
         <Button
@@ -70,11 +88,11 @@ export function Login() {
         </Button>
       </form>
 
-      <div className="mt-8 flex flex-col gap-3 border-t border-border-gray/80 pt-6">
-        <Link to="/solicitar-acesso" className="text-center text-sm font-medium text-navy transition-colors hover:text-asof-blue">
+      <div className="mt-6 flex flex-col gap-2 border-t border-border-gray/80 pt-4">
+        <Link to="/solicitar-acesso" className="text-center text-sm font-semibold text-navy transition-colors hover:text-asof-blue hover:underline underline-offset-2">
           Não tem uma conta? Solicitar acesso
         </Link>
-        <Link to="/recuperar-senha" className="text-center text-sm font-medium text-slate transition-colors hover:text-navy">
+        <Link to="/recuperar-senha" className="text-center text-sm font-semibold text-navy transition-colors hover:text-asof-blue hover:underline underline-offset-2">
           Esqueci minha senha
         </Link>
       </div>

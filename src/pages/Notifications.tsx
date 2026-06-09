@@ -30,19 +30,19 @@ export function Notifications({ profile }: { profile: UserProfile }) {
         {notifications.length === 0 ? (
           <div className="py-16 px-6 text-center text-slate bg-white flex flex-col items-center justify-center">
             <Bell className="w-12 h-12 mb-4 opacity-20 text-navy" />
-            <p className="font-serif text-xl text-navy mb-2">Nenhuma notificação</p>
-            <p className="text-sm opacity-80 max-w-sm mx-auto">Você não possui novas atualizações no momento.</p>
+            <p className="font-serif text-xl text-navy mb-2 leading-relaxed">Nenhuma notificação</p>
+            <p className="text-base opacity-80 max-w-sm mx-auto leading-relaxed">Você não possui novas atualizações no momento.</p>
           </div>
         ) : (
           <div className="divide-y divide-border-gray">
             {notifications.map(n => (
-              <div key={n.id} className={`p-5 flex gap-4 transition-colors ${n.read ? 'opacity-70' : 'bg-ice/30'}`}>
+              <div key={n.id} className={`p-5 flex gap-4 transition-colors ${n.read ? 'opacity-80' : 'bg-ice/30'}`}>
                 <div className="w-10 h-10 shrink-0 bg-ice border border-border-gray flex items-center justify-center text-navy rounded-full">
                   {n.type === 'APPROVAL' ? <Check className="w-5 h-5 text-success" /> : n.type === 'MENTION_POST' || n.type === 'MENTION_COMMENT' ? <span className="font-bold text-lg text-sky">@</span> : <Info className="w-5 h-5" />}
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-slate mb-1">{n.message}</p>
-                  <div className="flex items-center gap-4 text-xs font-medium text-slate opacity-70">
+                  <p className="text-base text-slate mb-1 leading-relaxed">{n.message}</p>
+                  <div className="flex items-center gap-4 text-sm font-medium text-slate opacity-80">
                      <span>{new Date(n.createdAt).toLocaleDateString()}</span>
                      {n.link && (
                        isExternalLink(n.link) ? (

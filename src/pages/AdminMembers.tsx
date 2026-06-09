@@ -20,12 +20,12 @@ export function AdminMembers() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-ice border-b border-border-gray text-navy">
-                <th className="py-4 px-6 font-semibold text-sm">Nome / E-mail</th>
-                <th className="py-4 px-6 font-semibold text-sm">Matrícula / CPF</th>
-                <th className="py-4 px-6 font-semibold text-sm">Categoria</th>
-                <th className="py-4 px-6 font-semibold text-sm">Posto</th>
-                <th className="py-4 px-6 font-semibold text-sm">Status</th>
-                <th className="py-4 px-6 font-semibold text-sm">Ações</th>
+                <th className="py-4 px-6 font-semibold text-base">Nome / E-mail</th>
+                <th className="py-4 px-6 font-semibold text-base">Matrícula / CPF</th>
+                <th className="py-4 px-6 font-semibold text-base">Categoria</th>
+                <th className="py-4 px-6 font-semibold text-base">Posto</th>
+                <th className="py-4 px-6 font-semibold text-base">Status</th>
+                <th className="py-4 px-6 font-semibold text-base">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -33,29 +33,29 @@ export function AdminMembers() {
                 <tr><td colSpan={6}>
                   <div className="py-12 px-6 flex flex-col items-center text-center">
                     <div className="w-16 h-16 rounded-full bg-ice flex items-center justify-center mb-4">
-                      <Check className="w-6 h-6 text-success opacity-50" />
+                      <Check className="w-6 h-6 text-success opacity-80" />
                     </div>
-                    <p className="text-sm font-medium text-navy mb-1">Nenhuma solicitação pendente</p>
-                    <p className="text-xs text-slate max-w-sm">Todas as solicitações de acesso foram processadas. Novas solicitações aparecerão aqui automaticamente.</p>
+                    <p className="text-base font-medium text-navy mb-1 leading-relaxed">Nenhuma solicitação pendente</p>
+                    <p className="text-sm text-slate max-w-sm leading-relaxed">Todas as solicitações de acesso foram processadas. Novas solicitações aparecerão aqui automaticamente.</p>
                   </div>
                 </td></tr>
               )}
               {requests.map(req => (
                 <tr key={req.id} className="border-b border-border-gray hover:bg-ice/50 transition-colors">
                   <td className="py-4 px-6">
-                    <p className="font-medium text-navy">{req.name}</p>
-                    <p className="text-xs text-slate">{req.email}</p>
+                    <p className="font-medium text-navy leading-relaxed">{req.name}</p>
+                    <p className="text-sm text-slate leading-relaxed">{req.email}</p>
                   </td>
-                  <td className="py-4 px-6 text-sm text-slate">
+                  <td className="py-4 px-6 text-base text-slate">
                     <p>{req.matricula}</p>
-                    <p className="text-xs opacity-70">{req.cpf}</p>
+                    <p className="text-sm opacity-80 leading-relaxed">{req.cpf}</p>
                   </td>
                   <td className="py-4 px-6">
                     <StatusBadge status={req.category === 'MEMBRO_ATIVO' ? 'info' : 'neutral'}>
                       {req.category === 'MEMBRO_ATIVO' ? 'ATIVA' : 'APOSENTADO'}
                     </StatusBadge>
                   </td>
-                  <td className="py-4 px-6 text-sm text-slate">{req.currentPost || '-'}</td>
+                  <td className="py-4 px-6 text-base text-slate">{req.currentPost || '-'}</td>
                   <td className="py-4 px-6">
                     {req.status === 'PENDING' && <StatusBadge status="warning">Pendente</StatusBadge>}
                     {req.status === 'APPROVED' && <StatusBadge status="success">Aprovado</StatusBadge>}

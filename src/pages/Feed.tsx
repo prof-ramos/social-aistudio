@@ -82,7 +82,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
           onClick={() => setShowEditor(!showEditor)}
           variant="primary"
           size="md"
-          className="tour-new-post shrink-0 uppercase tracking-wider text-xs font-bold"
+          className="tour-new-post shrink-0 uppercase tracking-wider text-sm font-bold"
         >
           NOVO POST
         </Button>
@@ -122,12 +122,12 @@ export function Feed({ profile }: { profile: UserProfile }) {
           </select>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+        <div className="flex gap-2 flex-wrap">
           {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
              <button 
                key={filterKey}
                onClick={() => setActiveFilter(filterKey)}
-               className={`min-h-[44px] px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-slate/5'}`}
+               className={`min-h-[44px] px-4 py-2 text-sm font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-slate/5'}`}
              >
                {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
              </button>
@@ -147,8 +147,8 @@ export function Feed({ profile }: { profile: UserProfile }) {
           {filteredPosts.length === 0 ? (
             <div className="py-16 px-6 text-center text-slate bg-white border border-dashed border-border-gray flex flex-col items-center justify-center">
               <MessageSquare className="w-12 h-12 mb-4 opacity-20 text-navy" />
-              <p className="font-serif text-xl text-navy mb-2">Nenhum post encontrado</p>
-              <p className="text-sm opacity-80 max-w-sm mx-auto">Não encontramos publicações para sua busca ou categoria selecionada.</p>
+              <p className="font-serif text-xl text-navy mb-2 leading-relaxed">Nenhum post encontrado</p>
+              <p className="text-base opacity-80 max-w-sm mx-auto leading-relaxed">Não encontramos publicações para sua busca ou categoria selecionada.</p>
             </div>
           ) : (
             filteredPosts.map(post => (
@@ -167,9 +167,9 @@ export function Feed({ profile }: { profile: UserProfile }) {
           )}
           {!hasMore && filteredPosts.length > 0 && (
             <div className="text-center py-10 px-4 bg-ice border border-dashed border-border-gray">
-              <p className="text-navy font-serif text-lg mb-2">Você está em dia!</p>
-              <p className="text-slate text-sm mb-4">Seja o primeiro a postar algo novo para a comunidade.</p>
-              <Button onClick={() => setShowEditor(true)} variant="secondary" size="sm" className="uppercase tracking-wider text-xs font-bold bg-white">
+              <p className="text-navy font-serif text-lg mb-2 leading-relaxed">Você está em dia!</p>
+              <p className="text-slate text-base mb-4 leading-relaxed">Seja o primeiro a postar algo novo para a comunidade.</p>
+              <Button onClick={() => setShowEditor(true)} variant="secondary" size="sm" className="uppercase tracking-wider text-sm font-bold bg-white">
                 Criar Post
               </Button>
             </div>
