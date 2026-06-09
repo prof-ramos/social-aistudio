@@ -41,6 +41,7 @@ export function PostEditor({ onCancel, onSubmit, onUpdate, isPosting, editPost, 
   };
 
   const editor = useEditor({
+    shouldRerenderOnTransaction: true,
     extensions: [
       StarterKit,
       Placeholder.configure({
