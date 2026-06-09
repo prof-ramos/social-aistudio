@@ -27,10 +27,12 @@ export function useFeed(profile: UserProfile) {
   // Real-time subscription: listen only for new inserts, manual merge
   useEffect(() => {
     let initialLoaded = false;
+    let isMounted = true;
 
     const fetchInitial = async () => {
       try {
         const { posts: newPosts, lastCreatedAt, lastId } = await postService.fetchMorePosts(null, null, PAGE_SIZE);
+        if (!isMounted) return;
         setRecentPosts(newPosts);
         lastCreatedAtRef.current = lastCreatedAt;
         lastIdRef.current = lastId;
@@ -76,6 +78,7 @@ export function useFeed(profile: UserProfile) {
       });
 
     return () => {
+      isMounted = false;
       supabase.removeChannel(channel);
     };
   }, []);

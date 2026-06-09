@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useFeed } from './useFeed';
 import { postService } from '../services/postService';
 import { vi } from 'vitest';
@@ -13,13 +13,13 @@ const wrapper = ({ children }: { children: React.ReactNode }) =>
 
 vi.mock('../services/postService', () => ({
   postService: {
-    subscribeToFeed: vi.fn((cb) => {
-      // Return some initial mocked data
-      cb([
+    fetchMorePosts: vi.fn().mockResolvedValue({
+      posts: [
         { id: '1', title: 'Post about Genebra', body: 'safe', category: 'POSTOS', pinned: false },
         { id: '2', title: 'Carreira', body: 'test', category: 'CARREIRA', pinned: false }
-      ]);
-      return vi.fn(); // unsubscribe
+      ],
+      lastCreatedAt: null,
+      lastId: null
     }),
     createPost: vi.fn()
   }
@@ -32,11 +32,11 @@ describe('useFeed Hook', () => {
     vi.clearAllMocks();
   });
 
-  it('filters posts by category correctly', () => {
+  it('filters posts by category correctly', async () => {
     const { result } = renderHook(() => useFeed(profile), { wrapper });
 
-    // Initial state: TODOS
-    expect(result.current.filteredPosts).toHaveLength(2);
+    // Wait for async initial fetch
+    await waitFor(() => expect(result.current.filteredPosts).toHaveLength(2));
 
     act(() => {
       result.current.setFilterCategory('POSTOS');
@@ -53,8 +53,11 @@ describe('useFeed Hook', () => {
     expect(result.current.filteredPosts[0].title).toBe('Carreira');
   });
 
-  it('filters posts by search string correctly', () => {
+  it('filters posts by search string correctly', async () => {
     const { result } = renderHook(() => useFeed(profile), { wrapper });
+
+    // Wait for async initial fetch
+    await waitFor(() => expect(result.current.filteredPosts).toHaveLength(2));
 
     act(() => {
       result.current.setSearch('genebra');

@@ -18,3 +18,7 @@ lighthouse-reports/
 # Supabase local
 supabase/.temp/
 .worktrees/
+.vercel
+.agents/
+.impeccable/
+repomix-output.xml

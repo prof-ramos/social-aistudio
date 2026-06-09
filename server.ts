@@ -8,8 +8,20 @@ const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
 const RATE_LIMIT_MAX = 5;
 
+function evictExpiredEntries(now: number) {
+  for (const [key, entry] of rateLimitStore) {
+    if (now > entry.resetAt) {
+      rateLimitStore.delete(key);
+    }
+  }
+}
+
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
+  // Periodic cleanup: evict stale entries every ~100 calls
+  if (rateLimitStore.size > 100 && Math.random() < 0.1) {
+    evictExpiredEntries(now);
+  }
   const entry = rateLimitStore.get(ip);
   if (!entry || now > entry.resetAt) {
     rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });

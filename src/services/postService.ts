@@ -6,7 +6,8 @@ import { notificationService } from './notificationService';
 const notifyMentions = async (text: string, type: 'MENTION_POST' | 'MENTION_COMMENT', postId: string, actorName: string, actorId: string) => {
   try {
     // Extract @mentions from text
-    const mentionRegex = /@([\wÀ-ú]+(?:\s+[\wÀ-ú]+)*)\b/g;
+    // Use Unicode-aware boundary (?![\wÀ-ú]) instead of \b because \b is ASCII-only
+    const mentionRegex = /@([\wÀ-ú]+(?:\s+[\wÀ-ú]+)*)(?![\wÀ-ú])/g;
     const matches = [...text.matchAll(mentionRegex)];
     const mentionedNames = new Set(
       matches.map(m => m[1].toLowerCase().trim())
@@ -14,10 +15,11 @@ const notifyMentions = async (text: string, type: 'MENTION_POST' | 'MENTION_COMM
 
     if (mentionedNames.size === 0) return;
 
-    // Busca apenas os users que correspondem aos nomes mencionados
+    // Busca apenas os users cujos nomes foram mencionados
     const { data: users, error: usersError } = await supabase
       .from('users_public')
       .select('id, name')
+      .in('name', [...mentionedNames])
       .neq('id', actorId);
 
     if (usersError || !users) {
