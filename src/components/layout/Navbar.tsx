@@ -123,12 +123,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     navigate('/login');
   };
 
-  const navItems = [
-    { to: '/feed', label: 'Feed', icon: Home },
-    { to: '/mensagens', label: 'Mensagens', icon: MessageSquare },
-    { to: '/postos', label: 'Postos', icon: Compass },
-  ];
-
   return (
     <>
       {/* Skip Link */}
@@ -145,26 +139,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
       >
         <div className="flex min-w-0 flex-1 items-center gap-8 md:flex-none md:w-auto xl:gap-12">
           <NavbarBrand isDarkMode={isDarkMode} />
-          <div className="hidden md:flex gap-2 text-sm font-medium h-16">
-            {navItems.map((item) => {
-              const isActive = location.pathname.startsWith(item.to);
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  className={cn(
-                    'flex items-center gap-2 px-3 transition-colors border-b-2 h-full',
-                    isActive ? 'border-navy text-navy font-bold' : 'border-transparent text-slate hover:text-navy'
-                  )}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  <Icon strokeWidth={isActive ? 2 : 1.5} className="w-5 h-5" aria-hidden="true" />
-                  <span className="hidden lg:inline-block">{item.label}</span>
-                </Link>
-              )
-            })}
-          </div>
         </div>
 
         {/* Global Search Bar */}

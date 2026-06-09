@@ -76,7 +76,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
 
   return (
     <PageContainer variant="feed" className="flex flex-col gap-8">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-border-gray pb-4 mb-2">
         <PageTitle className="text-2xl sm:text-4xl">Feed da Comunidade</PageTitle>
         <Button
           onClick={() => setShowEditor(!showEditor)}
@@ -97,40 +97,42 @@ export function Feed({ profile }: { profile: UserProfile }) {
           />
         )}
 
-      <div className="flex flex-col gap-4 sm:flex-row">
-        <input 
-          type="text" 
-          placeholder="Buscar no feed..."
-          aria-label="Buscar no feed"
-          className="flex-1 h-11 border border-border-gray px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-slate/60"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-        <select 
-          className="h-11 border border-border-gray bg-white px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none"
-          aria-label="Filtrar por categoria"
-          value={filterCategory}
-          onChange={e => setFilterCategory(e.target.value)}
-        >
-          <option value="TODOS">Todas as Categorias</option>
-          <option value="POSTOS">Postos</option>
-          <option value="CARREIRA">Carreira</option>
-          <option value="VIDA_EXTERIOR">Vida no Exterior</option>
-          <option value="APOSENTADORIA">Aposentadoria</option>
-          <option value="GERAL">Geral</option>
-        </select>
-      </div>
+      <div className="bg-ice border border-border-gray p-3 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col sm:flex-row flex-1 gap-3">
+          <input 
+            type="text" 
+            placeholder="Buscar no feed..."
+            aria-label="Buscar no feed"
+            className="flex-1 h-11 border border-border-gray px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-slate/60"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          <select 
+            className="h-11 border border-border-gray bg-white px-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none min-w-[180px]"
+            aria-label="Filtrar por categoria"
+            value={filterCategory}
+            onChange={e => setFilterCategory(e.target.value)}
+          >
+            <option value="TODOS">Todas as Categorias</option>
+            <option value="POSTOS">Postos</option>
+            <option value="CARREIRA">Carreira</option>
+            <option value="VIDA_EXTERIOR">Vida no Exterior</option>
+            <option value="APOSENTADORIA">Aposentadoria</option>
+            <option value="GERAL">Geral</option>
+          </select>
+        </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-        {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
-           <button 
-             key={filterKey}
-             onClick={() => setActiveFilter(filterKey)}
-             className={`min-h-[44px] px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-ice'}`}
-           >
-             {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
-           </button>
-        ))}
+        <div className="flex gap-2 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+          {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
+             <button 
+               key={filterKey}
+               onClick={() => setActiveFilter(filterKey)}
+               className={`min-h-[44px] px-4 py-2 text-xs font-bold uppercase tracking-wider border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-slate/5'}`}
+             >
+               {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
+             </button>
+          ))}
+        </div>
       </div>
 
       <div className="flex flex-col items-start gap-8 xl:flex-row">
@@ -164,7 +166,13 @@ export function Feed({ profile }: { profile: UserProfile }) {
             </div>
           )}
           {!hasMore && filteredPosts.length > 0 && (
-            <p className="text-center text-slate py-8 text-sm uppercase tracking-widest font-bold">Você atingiu o fim do feed</p>
+            <div className="text-center py-10 px-4 bg-ice border border-dashed border-border-gray">
+              <p className="text-navy font-serif text-lg mb-2">Você está em dia!</p>
+              <p className="text-slate text-sm mb-4">Seja o primeiro a postar algo novo para a comunidade.</p>
+              <Button onClick={() => setShowEditor(true)} variant="secondary" size="sm" className="uppercase tracking-wider text-xs font-bold bg-white">
+                Criar Post
+              </Button>
+            </div>
           )}
         </div>
         
