@@ -10,18 +10,34 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const AUTH_TIMEOUT_MS = 8000;
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let resolved = false;
+
     const unsubscribe = authService.onAuthStateChanged((u, p) => {
+      resolved = true;
       setUser(u);
       setProfile(p);
       setLoading(false);
     });
-    return () => unsubscribe();
+
+    const timer = setTimeout(() => {
+      if (!resolved) {
+        console.warn('Auth state not resolved within timeout. Proceeding without session.');
+        setLoading(false);
+      }
+    }, AUTH_TIMEOUT_MS);
+
+    return () => {
+      unsubscribe();
+      clearTimeout(timer);
+    };
   }, []);
 
   return (
