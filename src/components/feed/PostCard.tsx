@@ -84,15 +84,18 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
        <h4 className="font-bold text-navy text-xl mb-3 hover:text-sky transition-colors">{post.title}</h4>
      </Link>
      <div
-       className="text-sm leading-relaxed mb-6 text-slate line-clamp-3 prose prose-slate prose-sm"
+       className="text-sm leading-relaxed mb-6 text-slate/80 line-clamp-3 prose prose-slate prose-sm"
        dangerouslySetInnerHTML={{ __html: post.body }}
      />
 
-     <div className="flex gap-4 border-t border-border-gray/50 pt-4">
-       <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
-       <Link to={`/feed/${post.id}#comment`} className="text-xs font-bold text-slate/70 flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
-         <MessageSquare className="w-4 h-4" strokeWidth={1.5} /> RESPONDER
-       </Link>
+     <div className="flex items-center justify-between border-t border-border-gray/50 pt-4">
+       <div className="flex items-center gap-6">
+         <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
+         <Link to={`/feed/${post.id}#comment`} className="text-sm font-medium text-slate/70 flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
+           <MessageSquare className="w-5 h-5" strokeWidth={1.5} /> Responder
+         </Link>
+       </div>
+       {/* The "Informar" button is now inside ReactionButtons and will be pushed to the right because ReactionButtons uses flex-1 items-center justify-between */}
      </div>
   </Card>
       <ConfirmDialog

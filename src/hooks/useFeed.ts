@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { postService } from '../services/postService';
 import { Post, UserProfile } from '../types';
 
@@ -6,12 +7,13 @@ export type FeedFilter = 'RECENTES' | 'MAIS_COMENTADOS' | 'MEUS_POSTOS';
 const PAGE_SIZE = 10;
 
 export function useFeed(profile: UserProfile) {
+  const location = useLocation();
   const [recentPosts, setRecentPosts] = useState<Post[]>([]);
   const [olderPosts, setOlderPosts] = useState<Post[]>([]);
   const [isPosting, setIsPosting] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
   const [filterCategory, setFilterCategory] = useState('TODOS');
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => new URLSearchParams(location.search).get('q') || '');
   const [activeFilter, setActiveFilter] = useState<FeedFilter>('RECENTES');
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -29,6 +31,12 @@ export function useFeed(profile: UserProfile) {
     );
     return () => unsub();
   }, []);
+
+  // Update search state if URL query param changes
+  useEffect(() => {
+    const nextSearch = new URLSearchParams(location.search).get('q') || '';
+    setSearch(prev => prev !== nextSearch ? nextSearch : prev);
+  }, [location.search]);
 
   // Merge recent and older posts, removing duplicates by id
   const posts = useMemo(() => {

@@ -2,6 +2,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useFeed } from './useFeed';
 import { postService } from '../services/postService';
 import { vi } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('../services/postService', () => ({
   postService: {
@@ -25,7 +26,7 @@ describe('useFeed Hook', () => {
   });
 
   it('filters posts by category correctly', () => {
-    const { result } = renderHook(() => useFeed(profile));
+    const { result } = renderHook(() => useFeed(profile), { wrapper: MemoryRouter });
 
     // Initial state: TODOS
     expect(result.current.filteredPosts).toHaveLength(2);
@@ -46,7 +47,7 @@ describe('useFeed Hook', () => {
   });
 
   it('filters posts by search string correctly', () => {
-    const { result } = renderHook(() => useFeed(profile));
+    const { result } = renderHook(() => useFeed(profile), { wrapper: MemoryRouter });
 
     act(() => {
       result.current.setSearch('genebra');
