@@ -17,3 +17,4 @@ lighthouse-reports/
 
 # Supabase local
 supabase/.temp/
+.worktrees/
