@@ -5,23 +5,42 @@ import { notificationService } from './notificationService';
 
 const notifyMentions = async (text: string, type: 'MENTION_POST' | 'MENTION_COMMENT', postId: string, actorName: string, actorId: string) => {
   try {
-    const users = await userService.getAllUsers();
-    const sortedUsers = users.sort((a, b) => b.name.length - a.name.length);
-    const mentionedIds = new Set<string>();
+    // Extract @mentions from text
+    const mentionRegex = /@([\wÀ-ú]+(?:\s+[\wÀ-ú]+)*)\b/g;
+    const matches = [...text.matchAll(mentionRegex)];
+    const mentionedNames = new Set(
+      matches.map(m => m[1].toLowerCase().trim())
+    );
 
-    const lowerText = text.toLowerCase();
-    for (const user of sortedUsers) {
-      if (user.id !== actorId && !mentionedIds.has(user.id) && lowerText.includes(`@${user.name.toLowerCase()}`)) {
+    if (mentionedNames.size === 0) return;
+
+    // Busca apenas os users que correspondem aos nomes mencionados
+    const { data: users, error: usersError } = await supabase
+      .from('users_public')
+      .select('id, name')
+      .neq('id', actorId);
+
+    if (usersError || !users) {
+      console.error('Error fetching users for mentions:', usersError);
+      return;
+    }
+
+    const mentionedIds = new Set<string>();
+    for (const user of users) {
+      if (mentionedNames.has(user.name.toLowerCase().trim())) {
         mentionedIds.add(user.id);
-        await notificationService.createNotification({
-          userId: user.id,
-          type,
-          actorName,
-          postId,
-          message: `${actorName} mencionou você em um ${type === 'MENTION_POST' ? 'post' : 'comentário'}`,
-          link: `/feed/${postId}`
-        });
       }
+    }
+
+    for (const userId of mentionedIds) {
+      await notificationService.createNotification({
+        userId,
+        type,
+        actorName,
+        postId,
+        message: `${actorName} mencionou você em um ${type === 'MENTION_POST' ? 'post' : 'comentário'}`,
+        link: `/feed/${postId}`
+      });
     }
   } catch (err) {
     console.error('Error notifying mentions:', err);
