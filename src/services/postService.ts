@@ -5,23 +5,42 @@ import { notificationService } from './notificationService';
 
 const notifyMentions = async (text: string, type: 'MENTION_POST' | 'MENTION_COMMENT', postId: string, actorName: string, actorId: string) => {
   try {
-    const users = await userService.getAllUsers();
-    const sortedUsers = users.sort((a, b) => b.name.length - a.name.length);
-    const mentionedIds = new Set<string>();
+    // Extract @mentions from text
+    const mentionRegex = /@([\wÀ-ú]+(?:\s+[\wÀ-ú]+)*)\b/g;
+    const matches = [...text.matchAll(mentionRegex)];
+    const mentionedNames = new Set(
+      matches.map(m => m[1].toLowerCase().trim())
+    );
 
-    const lowerText = text.toLowerCase();
-    for (const user of sortedUsers) {
-      if (user.id !== actorId && !mentionedIds.has(user.id) && lowerText.includes(`@${user.name.toLowerCase()}`)) {
+    if (mentionedNames.size === 0) return;
+
+    // Busca apenas os users que correspondem aos nomes mencionados
+    const { data: users, error: usersError } = await supabase
+      .from('users_public')
+      .select('id, name')
+      .neq('id', actorId);
+
+    if (usersError || !users) {
+      console.error('Error fetching users for mentions:', usersError);
+      return;
+    }
+
+    const mentionedIds = new Set<string>();
+    for (const user of users) {
+      if (mentionedNames.has(user.name.toLowerCase().trim())) {
         mentionedIds.add(user.id);
-        await notificationService.createNotification({
-          userId: user.id,
-          type,
-          actorName,
-          postId,
-          message: `${actorName} mencionou você em um ${type === 'MENTION_POST' ? 'post' : 'comentário'}`,
-          link: `/feed/${postId}`
-        });
       }
+    }
+
+    for (const userId of mentionedIds) {
+      await notificationService.createNotification({
+        userId,
+        type,
+        actorName,
+        postId,
+        message: `${actorName} mencionou você em um ${type === 'MENTION_POST' ? 'post' : 'comentário'}`,
+        link: `/feed/${postId}`
+      });
     }
   } catch (err) {
     console.error('Error notifying mentions:', err);
@@ -177,14 +196,19 @@ export const postService = {
     };
   },
 
-  fetchMorePosts: async (lastCreatedAt: string | null, pageSize: number = 10): Promise<{ posts: Post[]; lastCreatedAt: string | null }> => {
+  fetchMorePosts: async (lastCreatedAt: string | null, lastId: string | null, pageSize: number = 10): Promise<{ posts: Post[]; lastCreatedAt: string | null; lastId: string | null }> => {
     let query = supabase
       .from('posts')
       .select('*, users_public!author_id(name, role)')
       .order('created_at', { ascending: false })
+      .order('id', { ascending: false })
       .limit(pageSize);
 
-    if (lastCreatedAt) {
+    if (lastCreatedAt && lastId) {
+      // Cursor composed (created_at, id) — handles identical timestamps
+      query = query
+        .or(`and(created_at.lt.${lastCreatedAt}),and(created_at.eq.${lastCreatedAt},id.lt.${lastId})`);
+    } else if (lastCreatedAt) {
       query = query.lt('created_at', lastCreatedAt);
     }
 
@@ -197,9 +221,13 @@ export const postService = {
     const rows = data || [];
     let posts = rows.map(mapPostRow);
     posts = await attachReactions(posts);
-    const newLastCreatedAt = rows.length > 0 ? rows[rows.length - 1].created_at : null;
+    const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
 
-    return { posts, lastCreatedAt: newLastCreatedAt };
+    return {
+      posts,
+      lastCreatedAt: lastRow ? lastRow.created_at : null,
+      lastId: lastRow ? lastRow.id : null,
+    };
   },
 
   createPost: async (title: string, bodyHTML: string, category: PostCategory | string, profile: UserProfile) => {
