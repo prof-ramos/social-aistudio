@@ -10,7 +10,7 @@
 ## ✅ Verificações ok
 
 - **TypeScript**: compila sem erros com strict mode ativo
-- **Testes**: 24 arquivos, 87/87 passando
+- **Testes**: 33 arquivos, 171/171 passando
 - **Build**: Vite 6 + esbuild — sucesso
 - **Git**: `main` limpa, synced com `origin/main`
 - **CI**: GitHub Actions presente (`ci.yml` com tsc + test + build)
