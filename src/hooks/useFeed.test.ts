@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook, act, waitFor } from '@testing-library/react';
 import { useFeed } from './useFeed';
 import { postService } from '../services/postService';
 import { vi } from 'vitest';
@@ -11,16 +11,22 @@ const wrapper = ({ children }: { children: React.ReactNode }) =>
     React.createElement(ToastProvider, null, children)
   );
 
+const MOCK_POSTS = [
+  { id: '1', title: 'Post about Genebra', body: 'safe', category: 'POSTOS', pinned: false, authorId: 'a1', authorName: 'Alice', authorRole: 'MEMBRO_ATIVO', createdAt: '2026-01-01' },
+  { id: '2', title: 'Carreira', body: 'test', category: 'CARREIRA', pinned: false, authorId: 'a2', authorName: 'Bob', authorRole: 'MEMBRO_ATIVO', createdAt: '2026-01-02' }
+];
+
 vi.mock('../services/postService', () => ({
   postService: {
     subscribeToFeed: vi.fn((cb) => {
-      // Return some initial mocked data
-      cb([
-        { id: '1', title: 'Post about Genebra', body: 'safe', category: 'POSTOS', pinned: false },
-        { id: '2', title: 'Carreira', body: 'test', category: 'CARREIRA', pinned: false }
-      ]);
-      return vi.fn(); // unsubscribe
+      cb([...MOCK_POSTS]);
+      return vi.fn();
     }),
+    fetchMorePosts: vi.fn(async () => ({
+      posts: [...MOCK_POSTS],
+      lastCreatedAt: '2026-01-01',
+      lastId: '1'
+    })),
     createPost: vi.fn()
   }
 }));
@@ -32,11 +38,11 @@ describe('useFeed Hook', () => {
     vi.clearAllMocks();
   });
 
-  it('filters posts by category correctly', () => {
+  it('filters posts by category correctly', async () => {
     const { result } = renderHook(() => useFeed(profile), { wrapper });
 
-    // Initial state: TODOS
-    expect(result.current.filteredPosts).toHaveLength(2);
+    // Wait for initial async fetch to populate posts
+    await waitFor(() => expect(result.current.filteredPosts).toHaveLength(2));
 
     act(() => {
       result.current.setFilterCategory('POSTOS');
@@ -53,14 +59,17 @@ describe('useFeed Hook', () => {
     expect(result.current.filteredPosts[0].title).toBe('Carreira');
   });
 
-  it('filters posts by search string correctly', () => {
+  it('filters posts by search string correctly', async () => {
     const { result } = renderHook(() => useFeed(profile), { wrapper });
+
+    // Wait for initial async fetch to populate posts
+    await waitFor(() => expect(result.current.filteredPosts).toHaveLength(2));
 
     act(() => {
       result.current.setSearch('genebra');
     });
 
-    expect(result.current.filteredPosts).toHaveLength(1);
+    await waitFor(() => expect(result.current.filteredPosts).toHaveLength(1));
     expect(result.current.filteredPosts[0].id).toBe('1');
   });
 });

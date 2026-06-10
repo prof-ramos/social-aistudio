@@ -57,8 +57,8 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
   const hasReported = reportReacts.includes(currentUserId);
 
   return (
-    <div className="flex flex-1 items-center justify-between">
-      <div className="flex gap-6">
+    <div className="flex items-center justify-between flex-1 min-w-0">
+      <div className="flex items-center gap-5">
         {POSITIVE_EMOJIS.map(({ emoji, label, Icon }) => {
           const reacts = localReactions[emoji] || [];
           const hasReacted = reacts.includes(currentUserId);
@@ -69,11 +69,11 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
               onClick={(e) => handleReact(e, emoji)}
               aria-label={`${label} (${reacts.length})`}
               aria-pressed={hasReacted}
-              className={`text-base font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
+              className={`text-sm font-medium flex items-center gap-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
                 hasReacted ? 'text-sky' : 'text-slate hover:text-navy'
               }`}
             >
-              <Icon className="w-5 h-5" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} />
+              <Icon className="w-[18px] h-[18px]" strokeWidth={hasReacted ? 2 : 1.5} fill={hasReacted ? 'currentColor' : 'none'} />
               <span className="hidden sm:inline" aria-hidden="true">{label}</span>
               <span className="flex items-center overflow-hidden" aria-hidden="true">
                 <AnimatePresence mode="popLayout" initial={false}>
@@ -93,16 +93,18 @@ export function ReactionButtons({ postId, reactions = {}, currentUserId }: React
           );
         })}
       </div>
-      
+
+      <div className="w-px h-6 bg-border-gray mx-3 shrink-0" aria-hidden="true" />
+
       <button
         onClick={(e) => handleReact(e, REPORT_EMOJI.emoji)}
         aria-label={`${REPORT_EMOJI.label} (${reportReacts.length})`}
         aria-pressed={hasReported}
-        className={`text-base font-medium flex items-center gap-2 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] ${
-          hasReported ? 'text-danger' : 'text-slate hover:text-danger'
+        className={`text-sm font-medium flex items-center gap-1.5 transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] shrink-0 ${
+          hasReported ? 'text-danger' : 'text-slate/60 hover:text-danger'
         }`}
       >
-        <REPORT_EMOJI.Icon className="w-5 h-5" strokeWidth={hasReported ? 2 : 1.5} fill={hasReported ? 'currentColor' : 'none'} />
+        <REPORT_EMOJI.Icon className="w-[18px] h-[18px]" strokeWidth={hasReported ? 2 : 1.5} fill={hasReported ? 'currentColor' : 'none'} />
         <span className="hidden sm:inline" aria-hidden="true">{REPORT_EMOJI.label}</span>
       </button>
     </div>
