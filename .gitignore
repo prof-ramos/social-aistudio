@@ -26,5 +26,4 @@ test-results/
 .impeccable/
 .agents/
 
-# Auto-generated AI docs (deepinit — poluem o tracking)
-**/AGENTS.md
+# AGENTS.md versioned — kept for AI agent orientation
