@@ -10,7 +10,7 @@ import { MemberSuggestionsCard } from '../components/feed/MemberSuggestionsCard'
 import { Button } from '../components/ui/Button';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useFeed, FeedFilter } from '../hooks/useFeed';
-import { userService } from '../services/userService';
+import { useSavedPosts } from '../hooks/useSavedPosts';
 import { postService } from '../services/postService';
 
 export function Feed({ profile }: { profile: UserProfile }) {
@@ -35,6 +35,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
     hasMore
   } = useFeed(profile);
 
+  const saved = useSavedPosts(profile.id, profile.savedPosts ?? []);
   const [postCount, setPostCount] = useState<number | null>(null);
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -78,20 +79,6 @@ export function Feed({ profile }: { profile: UserProfile }) {
       }
     };
   }, [hasMore, loadMore]);
-
-  const toggleSaved = async (postId: string) => {
-    try {
-      await userService.toggleSavedPost(profile.id, postId);
-      if (!profile.savedPosts) profile.savedPosts = [];
-      if (profile.savedPosts.includes(postId)) {
-        profile.savedPosts = profile.savedPosts.filter(id => id !== postId);
-      } else {
-        profile.savedPosts.push(postId);
-      }
-    } catch(err) {
-      console.error(err);
-    }
-  };
 
   return (
     <PageContainer variant="feed" className="flex flex-col gap-6">
@@ -206,7 +193,8 @@ export function Feed({ profile }: { profile: UserProfile }) {
                 key={post.id}
                 post={post}
                 profile={profile}
-                onToggleSaved={toggleSaved}
+                isSaved={saved.isSaved(post.id)}
+                onToggleSaved={saved.toggle}
                 onEdit={handleEditPost}
                 onDelete={handleDeletePost}
               />
@@ -251,7 +239,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
                 <p className="text-[11px] uppercase font-bold text-slate tracking-wider mt-1">Posts</p>
               </div>
               <div className="flex-1 bg-ice/50 py-2">
-                <p className="font-serif text-lg text-navy leading-none">{profile.savedPosts?.length || 0}</p>
+                <p className="font-serif text-lg text-navy leading-none">{saved.savedCount}</p>
                 <p className="text-[11px] uppercase font-bold text-slate tracking-wider mt-1">Salvos</p>
               </div>
             </div>

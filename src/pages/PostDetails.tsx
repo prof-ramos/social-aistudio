@@ -8,7 +8,7 @@ import { usePostDetails } from '../hooks/usePostDetails';
 import { postService } from '../services/postService';
 import { PostEditor } from '../components/feed/PostEditor';
 import { ReactionButtons } from '../components/feed/ReactionButtons';
-import { userService } from '../services/userService';
+import { useSavedPosts } from '../hooks/useSavedPosts';
 import { Card, PageTitle, Button, Alert, Breadcrumb } from '../components/ui';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { ReportDialog } from '../components/ui/ReportDialog';
@@ -39,21 +39,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
   } = usePostDetails(id, profile);
 
   const canModify = post && canEdit(profile, post);
-
-  const toggleSaved = async () => {
-    if (!post) return;
-    try {
-      await userService.toggleSavedPost(profile.id, post.id);
-      if (!profile.savedPosts) profile.savedPosts = [];
-      if (profile.savedPosts.includes(post.id)) {
-        profile.savedPosts = profile.savedPosts.filter(id => id !== post.id);
-      } else {
-        profile.savedPosts.push(post.id);
-      }
-    } catch(err) {
-      console.error(err);
-    }
-  };
+  const saved = useSavedPosts(profile.id, profile.savedPosts ?? []);
 
   const handleConfirmDelete = async () => {
     try {
@@ -194,11 +180,11 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={toggleSaved}
-                  className={`min-h-[44px] min-w-[44px] ${profile.savedPosts?.includes(post.id) ? 'text-sky' : 'text-slate hover:text-navy'}`}
+                  onClick={() => saved.toggle(post.id)}
+                  className={`min-h-[44px] min-w-[44px] ${saved.isSaved(post.id) ? 'text-sky' : 'text-slate hover:text-navy'}`}
                   title="Salvar Post"
                 >
-                  <Bookmark className="w-5 h-5" fill={profile.savedPosts?.includes(post.id) ? 'currentColor' : 'none'} />
+                  <Bookmark className="w-5 h-5" fill={saved.isSaved(post.id) ? 'currentColor' : 'none'} />
                 </Button>
               </div>
             </div>
