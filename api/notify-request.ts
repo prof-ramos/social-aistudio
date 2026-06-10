@@ -1,24 +1,6 @@
 import { IncomingMessage, ServerResponse } from "http";
 import nodemailer from "nodemailer";
-
-// Simple in-memory rate limiter per IP
-const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
-const RATE_LIMIT_WINDOW_MS = 60_000; // 1 minute
-const RATE_LIMIT_MAX = 5;
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitStore.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitStore.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  if (entry.count >= RATE_LIMIT_MAX) {
-    return false;
-  }
-  entry.count += 1;
-  return true;
-}
+import { checkRateLimit, validateNotifyRequest } from "./_lib/notifyRequest";
 
 function readBody(req: IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
@@ -64,21 +46,11 @@ export default async function handler(
 
   try {
     const body = await readBody(req);
-    const { name, email, matricula } = body as Record<string, unknown>;
-
-    if (!name || typeof name !== "string" || name.trim().length === 0) {
-      return json(res, 400, { error: "Nome é obrigatório." });
+    const result = validateNotifyRequest(body);
+    if (!result.ok) {
+      return json(res, 400, { error: result.error });
     }
-    if (!email || typeof email !== "string" || !email.includes("@")) {
-      return json(res, 400, { error: "E-mail inválido." });
-    }
-    if (
-      !matricula ||
-      typeof matricula !== "string" ||
-      matricula.trim().length === 0
-    ) {
-      return json(res, 400, { error: "Matrícula é obrigatória." });
-    }
+    const { name, email, matricula } = result.fields;
 
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || "smtp.hostinger.com",
@@ -97,7 +69,7 @@ export default async function handler(
         process.env.SMTP_FROM || '"Social-ASOF" <admin@asof.space>',
       to: process.env.ADMIN_EMAIL || "admin@asof.space",
       subject: "Nova solicitação de acesso - Social-ASOF",
-      text: `Uma nova solicitação foi recebida:\n\nNome: ${name.trim()}\nE-mail: ${email.trim()}\nMatrícula: ${matricula.trim()}\n\nAcesse o painel para avaliar.`,
+      text: `Uma nova solicitação foi recebida:\n\nNome: ${name}\nE-mail: ${email}\nMatrícula: ${matricula}\n\nAcesse o painel para avaliar.`,
     });
 
     return json(res, 200, { success: true });
