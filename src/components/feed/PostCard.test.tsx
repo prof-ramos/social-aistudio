@@ -42,6 +42,7 @@ describe('PostCard - sanitizeHtml', () => {
       <PostCard
         post={post}
         profile={profile}
+        isSaved={false}
         onToggleSaved={mockOnToggleSaved}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}
@@ -72,6 +73,7 @@ describe('PostCard - sanitizeHtml', () => {
       <PostCard
         post={post}
         profile={profile}
+        isSaved={false}
         onToggleSaved={mockOnToggleSaved}
       />
     );
@@ -101,6 +103,7 @@ describe('PostCard - sanitizeHtml', () => {
       <PostCard
         post={post}
         profile={profile}
+        isSaved={false}
         onToggleSaved={mockOnToggleSaved}
         onEdit={mockOnEdit}
         onDelete={mockOnDelete}

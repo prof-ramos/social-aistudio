@@ -12,13 +12,13 @@ import { ConfirmDialog } from '../ui/ConfirmDialog';
 interface PostCardProps {
   post: Post;
   profile: UserProfile;
+  isSaved: boolean;
   onToggleSaved: (postId: string) => void;
   onEdit?: (post: Post) => void;
   onDelete?: (postId: string) => void;
 }
 
-function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: PostCardProps) {
-  const isSaved = profile.savedPosts?.includes(post.id);
+function PostCardComponent({ post, profile, isSaved, onToggleSaved, onEdit, onDelete }: PostCardProps) {
   const canEditPost = canEdit(profile, post);
   const canDeletePost = canDelete(profile, post);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

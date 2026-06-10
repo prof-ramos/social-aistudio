@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Feed } from './Feed';
 import { useFeed } from '../hooks/useFeed';
 import { userService } from '../services/userService';
+import { ToastProvider } from '../components/ui/Toast';
 import { vi } from 'vitest';
 
 vi.mock('../hooks/useFeed');
@@ -29,7 +30,13 @@ vi.mock('../components/feed/PostoHighlightCard', () => ({
 }));
 
 const renderWithRouter = (ui: React.ReactElement) => {
-  return render(ui, { wrapper: BrowserRouter });
+  return render(ui, {
+    wrapper: ({ children }) => (
+      <BrowserRouter>
+        <ToastProvider>{children}</ToastProvider>
+      </BrowserRouter>
+    ),
+  });
 };
 
 describe('Feed', () => {
@@ -115,12 +122,15 @@ describe('Feed', () => {
     renderWithRouter(<Feed profile={profile} />);
 
     const saveButton = screen.getByLabelText('Salvar post');
-    
+
     await user.click(saveButton);
 
     expect(mockToggleSavedPost).toHaveBeenCalledWith('user1', 'post1');
-    
-    // The profile object should have been mutated inline based on the current implementation
-    expect(profile.savedPosts).toContain('post1');
+
+    // New behavior: saved state lives in React state (useSavedPosts), so the
+    // bookmark re-renders immediately — its label flips to "Remover dos salvos"
+    // — without mutating the profile prop.
+    expect(await screen.findByLabelText('Remover dos salvos')).toBeInTheDocument();
+    expect(profile.savedPosts).not.toContain('post1');
   });
 });
