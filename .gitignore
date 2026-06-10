@@ -22,6 +22,11 @@ supabase/.temp/
 # Test artifacts
 test-results/
 
+# Generated tool output / binaries (not source)
+repomix-output.xml
+login-page.png
+user_personas.xlsx
+
 # Dev tooling (skills, artifacts, não fazem parte do código do projeto)
 .impeccable/
 .agents/

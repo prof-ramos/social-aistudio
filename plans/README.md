@@ -17,7 +17,7 @@ Baseline at generation time: `npm run lint` (tsc --noEmit) passes; `npm test` �
 | 003 | Consolidate + harden duplicated notify-request endpoint | P1 | S | — | DONE |
 | 004 | Debounce feed realtime refetch storm + drop double initial fetch | P2 | M | — | TODO |
 | 005 | Characterization tests for auth / chat / notification services | P2 | M | — | TODO |
-| 006 | Untrack generated artifacts (repomix dump, screenshots, xlsx) | P3 | S | — | TODO |
+| 006 | Untrack generated artifacts (repomix dump, screenshots, xlsx) | P3 | S | — | DONE |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 
