@@ -51,9 +51,8 @@ export function AppRoutes() {
             <Route path="/perfil/:id" element={<Profile profile={profile!} />} />
             <Route path="/carreira" element={<CarreiraPromocao profile={profile!} />} />
             <Route path="/aposentadoria" element={<Aposentadoria profile={profile!} />} />
+            <Route path="/proto-feed" element={<ProtoFeed />} />
           </Route>
-
-          <Route path="/proto-feed" element={<ProtoFeed />} />
 
           {/* Admin Routes */}
           <Route element={user && profile?.role === 'ADMIN' ? <AppLayout profile={profile} isAdminView /> : <Navigate to="/feed" replace />}>

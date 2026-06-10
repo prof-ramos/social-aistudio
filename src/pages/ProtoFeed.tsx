@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PageContainer } from '../components/layout/PageContainer';
-import { Post, UserProfile, UserRole } from '../types';
+import { Post, UserProfile } from '../types';
 import {
   Heart,
   MessageSquare,
@@ -141,6 +141,13 @@ function initials(name: string) {
   return name.split(' ').map(n => n[0]).slice(0, 2).join('');
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  MEMBRO_ATIVO: 'Membro Ativo',
+  MEMBRO_APOSENTADO: 'Membro Aposentado',
+  ADMIN: 'Administrador',
+  PENDENTE: 'Pendente',
+};
+
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
@@ -170,7 +177,7 @@ function VariantSwitcher() {
       {variants.map(v => (
         <button
           key={v.key}
-          onClick={() => setParams({ variant: v.key })}
+          onClick={() => { params.set('variant', v.key); setParams(params); }}
           className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
             current === v.key
               ? 'bg-white text-navy'
@@ -201,10 +208,10 @@ function ClassicPost({ post, index }: { post: Post; index: number }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <span className="font-bold text-navy text-base">{post.authorName}</span>
-            <span className="text-xs text-slate/60">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : 'Membro Aposentado'}</span>
+              <span className="text-sm text-slate/60">• {ROLE_LABELS[post.authorRole] || 'Membro'}</span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate/60">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-sm border text-[11px] font-semibold uppercase tracking-wide ${categoryColor(post.category)}`}>
+          <div className="flex items-center gap-2 text-sm text-slate/60">
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-sm border text-sm font-semibold uppercase tracking-wide ${categoryColor(post.category)}`}>
               {categoryLabel(post.category)}
             </span>
             <span>•</span>
@@ -384,7 +391,7 @@ function EditorialHero({ post }: { post: Post }) {
           </div>
           <div>
             <p className="font-bold text-sm">{post.authorName}</p>
-            <p className="text-xs text-white/60">{post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : 'Membro Aposentado'}</p>
+            <p className="text-xs text-white/60">{ROLE_LABELS[post.authorRole] || 'Membro'}</p>
           </div>
           <button className="ml-auto flex items-center gap-2 bg-white/10 hover:bg-white/20 transition-colors px-4 py-2 text-sm font-medium">
             Ler artigo <ArrowRight className="w-4 h-4" />
@@ -421,7 +428,7 @@ function EditorialPost({ post, isSecondary }: { post: Post; isSecondary?: boolea
 
   return (
     <article className="group bg-white border border-border-gray p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-center gap-2 mb-3 text-[11px] text-slate/60 uppercase tracking-wider font-semibold">
+      <div className="flex items-center gap-2 mb-3 text-sm text-slate/60 uppercase tracking-wider font-semibold">
         <span className={`inline-flex items-center px-2 py-0.5 rounded-sm border ${categoryColor(post.category)}`}>{categoryLabel(post.category)}</span>
         {post.pinned && <span className="text-sky font-bold flex items-center gap-1"><Pin className="w-3 h-3" /> Fixado</span>}
       </div>
@@ -437,7 +444,7 @@ function EditorialPost({ post, isSecondary }: { post: Post; isSecondary?: boolea
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold text-navy truncate">{post.authorName}</p>
-          <p className="text-xs text-slate/60">{post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : 'Membro Aposentado'}</p>
+          <p className="text-xs text-slate/60">{ROLE_LABELS[post.authorRole] || 'Membro'}</p>
         </div>
         <div className="flex items-center gap-4 text-sm text-slate">
           <span className="flex items-center gap-1"><ThumbsUp className="w-4 h-4" /> {Object.values(post.reactions || {}).flat().length}</span>
@@ -495,7 +502,7 @@ function EditorialFeed() {
             <h3 className="font-bold text-xs text-navy mb-3 uppercase tracking-wider">Tags populares</h3>
             <div className="flex flex-wrap gap-2">
               {['Aposentadoria', 'Remoção', 'Auxílio', 'Postos', 'Carreira'].map(tag => (
-                <span key={tag} className="px-3 py-1 bg-ice text-navy text-xs font-medium border border-border-gray hover:bg-sky/10 hover:border-sky/30 transition-colors cursor-pointer">
+                <span key={tag} className="px-3 py-1 bg-ice text-navy text-sm font-medium border border-border-gray hover:bg-sky/10 hover:border-sky/30 transition-colors">
                   #{tag}
                 </span>
               ))}
@@ -514,14 +521,14 @@ function DensePost({ post }: { post: Post }) {
   return (
     <article className="py-4 border-b border-border-gray/60 last:border-b-0 hover:bg-ice/30 transition-colors px-2 -mx-2">
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 rounded-full bg-ice border border-border-gray flex items-center justify-center font-bold text-navy text-[11px] shrink-0">
+        <div className="w-8 h-8 rounded-full bg-ice border border-border-gray flex items-center justify-center font-bold text-navy text-sm shrink-0">
           {initials(post.authorName)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
             <span className="font-bold text-navy text-sm">{post.authorName}</span>
-            <span className="text-[11px] text-slate/50">@{post.authorId}</span>
-            <span className="text-[11px] text-slate/40">• {timeAgo(post.createdAt)}</span>
+            <span className="text-sm text-slate/50">@{post.authorId}</span>
+            <span className="text-sm text-slate/40">• {timeAgo(post.createdAt)}</span>
             {post.pinned && <Pin className="w-3 h-3 text-sky ml-auto" />}
           </div>
 
@@ -531,7 +538,7 @@ function DensePost({ post }: { post: Post }) {
           </p>
 
           <div className="flex items-center gap-4 text-xs text-slate/70">
-            <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-[10px] font-semibold uppercase tracking-wide ${categoryColor(post.category)}`}>
+            <span className={`inline-flex items-center px-1.5 py-0.5 rounded border text-sm font-semibold uppercase tracking-wide ${categoryColor(post.category)}`}>
               {categoryLabel(post.category)}
             </span>
             <button className="flex items-center gap-1 hover:text-sky transition-colors">
@@ -593,7 +600,7 @@ function DenseFeed() {
 
       {/* Quick composer */}
       <div className="flex items-center gap-3 border border-border-gray bg-white px-3 py-2">
-        <div className="w-8 h-8 rounded-full bg-ice border border-border-gray flex items-center justify-center font-bold text-navy text-[11px] shrink-0">
+        <div className="w-8 h-8 rounded-full bg-ice border border-border-gray flex items-center justify-center font-bold text-navy text-sm shrink-0">
           {initials(PROFILE_MOCK.name)}
         </div>
         <input
@@ -648,10 +655,10 @@ function ShadcnPost({ post }: { post: Post }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-semibold text-navy text-sm">{post.authorName}</span>
-            <span className="text-xs text-slate/50">{post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : 'Membro Aposentado'}</span>
+            <span className="text-xs text-slate/50">{ROLE_LABELS[post.authorRole] || 'Membro'}</span>
             <span className="text-xs text-slate/30">•</span>
             <span className="text-xs text-slate/50">{timeAgo(post.createdAt)}</span>
-            {post.pinned && <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-semibold text-sky uppercase tracking-wider bg-sky/10 px-2 py-0.5 rounded-full"><Pin className="w-3 h-3" /> Fixado</span>}
+            {post.pinned && <span className="ml-auto inline-flex items-center gap-1 text-sm font-semibold text-sky uppercase tracking-wider bg-sky/10 px-2 py-0.5 rounded-full"><Pin className="w-3 h-3" /> Fixado</span>}
           </div>
         </div>
       </div>
@@ -667,7 +674,7 @@ function ShadcnPost({ post }: { post: Post }) {
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium border ${categoryColor(post.category)}`}>
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium border ${categoryColor(post.category)}`}>
             {categoryLabel(post.category)}
           </span>
         </div>
