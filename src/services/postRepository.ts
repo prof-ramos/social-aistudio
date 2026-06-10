@@ -95,7 +95,18 @@ export const postRepository = {
       }
     };
 
-    fetchFeed();
+    // The first page is loaded once by the consumer (useFeed.fetchInitial); this
+    // subscription only streams subsequent changes. A trailing debounce collapses
+    // a burst of posts/reactions events into a single refetch instead of one full
+    // feed refetch (posts query + reactions batch) per event.
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+    const scheduleFetch = () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        debounceTimer = null;
+        fetchFeed();
+      }, 250);
+    };
 
     const channel = supabase
       .channel('posts-feed')
@@ -103,16 +114,12 @@ export const postRepository = {
         event: '*',
         schema: 'public',
         table: 'posts',
-      }, () => {
-        fetchFeed();
-      })
+      }, scheduleFetch)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
         table: 'reactions',
-      }, () => {
-        fetchFeed();
-      })
+      }, scheduleFetch)
       .subscribe((status, err) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           onError(err ?? new Error(`Feed channel status: ${status}`));
@@ -120,6 +127,7 @@ export const postRepository = {
       });
 
     return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
       supabase.removeChannel(channel);
     };
   },

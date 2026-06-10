@@ -313,4 +313,74 @@ describe('postRepository', () => {
     });
   });
 
+  describe('subscribeToFeed', () => {
+    // Build a feed-query chain that resolves (so fetchFeed() completes) and a
+    // channel mock that captures the postgres_changes handlers so we can fire them.
+    const setupFeedMocks = () => {
+      const queryChain: any = {
+        select: vi.fn(() => queryChain),
+        order: vi.fn(() => queryChain),
+        limit: vi.fn(() => Promise.resolve({ data: [], error: null })),
+      };
+      vi.mocked(supabase.from).mockReturnValue(queryChain);
+
+      const handlers: Array<() => void> = [];
+      const channelChain: any = {
+        on: vi.fn((_event: any, _config: any, handler: () => void) => {
+          handlers.push(handler);
+          return channelChain;
+        }),
+        subscribe: vi.fn(() => channelChain),
+      };
+      vi.mocked(supabase.channel).mockReturnValue(channelChain);
+      return { handlers };
+    };
+
+    it('does not fetch eagerly on subscribe (first page comes from the consumer)', async () => {
+      const { handlers } = setupFeedMocks();
+      const onUpdate = vi.fn();
+
+      const unsubscribe = postRepository.subscribeToFeed(onUpdate, vi.fn(), 10);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(handlers.length).toBe(2); // posts + reactions handlers registered
+      expect(onUpdate).not.toHaveBeenCalled(); // no eager refetch
+      unsubscribe();
+    });
+
+    it('collapses a burst of channel events into a single debounced refetch', async () => {
+      vi.useFakeTimers();
+      const { handlers } = setupFeedMocks();
+      const onUpdate = vi.fn();
+
+      const unsubscribe = postRepository.subscribeToFeed(onUpdate, vi.fn(), 10);
+
+      // Fire both handlers twice in quick succession (a burst of 4 events).
+      handlers.forEach((h) => h());
+      handlers.forEach((h) => h());
+      expect(onUpdate).not.toHaveBeenCalled(); // nothing before the window elapses
+
+      await vi.advanceTimersByTimeAsync(250);
+      expect(onUpdate).toHaveBeenCalledTimes(1); // single refetch for the whole burst
+
+      unsubscribe();
+      vi.useRealTimers();
+    });
+
+    it('cleanup clears the pending debounce timer (no refetch after unmount)', async () => {
+      vi.useFakeTimers();
+      const { handlers } = setupFeedMocks();
+      const onUpdate = vi.fn();
+
+      const unsubscribe = postRepository.subscribeToFeed(onUpdate, vi.fn(), 10);
+      handlers[0](); // schedule a fetch
+      unsubscribe(); // ...then unmount before the window elapses
+
+      await vi.advanceTimersByTimeAsync(250);
+      expect(onUpdate).not.toHaveBeenCalled();
+      vi.useRealTimers();
+    });
+  });
+
 });
