@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { PageContainer } from '../components/layout/PageContainer';
 import { Post, UserProfile } from '../types';
 import {
-  Heart,
   MessageSquare,
   Bookmark,
   Share2,
@@ -14,7 +13,6 @@ import {
   ThumbsUp,
   Flame,
   Hash,
-  Filter,
   ChevronRight,
   Search,
   PenLine,
@@ -272,6 +270,9 @@ function ClassicFeed() {
     }
     if (activeFilter === 'popular') {
       list.sort((a, b) => (b.commentCount || 0) - (a.commentCount || 0));
+    }
+    if (activeFilter === 'meus') {
+      list = list.filter(p => p.authorId === PROFILE_MOCK.id);
     }
     return list;
   }, [search, activeFilter]);
