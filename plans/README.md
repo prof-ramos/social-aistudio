@@ -12,7 +12,7 @@ Baseline at generation time: `npm run lint` (tsc --noEmit) passes; `npm test` �
 
 | Plan | Title | Priority | Effort | Depends on | Status |
 |------|-------|----------|--------|------------|--------|
-| 001 | Close chat-participants IDOR (private DM read by non-participants) | P1 | S | — | TODO |
+| 001 | Close chat-participants IDOR (private DM read by non-participants) | P1 | S | — | DONE |
 | 002 | Fix save-post bookmark not updating (profile-prop mutation) | P1 | S | — | TODO |
 | 003 | Consolidate + harden duplicated notify-request endpoint | P1 | S | — | TODO |
 | 004 | Debounce feed realtime refetch storm + drop double initial fetch | P2 | M | — | TODO |
