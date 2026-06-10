@@ -25,6 +25,7 @@ Create `.env.local` at the repo root for local secrets:
 - `VITE_SUPABASE_URL` — Supabase project URL
 - `VITE_SUPABASE_ANON_KEY` — Supabase anonymous key
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `ADMIN_EMAIL` — Used by the Express `/api/admin/notify-request` route to send access-request emails
+- `KV_URL`, `KV_REST_API_TOKEN` — Vercel KV credentials for cross-instance rate limiting (production only; dev falls back to in-memory Map)
 
 The Vite dev server respects `DISABLE_HMR=true` (set by AI Studio during agent edits) to disable HMR and file watching.
 
@@ -34,7 +35,7 @@ The Vite dev server respects `DISABLE_HMR=true` (set by AI Studio during agent e
 
 Express app that serves the React SPA. In development it uses Vite's `middlewareMode`; in production it serves static files from `dist/` with a catch-all SPA fallback. It exposes one custom API endpoint:
 
-- `POST /api/admin/notify-request` — Sends an SMTP email via nodemailer when a new user requests access.
+- `POST /api/admin/notify-request` — Sends an SMTP email via nodemailer when a new user requests access. Rate limiting is enforced by `api/_lib/notifyRequest.ts` using Vercel KV in production (in-memory Map fallback in dev).
 
 ### Client
 
@@ -62,7 +63,7 @@ Services are plain objects that encapsulate all Supabase interactions. Key servi
 
 **Hooks** (`src/hooks/*`)
 
-Hooks wrap services and expose component-ready state. They typically subscribe to Supabase Realtime channels and clean up on unmount. For example, `useFeed` subscribes to `postService.subscribeToFeed` and manages pagination, filters, and the editor modal state.
+Hooks wrap services and expose component-ready state. They typically subscribe to Supabase Realtime channels and clean up on unmount. For example, `useFeed` subscribes to `postService.subscribeToFeed` and manages pagination, filters, and the editor modal state. `useSavedPosts` manages saved-post state locally (optimistic toggle, seeded from profile snapshot, reverts on error) without mutating the profile prop.
 
 **Pages** (`src/pages/*`)
 
@@ -98,3 +99,5 @@ Tests are co-located with source files (`*.test.ts` / `*.test.tsx`).
 - Framework: Vitest with `globals: true`, environment `jsdom`
 - Setup file: `vitest.setup.ts` — mocks `ResizeObserver`, `localStorage`, and `matchMedia`, and cleans up the DOM after each test
 - `lint-staged` runs `vitest related --run` and `tsc --noEmit` on staged `.ts`/`.tsx` files
+- Test coverage: 33 test files, 171 tests (characterization tests for all core services: auth, chat, notification, user, admin, memberRequest, report, postRepository, postoService, postService, reactionRepository, searchService)
+- Vitest `exclude` in `vite.config.ts` must cover `**/.claude/worktrees/**` (not just `**/.worktrees/**`) to avoid stale worktree tests

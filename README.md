@@ -318,6 +318,7 @@ graph LR
 - Setup global em `vitest.setup.ts` (mocks de `ResizeObserver`, `localStorage`, `matchMedia`)
 - `lint-staged` roda `vitest related --run` + `tsc --noEmit` em arquivos staged
 - Auditoria visual via Lighthouse CI (`npx lhci autorun`)
+- **Cobertura atual:** 33 arquivos de teste, 171 testes passando (characterization tests para todos os serviços core: auth, chat, notification, user, admin, memberRequest, report, postRepository, postoService, postService, reactionRepository, searchService)
 
 ```bash
 # Rodar todos os testes
@@ -340,7 +341,7 @@ O servidor Express (`server.ts`) expõe endpoints públicos para operações sen
 
 #### `POST /api/admin/notify-request`
 
-Notifica administradores por email quando um novo associado solicita acesso.
+Notifica administradores por email quando um novo associado solicita acesso. Validação de email por regex (anti header-injection) e rate limiting por IP via Vercel KV em produção (fallback in-memory em dev).
 
 ```json
 // Request
@@ -450,6 +451,8 @@ npx supabase gen types typescript --project-id seu-ref --schema public > src/typ
 ├── docs/                         # Documentação adicional
 ├── public/                       # Arquivos estáticos (favicon, logo)
 ├── server.ts                     # Servidor Express
+├── api/                          # Módulos compartilhados serverless + Express
+│   └── _lib/                     # notifyRequest.ts (validation + rate limit)
 ├── vite.config.ts                # Configuração Vite
 └── tsconfig.json                 # Configuração TypeScript
 ```
@@ -467,6 +470,7 @@ npx supabase gen types typescript --project-id seu-ref --schema public > src/typ
 | [`PRODUCT.md`](./PRODUCT.md) | Visão de produto, personas e princípios de design |
 | [`GUIA_DESENVOLVEDOR.md`](./GUIA_DESENVOLVEDOR.md) | Guia completo para desenvolvedores |
 | [`CLAUDE.md`](./CLAUDE.md) | Instruções para Claude Code |
+| [`READY-TO.md`](./READY-TO.md) | Checklist de deploy e verificações pré-produção |
 
 ---
 
