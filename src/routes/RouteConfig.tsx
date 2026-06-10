@@ -20,6 +20,8 @@ const Messages = lazy(() => import('../pages/Messages').then(m => ({ default: m.
 const CarreiraPromocao = lazy(() => import('../pages/CarreiraPromocao').then(m => ({ default: m.CarreiraPromocao })));
 const Aposentadoria = lazy(() => import('../pages/Aposentadoria').then(m => ({ default: m.Aposentadoria })));
 
+const ProtoFeed = lazy(() => import('../pages/ProtoFeed').then(m => ({ default: m.default })));
+
 export function AppRoutes() {
   const { user, profile, loading } = useAuth();
 
@@ -49,6 +51,7 @@ export function AppRoutes() {
             <Route path="/perfil/:id" element={<Profile profile={profile!} />} />
             <Route path="/carreira" element={<CarreiraPromocao profile={profile!} />} />
             <Route path="/aposentadoria" element={<Aposentadoria profile={profile!} />} />
+            <Route path="/proto-feed" element={<ProtoFeed />} />
           </Route>
 
           {/* Admin Routes */}
