@@ -118,7 +118,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                         {chat.lastMessage || 'Envie a primeira mensagem...'}
                       </p>
                     </div>
-                    {chat.unreadCount > 0 && (
+                    {(chat.unreadCount ?? 0) > 0 && (
                       <span className="ml-auto shrink-0 bg-navy text-white text-sm font-bold rounded-full min-w-[24px] min-h-[24px] flex items-center justify-center px-1">
                         {chat.unreadCount}
                       </span>

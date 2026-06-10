@@ -171,9 +171,10 @@ describe('PostEditor - interactive behaviors', () => {
     vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any);
 
     // Trigger resize callback
-    const resizeHandler = mockVisualViewport.addEventListener.mock.calls.find(
+    const resizeCall = mockVisualViewport.addEventListener.mock.calls.find(
       (call: any) => call[0] === 'resize'
-    )[1];
+    );
+    const resizeHandler = resizeCall?.[1];
     resizeHandler();
 
     // Should scroll by the difference (600 + 16 - 500 = 116)

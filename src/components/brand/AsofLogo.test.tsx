@@ -9,7 +9,7 @@ let originalFetch: typeof global.fetch;
 beforeEach(() => {
   _resetSvgCache();
   originalFetch = global.fetch;
-  global.fetch = vi.fn((input: RequestInfo) => {
+  global.fetch = vi.fn((input: RequestInfo | URL) => {
     const url = String(input);
     if (url.includes('favicon.svg')) {
       return Promise.resolve({ ok: true, text: () => Promise.resolve(MARK_SVG) } as Response);
