@@ -1,7 +1,8 @@
 {
-  "name": "react-example",
+  "name": "social-aistudio",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Rede social institucional privada para associados da ASOF — Associação dos Oficiais de Chancelaria",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
