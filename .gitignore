@@ -31,4 +31,5 @@ user_personas.xlsx
 .impeccable/
 .agents/
 
-# AGENTS.md versioned — kept for AI agent orientation
+# Claude session transcripts dumped to repo root
+*-claude-*.txt
