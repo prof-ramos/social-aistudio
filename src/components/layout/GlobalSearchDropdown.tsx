@@ -55,8 +55,9 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
   useEffect(() => {
     const input = inputRef.current;
     if (input) {
-      input.addEventListener('keydown', handleKeyDown as any);
-      return () => input.removeEventListener('keydown', handleKeyDown as any);
+      const onKeyDown = (e: Event) => handleKeyDown(e as unknown as React.KeyboardEvent);
+      input.addEventListener('keydown', onKeyDown);
+      return () => input.removeEventListener('keydown', onKeyDown);
     }
   }, [handleKeyDown, inputRef]);
 
