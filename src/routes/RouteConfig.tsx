@@ -19,6 +19,7 @@ const Notifications = lazy(() => import('../pages/Notifications').then(m => ({ d
 const Messages = lazy(() => import('../pages/Messages').then(m => ({ default: m.Messages })));
 const CarreiraPromocao = lazy(() => import('../pages/CarreiraPromocao').then(m => ({ default: m.CarreiraPromocao })));
 const Aposentadoria = lazy(() => import('../pages/Aposentadoria').then(m => ({ default: m.Aposentadoria })));
+const ProtoFeed = lazy(() => import('../pages/ProtoFeed').then(m => ({ default: m.default })));
 
 const ProtoFeed = lazy(() => import('../pages/ProtoFeed').then(m => ({ default: m.default })));
 
@@ -39,6 +40,9 @@ export function AppRoutes() {
           <Route path="/login" element={user && profile ? <Navigate to="/feed" replace /> : <Login />} />
           <Route path="/solicitar-acesso" element={<RegisterRequest />} />
           <Route path="/recuperar-senha" element={<ForgotPassword />} />
+
+          {/* Prototype Route */}
+          <Route path="/proto-feed" element={<ProtoFeed />} />
 
           {/* App Routes */}
           <Route element={user && profile ? <AppLayout profile={profile} /> : <Navigate to="/login" replace />}>

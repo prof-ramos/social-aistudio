@@ -1,26 +1,27 @@
-# Documentação da API - Social-ASOF
+# Documentação da API — Social-ASOF
 
 A aplicação Social-ASOF utiliza uma arquitetura híbrida de API:
-1. **API REST (Node.js/Express):** Usada para funcionalidades que não podem ser expostas no lado do cliente com segurança (como envio de e-mails via SMTP).
-2. **API de Dados e Tempo Real (Firebase SDK):** Interação direta com o Firestore para gerenciar usuários, postagens, postos e denúncias, protegida por Regras de Segurança do Firebase (`firestore.rules`).
+
+1. **API REST (Express 5):** Usada para funcionalidades que não podem ser expostas no lado do cliente com segurança (envio de e-mails via SMTP).
+2. **API de Dados e Tempo Real (Supabase SDK):** Interação direta com o PostgreSQL via Supabase JS SDK para gerenciar usuários, postagens, postos, chat e denúncias, protegida por políticas de Row Level Security (RLS).
 
 ---
 
 ## 1. API REST (Endpoints Públicos)
 
-O sistema Express.js (`server.ts`) expõe as seguintes rotas HTTP.
+O servidor Express (`server.ts`) expõe as seguintes rotas HTTP.
 
 ### 1.1 `POST /api/admin/notify-request`
 
-**Descrição:**  
-Endpoint utilizado para notificar os administradores (via disparo de e-mail SMTP) quando um novo associado preenche o formulário para ingressar e ter status de acesso aprovado (Approval Request) na plataforma.
+**Descrição:**
+Endpoint utilizado para notificar os administradores (via disparo de e-mail SMTP) quando um novo associado preenche o formulário de solicitação de acesso à plataforma.
 
 **Restrições e Autenticação:**
-* **Publicamente Acessível:** Não exige autenticação de tokens, pois atende a visitantes não registrados/não aprovados da página inicial.
-* **Limitação de Taxa (Rate Limiting):** Nenhuma limitação nativa em vigor. O envio abusivo pode acabar consumindo a cota de envio do provedor SMTP.
+- **Publicamente Acessível:** Não exige autenticação de tokens, pois atende a visitantes não registrados.
+- **Limitação de Taxa (Rate Limiting):** Implementada via `express-rate-limit` — máximo de 5 requisições por IP a cada 15 minutos.
 
 **Formato de Solicitação (Request):**
-* Content-Type: `application/json`
+- Content-Type: `application/json`
 
 ```json
 {
@@ -31,16 +32,16 @@ Endpoint utilizado para notificar os administradores (via disparo de e-mail SMTP
 ```
 
 **Formato de Resposta (Response):**
-* Content-Type: `application/json`
+- Content-Type: `application/json`
 
-* **Sucesso (Status 200 OK):**
+- **Sucesso (Status 200 OK):**
 ```json
 {
   "success": true
 }
 ```
 
-* **Erro (Status 500 Internal Server Error):**
+- **Erro (Status 500 Internal Server Error):**
 ```json
 {
   "error": "Erro ao enviar email"
@@ -71,38 +72,91 @@ async function sendAccessRequest() {
 
 ---
 
-## 2. API Local e Modelos de Banco de Dados (Firebase)
+## 2. API de Dados (Supabase)
 
-Por utilizar o modelo de arquitetura *Serverless* com Data-as-an-API, grande parte da plataforma interage diretamente com o banco de dados via Firebase Client SDK. Essas operações são isoladas dentro dos "Serviços" (ex. `userService`, `postService`) na pasta `/src/services/` e totalmente protegidas por regras de segurança no Firestore (`firestore.rules`).
+A maior parte da plataforma interage diretamente com o banco de dados PostgreSQL via Supabase JS SDK. Essas operações são isoladas dentro dos serviços em `/src/services/` e protegidas por políticas RLS no banco de dados.
 
 ### Entidades e Permissões de Acesso
 
-| Coleção Firestore | Serviço Responsável | Interface (Types) | Diretrizes e Regras de Segurança |
-| :--- | :--- | :--- | :--- |
-| **`users`** | `userService`, `authService` | `UserProfile`, `AuthUser` | Editável apenas pelo próprio usuário ou por um `ADMIN`. Leitura pública para usuários autenticados. |
-| **`posts`** | `postService` | `Post` | Podem ser criados por usuários logados (não reprovados/pendentes). Edição e exclusão permitidas apenas ao autor ou `ADMIN`. |
-| **`posts/{id}/comments`** | `postService` | `PostComment` | Subcoleção aninhada vinculada ao post. Leitura/Escrita restritas a usuários autenticados. |
-| **`postos`** | `postoService` | `STATIC_POSTOS` | Acesso de leitura/escrita protegido via stream em canais da plataforma. |
-| **`memberRequests`** | `memberRequestService`, `adminService` | `{ name, email, role, status }` | Escrita livre (requests). Leitura, atualização ou exclusão (`status`) controladas de forma exclusiva pela regra de `ADMIN`. |
-| **`reports`** | `reportService`, `adminService` | `Report` | Criação livre pelos usuários ao flagrar conteúdo inadequado. Apenas `ADMIN` consegue resolver/acompanhar ou aprovar denúncias. |
-| **`notifications`** | `notificationService` | `{ userId, message, read }` | Rigidez restrita: A leitura e a atualização das notificações são vinculadas rigidamente ao `userId` de destino. |
+| Tabela | Serviço Responsável | Interface (Types) | Diretrizes de Acesso |
+|:---|:---|:---|:---|
+| **`users`** | `userService`, `authService` | `UserProfile`, `AuthUser` | Editável apenas pelo próprio usuário ou ADMIN. Leitura para usuários autenticados. |
+| **`posts`** | `postService`, `postRepository` | `Post` | Criação por usuários logados (role != PENDENTE). Edição/exclusão apenas pelo autor ou ADMIN. |
+| **`post_comments`** | `postService` | `PostComment` | Vinculada ao post pai. Leitura/escrita para usuários autenticados. |
+| **`postos`** | `postoService` | `Posto` | Leitura pública autenticada. Avaliações via `posto_reviews`. |
+| **`posto_reviews`** | `postoService` | `PostoReview` | Uma avaliação por usuário por posto. |
+| **`chat_sessions`** | `chatService` | `ChatSession` | Participantes da sessão têm acesso. |
+| **`chat_messages`** | `chatService` | `ChatMessage` | Apenas participantes da sessão. |
+| **`member_requests`** | `memberRequestService` | — | Escrita livre (solicitação). Leitura/atualização apenas por ADMIN. |
+| **`notifications`** | `notificationService`, `notificationOrchestrator` | `Notification` | Leitura e atualização vinculadas ao `userId` de destino. |
+| **`reports`** | `reportService` | `Report` | Criação por qualquer usuário autenticado. Resolução apenas por ADMIN. |
 
-**Exemplo de Consumo no Cliente (Tempo Real):**
+### Operações Comuns
+
+#### Autenticação (`authService`)
+```typescript
+import { authService } from '../services/authService';
+
+// Login
+const { user, session } = await authService.signIn('email@exemplo.com', 'senha');
+
+// Logout
+await authService.signOut();
+
+// Observer de estado da sessão
+const unsubscribe = authService.onAuthStateChanged((session) => {
+  console.log('Sessão alterada:', session);
+});
+```
+
+#### Feed em Tempo Real (`postService`)
 ```typescript
 import { postService } from '../services/postService';
 
-// Ouvir ativamente e em tempo real novas publicações feitas
+// Inscrever-se no feed ao vivo
 const unsubscribe = postService.subscribeToFeed((posts) => {
-   console.log("Recebidos novos posts na timeline principal:", posts);
-});
+  console.log("Novos posts na timeline:", posts);
+}, { category: 'GERAL' });
 
 // Limpar escuta ao desmontar componente
 unsubscribe();
 ```
 
+#### Chat em Tempo Real (`chatService`)
+```typescript
+import { chatService } from '../services/chatService';
+
+const unsubscribe = chatService.subscribeToMessages(sessionId, (messages) => {
+  console.log("Novas mensagens:", messages);
+});
+```
+
+#### Notificações (`notificationService`)
+```typescript
+import { notificationService } from '../services/notificationService';
+
+const { data: notifications, count: unreadCount } = 
+  await notificationService.getNotifications(userId);
+
+await notificationService.markAsRead(notificationId);
+```
+
+### RLS (Row Level Security)
+
+Todas as tabelas com dados de usuário possuem políticas RLS implementadas nas migrations SQL. As políticas garantem que:
+
+- Usuários só veem dados que têm permissão para ver
+- Operações de escrita verificam propriedade (authorId, userId) ou role ADMIN
+- O `service_role_key` (usado apenas em scripts server-side) bypassa RLS
+
 ---
 
 ## 3. Requisitos e Considerações Finais
 
-1. **Variáveis de Ambiente (SMTP):** O endpoint `/api/admin/notify-request` requer explicitamente as chaves `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER` e `SMTP_PASS` lançadas nas variáveis de ambiente. A ausência causará quebras no transporte e timeout na resposta das solicitações de acesso.
-2. **Separação de Lógica UI/Service:** Evite chamadas diretas ao banco do Firebase dentro nos componentes de interface `.tsx`. Empregue componentes independentes com os Hooks (`src/hooks/useFeed.ts`) que delegam as funções complexas para os módulos de serviço e respeitam o MVC do front-end.
+1. **Variáveis de Ambiente:** O endpoint `/api/admin/notify-request` requer `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` e `ADMIN_EMAIL`. O cliente Supabase requer `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`. Todas em `.env.local`.
+
+2. **Separação de Camadas:** Evite chamadas diretas ao Supabase SDK dentro de componentes `.tsx`. Use hooks (`src/hooks/`) que delegam para os serviços (`src/services/`).
+
+3. **Realtime:** Assinaturas Realtime devem ser limpas no unmount do componente para evitar vazamento de memória e conexões órfãs.
+
+4. **Migrações:** Alterações no esquema do banco são feitas via migrations SQL em `supabase/migrations/` e aplicadas com `npx supabase db push`.
