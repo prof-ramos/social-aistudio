@@ -2,11 +2,15 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter, MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Profile } from './Profile';
-import { useProfile } from '../hooks/useProfile';
+import { useUserProfile } from '../hooks/useUserProfile';
+import { useUserContent } from '../hooks/useUserContent';
+import { useEditProfile } from '../hooks/useEditProfile';
 import { ToastProvider } from '../components/ui/Toast';
 import { vi } from 'vitest';
 
-vi.mock('../hooks/useProfile');
+vi.mock('../hooks/useUserProfile');
+vi.mock('../hooks/useUserContent');
+vi.mock('../hooks/useEditProfile');
 vi.mock('../services/userService');
 
 // Mock data
@@ -32,30 +36,6 @@ const mockProfile = {
   role: 'MEMBRO_ATIVO' as const,
 };
 
-const mockUseProfile = (overrides = {}) => ({
-  user: mockUser,
-  loading: false,
-  isEditing: false,
-  setIsEditing: vi.fn(),
-  editForm: {
-    bio: '',
-    avatarUrl: '',
-    currentPost: '',
-    interests: '',
-    phone: '',
-    phoneIsWhatsapp: false,
-    showPhone: false,
-    showEmail: false,
-  },
-  setEditForm: vi.fn(),
-  saving: false,
-  isOwnProfile: true,
-  handleSave: vi.fn(),
-  savedPosts: [],
-  userPosts: [],
-  ...overrides,
-});
-
 const renderWithRouter = (ui: React.ReactElement) =>
   render(ui, {
     wrapper: ({ children }) => (
@@ -68,15 +48,42 @@ const renderWithRouter = (ui: React.ReactElement) =>
 describe('Profile - Contact Fields (OFC)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useUserProfile).mockReturnValue({
+      user: mockUser,
+      loading: false,
+      isOwnProfile: true,
+      isViewingOwnProfile: true,
+    });
+    vi.mocked(useUserContent).mockReturnValue({
+      savedPosts: [],
+      userPosts: [],
+    });
+    vi.mocked(useEditProfile).mockReturnValue({
+      isEditing: false,
+      setIsEditing: vi.fn(),
+      editForm: {
+        bio: '',
+        avatarUrl: '',
+        currentPost: '',
+        interests: '',
+        phone: '',
+        phoneIsWhatsapp: false,
+        showPhone: false,
+        showEmail: false,
+      },
+      setEditForm: vi.fn(),
+      saving: false,
+      handleSave: vi.fn(),
+    });
   });
 
   it('shows public contact when showPhone is true for other users', () => {
-    vi.mocked(useProfile).mockReturnValue(
-      mockUseProfile({
-        user: { ...mockUser, id: 'other-user', phone: '(61) 99999-9999', showPhone: true },
-        isOwnProfile: false,
-      })
-    );
+    vi.mocked(useUserProfile).mockReturnValue({
+      user: { ...mockUser, id: 'other-user', phone: '(61) 99999-9999', showPhone: true },
+      loading: false,
+      isOwnProfile: false,
+      isViewingOwnProfile: false,
+    });
 
     render(
       <MemoryRouter initialEntries={['/perfil/other-user']}>
@@ -93,19 +100,19 @@ describe('Profile - Contact Fields (OFC)', () => {
   });
 
   it('hides phone and email for other users when showPhone/showEmail is false', () => {
-    vi.mocked(useProfile).mockReturnValue(
-      mockUseProfile({
-        user: {
-          ...mockUser,
-          id: 'other-user',
-          phone: '(61) 99999-9999',
-          email: 'test@example.com',
-          showPhone: false,
-          showEmail: false,
-        },
-        isOwnProfile: false,
-      })
-    );
+    vi.mocked(useUserProfile).mockReturnValue({
+      user: {
+        ...mockUser,
+        id: 'other-user',
+        phone: '(61) 99999-9999',
+        email: 'test@example.com',
+        showPhone: false,
+        showEmail: false,
+      },
+      loading: false,
+      isOwnProfile: false,
+      isViewingOwnProfile: false,
+    });
 
     render(
       <MemoryRouter initialEntries={['/perfil/other-user']}>
@@ -123,19 +130,19 @@ describe('Profile - Contact Fields (OFC)', () => {
   });
 
   it('shows phone and email for other users when showPhone/showEmail is true', () => {
-    vi.mocked(useProfile).mockReturnValue(
-      mockUseProfile({
-        user: {
-          ...mockUser,
-          id: 'other-user',
-          phone: '(61) 99999-9999',
-          email: 'test@example.com',
-          showPhone: true,
-          showEmail: true,
-        },
-        isOwnProfile: false,
-      })
-    );
+    vi.mocked(useUserProfile).mockReturnValue({
+      user: {
+        ...mockUser,
+        id: 'other-user',
+        phone: '(61) 99999-9999',
+        email: 'test@example.com',
+        showPhone: true,
+        showEmail: true,
+      },
+      loading: false,
+      isOwnProfile: false,
+      isViewingOwnProfile: false,
+    });
 
     render(
       <MemoryRouter initialEntries={['/perfil/other-user']}>
@@ -153,9 +160,23 @@ describe('Profile - Contact Fields (OFC)', () => {
   });
 
   it('shows contact fields section in edit form', async () => {
-    vi.mocked(useProfile).mockReturnValue(
-      mockUseProfile({ isEditing: true })
-    );
+    vi.mocked(useEditProfile).mockReturnValue({
+      isEditing: true,
+      setIsEditing: vi.fn(),
+      editForm: {
+        bio: '',
+        avatarUrl: '',
+        currentPost: '',
+        interests: '',
+        phone: '',
+        phoneIsWhatsapp: false,
+        showPhone: false,
+        showEmail: false,
+      },
+      setEditForm: vi.fn(),
+      saving: false,
+      handleSave: vi.fn(),
+    });
 
     renderWithRouter(<Profile profile={mockProfile} />);
 

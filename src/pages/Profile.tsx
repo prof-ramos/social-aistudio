@@ -2,7 +2,9 @@ import React, { useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { Camera, Save, MapPin, BookOpen, MessageSquare, Bookmark, X, Star, Lock, Phone, Mail, FileEdit } from 'lucide-react';
-import { useProfile } from '../hooks/useProfile';
+import { useUserProfile } from '../hooks/useUserProfile';
+import { useUserContent } from '../hooks/useUserContent';
+import { useEditProfile } from '../hooks/useEditProfile';
 import { Card, PageTitle, Button, Alert, StatusBadge, Breadcrumb, AvatarUpload, Checkbox } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -11,19 +13,9 @@ export function Profile({ profile }: { profile: UserProfile }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const editDialogRef = useRef<HTMLDivElement>(null);
-  const {
-    user,
-    loading,
-    isEditing,
-    setIsEditing,
-    editForm,
-    setEditForm,
-    saving,
-    isOwnProfile,
-    handleSave,
-    savedPosts,
-    userPosts,
-  } = useProfile(id, profile);
+  const { user, loading, isOwnProfile } = useUserProfile(id, profile);
+  const { savedPosts, userPosts } = useUserContent(user, id);
+  const { isEditing, setIsEditing, editForm, setEditForm, saving, handleSave } = useEditProfile(user, id, isOwnProfile);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

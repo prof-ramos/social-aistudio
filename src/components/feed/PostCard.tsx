@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { sanitizeHtml } from '../../lib/sanitize';
 import { Post, UserProfile } from '../../types';
+import { canEdit, canDelete } from '../../policies/postPolicy';
 import { Pin, MessageSquare, Bookmark, Pencil, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ReactionButtons } from './ReactionButtons';
@@ -18,7 +19,8 @@ interface PostCardProps {
 
 function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: PostCardProps) {
   const isSaved = profile.savedPosts?.includes(post.id);
-  const canEdit = post.authorId === profile.id || profile.role === 'ADMIN';
+  const canEditPost = canEdit(profile, post);
+  const canDeletePost = canDelete(profile, post);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   return (
@@ -30,20 +32,22 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
        </div>
      )}
      <div className="flex gap-4 mb-4">
-       <div className="w-12 h-12 bg-ice border border-border-gray flex items-center justify-center font-bold text-navy shrink-0 uppercase">
+       <div className="w-12 h-12 rounded-full bg-ice border border-border-gray flex items-center justify-center font-bold text-navy shrink-0 uppercase overflow-hidden">
           {post.authorName ? post.authorName.charAt(0) : 'U'}
        </div>
-       <div className="flex-1 flex justify-between items-start">
-         <div>
-            <span className="font-bold text-lg text-slate block">
-              {post.authorName || 'Usuário'} <span className="text-sm font-normal text-slate">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador'}</span>
+       <div className="flex-1 flex justify-between items-start min-w-0">
+         <div className="min-w-0">
+            <span className="font-bold text-lg text-navy block truncate">
+              {post.authorName || 'Usuário'} <span className="text-sm font-normal text-slate/70">• {post.authorRole === 'MEMBRO_ATIVO' ? 'Membro Ativo' : post.authorRole === 'MEMBRO_APOSENTADO' ? 'Membro Aposentado' : 'Administrador'}</span>
             </span>
-           <div className="flex items-center">
-               <p className="text-sm uppercase text-slate font-bold tracking-wider mt-0.5">#{post.category}</p>
+           <div className="flex items-center gap-2 mt-0.5">
+               <p className="text-xs uppercase text-slate font-bold tracking-wider">#{post.category}</p>
+               <span className="text-xs text-slate/50">•</span>
+               <p className="text-xs text-slate/60">{new Date(post.createdAt).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</p>
            </div>
          </div>
-         <div className="flex items-center gap-1">
-           {canEdit && (onEdit || onDelete) && (
+         <div className="flex items-center gap-1 shrink-0">
+           {canEditPost && (onEdit || onDelete) && (
              <div className="flex items-center gap-1">
                {onEdit && (
                  <Button
@@ -82,21 +86,20 @@ function PostCardComponent({ post, profile, onToggleSaved, onEdit, onDelete }: P
        </div>
      </div>
      <Link to={`/feed/${post.id}`}>
-        <h3 className="font-bold text-navy text-xl mb-3 hover:text-sky transition-colors">{post.title}</h3>
+        <h3 className="font-bold text-navy text-xl mb-2 hover:text-sky transition-colors leading-tight">{post.title}</h3>
      </Link>
      <div
-       className="text-base leading-loose mb-6 text-slate line-clamp-3 prose prose-slate prose-sm"
+       className="text-base leading-relaxed mb-5 text-slate/80 line-clamp-3 prose prose-slate prose-sm"
        dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.body) }}
      />
 
      <div className="flex items-center justify-between border-t border-border-gray/50 pt-4">
-       <div className="flex items-center gap-6">
+       <div className="flex items-center gap-4 flex-1 min-w-0">
          <ReactionButtons postId={post.id} reactions={post.reactions} currentUserId={profile.id} />
-         <Link to={`/feed/${post.id}#comment`} className="text-base font-medium text-slate flex items-center gap-2 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px]">
-           <MessageSquare className="w-5 h-5" strokeWidth={1.5} /> Responder
+         <Link to={`/feed/${post.id}#comment`} className="text-sm font-medium text-slate flex items-center gap-1.5 hover:text-navy transition-colors focus:ring-2 focus:ring-navy focus:outline-none min-h-[44px] shrink-0">
+           <MessageSquare className="w-4 h-4" strokeWidth={1.5} /> Responder
          </Link>
        </div>
-       {/* The "Informar" button is now inside ReactionButtons and will be pushed to the right because ReactionButtons uses flex-1 items-center justify-between */}
      </div>
   </Card>
       <ConfirmDialog

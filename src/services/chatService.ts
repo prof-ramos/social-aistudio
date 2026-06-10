@@ -15,7 +15,9 @@ export const chatService = {
       }
 
       const chats = (data || []).map(row => {
-        const session = row.chat_sessions as any;
+        const session = Array.isArray(row.chat_sessions)
+          ? row.chat_sessions[0]
+          : row.chat_sessions;
         return {
           id: session.id,
           participants: session.participants || [],

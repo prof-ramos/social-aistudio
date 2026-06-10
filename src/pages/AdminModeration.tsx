@@ -1,7 +1,7 @@
 import React from 'react';
 import { ShieldAlert, Check, AlertTriangle, Trash2, ArrowRight } from 'lucide-react';
 import { Breadcrumb } from '../components/ui/Breadcrumb';
-import { useAdminModeration } from '../hooks/useAdminModeration';
+import { useAdminModeration, type Report } from '../hooks/useAdminModeration';
 import { Card } from '../components/ui/Card';
 import { PageTitle } from '../components/ui/PageTitle';
 import { Button } from '../components/ui/Button';
@@ -87,7 +87,7 @@ export default function AdminModeration() {
                               id="acao"
                               className="w-full min-h-[44px] border border-border-gray rounded text-base px-2 focus:ring-2 focus:ring-navy focus:outline-none"
                               value={action}
-                              onChange={e => setAction(e.target.value as any)}
+                              onChange={e => setAction(e.target.value as Report['status'])}
                             >
                               <option value="RESOLVED_KEPT">Manter Conteúdo (Rejeitar Denúncia)</option>
                               <option value="RESOLVED_WARNED">Advertir Autor (Manter Conteúdo)</option>

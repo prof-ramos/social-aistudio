@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { postService } from '../services/postService';
 import { Post, UserProfile } from '../types';
 import { useToast } from '../components/ui/Toast';
-import { supabase } from '../lib/supabase';
 
 export type FeedFilter = 'RECENTES' | 'MAIS_COMENTADOS' | 'MEUS_POSTOS';
 const PAGE_SIZE = 10;
@@ -24,13 +23,14 @@ export function useFeed(profile: UserProfile) {
   const lastCreatedAtRef = useRef<string | null>(null);
   const lastIdRef = useRef<string | null>(null);
 
-  // Real-time subscription: listen only for new inserts, manual merge
+  // Real-time subscription via postService.subscribeToFeed
   useEffect(() => {
-    let initialLoaded = false;
+    let isMounted = true;
 
     const fetchInitial = async () => {
       try {
         const { posts: newPosts, lastCreatedAt, lastId } = await postService.fetchMorePosts(null, null, PAGE_SIZE);
+        if (!isMounted) return;
         setRecentPosts(newPosts);
         lastCreatedAtRef.current = lastCreatedAt;
         lastIdRef.current = lastId;
@@ -38,45 +38,24 @@ export function useFeed(profile: UserProfile) {
       } catch (e) {
         console.error('Error loading initial feed:', e);
       }
-      initialLoaded = true;
     };
 
     fetchInitial();
 
-    // Listen only to new inserts — merge into recentPosts without full re-fetch
-    const channel = supabase
-      .channel('posts-feed-inserts')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'posts',
-      }, (payload) => {
-        if (!initialLoaded) return;
-        // Fetch the new post with user info and reactions
-        postService.getPost(payload.new.id).then((post) => {
-          if (post) {
-            setRecentPosts((prev) => {
-              if (prev.some((p) => p.id === post.id)) return prev;
-              const next = [post, ...prev].sort((a, b) => {
-                if (a.pinned && !b.pinned) return -1;
-                if (!a.pinned && b.pinned) return 1;
-                const tA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-                const tB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-                return tB - tA;
-              });
-              return next.slice(0, PAGE_SIZE);
-            });
-          }
-        }).catch(() => {});
-      })
-      .subscribe((status, err) => {
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.error('Feed channel status:', status, err);
-        }
-      });
+    const unsubscribe = postService.subscribeToFeed?.(
+      (posts) => {
+        if (!isMounted) return;
+        setRecentPosts(posts);
+      },
+      (error) => {
+        console.error('Feed subscription error:', error);
+      },
+      PAGE_SIZE
+    ) || (() => {});
 
     return () => {
-      supabase.removeChannel(channel);
+      isMounted = false;
+      unsubscribe();
     };
   }, []);
 

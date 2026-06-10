@@ -18,3 +18,13 @@ lighthouse-reports/
 # Supabase local
 supabase/.temp/
 .worktrees/
+
+# Test artifacts
+test-results/
+
+# Dev tooling (skills, artifacts, não fazem parte do código do projeto)
+.impeccable/
+.agents/
+
+# Auto-generated AI docs (deepinit — poluem o tracking)
+**/AGENTS.md
