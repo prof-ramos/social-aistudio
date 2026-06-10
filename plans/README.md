@@ -15,7 +15,7 @@ Baseline at generation time: `npm run lint` (tsc --noEmit) passes; `npm test` �
 | 001 | Close chat-participants IDOR (private DM read by non-participants) | P1 | S | — | DONE |
 | 002 | Fix save-post bookmark not updating (profile-prop mutation) | P1 | S | — | DONE |
 | 003 | Consolidate + harden duplicated notify-request endpoint | P1 | S | — | DONE |
-| 004 | Debounce feed realtime refetch storm + drop double initial fetch | P2 | M | — | TODO |
+| 004 | Debounce feed realtime refetch storm + drop double initial fetch | P2 | M | — | DONE |
 | 005 | Characterization tests for auth / chat / notification services | P2 | M | — | TODO |
 | 006 | Untrack generated artifacts (repomix dump, screenshots, xlsx) | P3 | S | — | DONE |
 
