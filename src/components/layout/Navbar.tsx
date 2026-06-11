@@ -2,7 +2,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, User, LogOut, Bell, Shield, Search, MessageSquare, Compass, Home, Moon, Sun } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { UserProfile } from '../../types';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { notificationService } from '../../services/notificationService';
 import { adminService } from '../../services/adminService';
 import { cn } from '../../lib/utils';
@@ -12,26 +12,37 @@ import { useGlobalSearch } from '../../hooks/useGlobalSearch';
 import { NavbarBrand } from '../brand/NavbarBrand';
 import { BrandLockup } from '../brand/BrandLockup';
 import { GlobalSearchDropdown } from './GlobalSearchDropdown';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/alert-dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
 export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdminView?: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [pendingRequests, setPendingRequests] = useState(0);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const { query, setQuery, results, isSearching, clearQuery } = useGlobalSearch();
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const adminDropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const logoutDialogRef = useRef<HTMLDivElement>(null);
-  const logoutButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const unsubNotif = notificationService.subscribeToUnreadNotifications(
@@ -52,15 +63,9 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     };
   }, [profile.id, profile.role]);
 
-  // Close dropdowns on click outside
+  // Clear search when clicking outside the search area
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-      if (adminDropdownRef.current && !adminDropdownRef.current.contains(event.target as Node)) {
-        setAdminDropdownOpen(false);
-      }
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         clearQuery();
       }
@@ -96,20 +101,14 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
           clearQuery();
           return;
         }
-        setDropdownOpen(false);
-        setAdminDropdownOpen(false);
         setMobileMenuOpen(false);
-        if (showLogoutDialog) {
-          setShowLogoutDialog(false);
-        }
       }
     }
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [showLogoutDialog, query, clearQuery]);
+  }, [query, clearQuery]);
 
   useFocusTrap(mobileMenuRef, mobileMenuOpen);
-  useFocusTrap(logoutDialogRef, showLogoutDialog);
 
   // Body scroll lock for mobile menu
   const savedScrollY = useRef(0);
@@ -137,7 +136,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
 
   const handleLogoutClick = () => {
     setShowLogoutDialog(true);
-    setDropdownOpen(false);
     setMobileMenuOpen(false);
   };
 
@@ -218,68 +216,67 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
           </Link>
 
           {profile.role === 'ADMIN' && (
-             <div className="relative flex items-center h-16" ref={adminDropdownRef}>
-               <button
-                 onClick={() => setAdminDropdownOpen(!adminDropdownOpen)}
-                 className={cn(
-                   'relative p-2 transition-colors rounded-none flex items-center h-16 border-b-2',
-                   location.pathname.startsWith('/admin') ? 'border-navy text-navy font-bold' : 'border-transparent text-slate hover:text-navy hover:bg-ice/50'
-                 )}
-                 title="Painel Admin"
-                 aria-expanded={adminDropdownOpen}
-                 aria-haspopup="true"
-                 aria-label="Painel Admin"
-               >
-                 <Shield className="w-5 h-5" strokeWidth={location.pathname.startsWith('/admin') ? 2 : 1.5} aria-hidden="true" />
-                 {pendingRequests > 0 && (
-                   <span className="absolute top-3 right-2 w-2 h-2 bg-sky rounded-full animate-pulse border border-white" aria-hidden="true"></span>
-                 )}
-               </button>
-               {adminDropdownOpen && (
-                 <div className="absolute right-[max(0px,env(safe-area-inset-right))] top-full mt-0 w-56 bg-white text-navy shadow-md border border-border-gray z-50">
-                    <Link to="/admin/membros" className="block px-4 py-3 text-base hover:bg-ice transition-colors border-b border-border-gray" onClick={() => setAdminDropdownOpen(false)}>Configurações & Membros</Link>
-                    <Link to="/admin/moderacao" className="block px-4 py-3 text-base hover:bg-ice transition-colors" onClick={() => setAdminDropdownOpen(false)}>Central de Moderação</Link>
-                 </div>
-               )}
-             </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={cn(
+                    'relative p-2 transition-colors rounded-none flex items-center h-16 border-b-2',
+                    location.pathname.startsWith('/admin') ? 'border-navy text-navy font-bold' : 'border-transparent text-slate hover:text-navy hover:bg-ice/50'
+                  )}
+                  title="Painel Admin"
+                  aria-label="Painel Admin"
+                >
+                  <Shield className="w-5 h-5" strokeWidth={location.pathname.startsWith('/admin') ? 2 : 1.5} aria-hidden="true" />
+                  {pendingRequests > 0 && (
+                    <span className="absolute top-3 right-2 w-2 h-2 bg-sky rounded-full animate-pulse border border-white" aria-hidden="true"></span>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 rounded-none border-border-gray">
+                <DropdownMenuItem asChild className="rounded-none px-4 py-3 text-base text-navy hover:bg-ice focus:bg-ice focus:text-navy cursor-pointer">
+                  <Link to="/admin/membros">Configurações & Membros</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="rounded-none px-4 py-3 text-base text-navy hover:bg-ice focus:bg-ice focus:text-navy cursor-pointer">
+                  <Link to="/admin/moderacao">Central de Moderação</Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           <div className="h-6 w-px bg-border-gray mx-1 lg:mx-2" aria-hidden="true"></div>
 
-          <div className="relative flex items-center h-16" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-3 hover:bg-ice/50 p-2 rounded-none transition-colors group focus:outline-none focus:ring-2 focus:ring-navy"
-              aria-expanded={dropdownOpen}
-              aria-haspopup="true"
-              aria-label="Menu do perfil"
-            >
-              <div className="text-right hidden sm:block">
-                <p className="text-base font-bold text-navy group-hover:text-sky transition-colors">{profile.name.split(' ')[0]}</p>
-                <p className="text-sm text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : 'Admin'}</p>
-              </div>
-              <div className="w-11 h-11 bg-ice border border-border-gray flex items-center justify-center text-navy font-bold uppercase overflow-hidden">
-                {profile.avatarUrl ? <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" /> : profile.name.charAt(0)}
-              </div>
-            </button>
-
-            {dropdownOpen && (
-              <div className="absolute right-[max(0px,env(safe-area-inset-right))] top-full mt-0 w-48 bg-white text-slate shadow-md border border-border-gray z-50">
-                <div className="px-4 py-3 border-b border-border-gray bg-ice/30">
-                  <p className="text-base font-bold text-navy">{profile.name}</p>
-                  <p className="text-sm text-slate truncate">{profile.email}</p>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="flex items-center gap-3 hover:bg-ice/50 p-2 rounded-none transition-colors group focus:outline-none focus:ring-2 focus:ring-navy"
+                aria-label="Menu do perfil"
+              >
+                <div className="text-right hidden sm:block">
+                  <p className="text-base font-bold text-navy group-hover:text-sky transition-colors">{profile.name.split(' ')[0]}</p>
+                  <p className="text-sm text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : 'Admin'}</p>
                 </div>
-                <Link to={`/perfil/${profile.id}`} className="block px-4 py-3 text-base hover:bg-ice transition-colors text-navy font-medium" onClick={() => setDropdownOpen(false)}>Meu Perfil</Link>
-                <button
-                  ref={logoutButtonRef}
-                  onClick={handleLogoutClick}
-                  className="w-full text-left px-4 py-3 text-base hover:bg-danger/5 hover:text-danger text-slate transition-colors flex items-center gap-2 border-t border-border-gray/50"
-                >
-                  <LogOut className="w-4 h-4" strokeWidth={1.5} aria-hidden="true" /> Sair
-                </button>
+                <div className="w-11 h-11 bg-ice border border-border-gray flex items-center justify-center text-navy font-bold uppercase overflow-hidden">
+                  {profile.avatarUrl ? <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" /> : profile.name.charAt(0)}
+                </div>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48 rounded-none border-border-gray p-0">
+              <div className="px-4 py-3 border-b border-border-gray bg-ice/30">
+                <p className="text-base font-bold text-navy">{profile.name}</p>
+                <p className="text-sm text-slate truncate">{profile.email}</p>
               </div>
-            )}
-          </div>
+              <DropdownMenuItem asChild className="rounded-none px-4 py-3 text-base text-navy font-medium hover:bg-ice focus:bg-ice focus:text-navy cursor-pointer">
+                <Link to={`/perfil/${profile.id}`}>Meu Perfil</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="my-0 bg-border-gray/50" />
+              <DropdownMenuItem
+                className="rounded-none px-4 py-3 text-base text-slate hover:bg-danger/5 hover:text-danger focus:bg-danger/5 focus:text-danger cursor-pointer flex items-center gap-2"
+                onSelect={handleLogoutClick}
+              >
+                <LogOut className="w-4 h-4" strokeWidth={1.5} aria-hidden="true" /> Sair
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Mobile state */}
@@ -342,37 +339,23 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         )}
 
         {/* Logout Confirmation Dialog */}
-        {showLogoutDialog && (
-          <div
-            className="fixed inset-0 bg-navy/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-contain"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="logout-dialog-title"
-          >
-            <div
-              ref={logoutDialogRef}
-              className="bg-white border border-border-gray shadow-lg max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200"
-            >
-              <h3 id="logout-dialog-title" className="text-xl font-serif font-bold text-navy mb-2">Confirmar Saída</h3>
-              <p className="text-slate mb-6">Tem certeza que deseja sair da sua conta?</p>
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  onClick={() => setShowLogoutDialog(false)}
-                  className="px-4 py-2 text-slate hover:bg-ice transition-colors font-medium border border-transparent min-h-[44px]"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={performLogout}
-                  className="px-4 py-2 bg-danger text-white hover:bg-danger/90 transition-colors font-medium flex items-center gap-2 min-h-[44px]"
-                >
-                  <LogOut className="w-4 h-4" aria-hidden="true" />
-                  Sair
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar Saída</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja sair da sua conta?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel variant="ghost" size="md">Cancelar</AlertDialogCancel>
+              <AlertDialogAction variant="danger" size="md" onClick={performLogout}>
+                <LogOut className="w-4 h-4" aria-hidden="true" />
+                Sair
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </nav>
     </>
   );

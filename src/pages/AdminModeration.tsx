@@ -7,6 +7,14 @@ import { PageTitle } from '../components/ui/PageTitle';
 import { Button } from '../components/ui/Button';
 import { StatusBadge } from '../components/ui/StatusBadge';
 import { PageContainer } from '../components/layout/PageContainer';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../components/ui/table';
 
 export default function AdminModeration() {
   const {
@@ -57,28 +65,28 @@ export default function AdminModeration() {
           </div>
         ) : (
           <div className="overflow-y-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-ice border-b border-border-gray text-sm font-bold uppercase tracking-wider text-slate">
-                  <th scope="col" className="p-4">Conteúdo</th>
-                  <th scope="col" className="p-4">Motivo / Denunciante</th>
-                  <th scope="col" className="p-4">Ação</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-gray">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-ice border-b border-border-gray hover:bg-ice">
+                  <TableHead scope="col" className="p-4 text-sm font-bold uppercase tracking-wider text-slate">Conteúdo</TableHead>
+                  <TableHead scope="col" className="p-4 text-sm font-bold uppercase tracking-wider text-slate">Motivo / Denunciante</TableHead>
+                  <TableHead scope="col" className="p-4 text-sm font-bold uppercase tracking-wider text-slate">Ação</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {pendingReports.map(rep => (
-                  <tr key={rep.id} className="hover:bg-ice/30 transition-colors">
-                    <td className="p-4">
+                  <TableRow key={rep.id} className="hover:bg-ice/30 transition-colors">
+                    <TableCell className="p-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-sky uppercase tracking-wider mb-1">{rep.type}</span>
                         <p className="text-base text-slate overflow-hidden text-ellipsis line-clamp-3 leading-relaxed">{rep.preview}</p>
                       </div>
-                    </td>
-                    <td className="p-4">
+                    </TableCell>
+                    <TableCell className="p-4">
                       <p className="text-base font-bold text-navy leading-relaxed">{rep.reason}</p>
                       <p className="text-sm text-slate font-medium leading-relaxed">Por: {rep.reportedBy}</p>
-                    </td>
-                    <td className="p-4">
+                    </TableCell>
+                    <TableCell className="p-4">
                       {resolvingId === rep.id ? (
                         <form onSubmit={(e) => handleResolve(rep.id, e)} className="bg-ice p-3 rounded-none border border-border-gray space-y-3 min-w-[250px]">
                           <div>
@@ -120,11 +128,11 @@ export default function AdminModeration() {
                           Resolver
                         </Button>
                       )}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         )}
       </Card>
@@ -133,33 +141,33 @@ export default function AdminModeration() {
         <div>
           <PageTitle as="h2" size="lg">Histórico de Moderação</PageTitle>
           <Card variant="elevated" className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-ice border-b border-border-gray text-sm font-bold uppercase tracking-wider text-slate">
-                  <th scope="col" className="p-4">Conteúdo</th>
-                  <th scope="col" className="p-4">Resolução</th>
-                  <th scope="col" className="p-4">Nota Interna</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border-gray text-base text-slate">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-ice border-b border-border-gray hover:bg-ice">
+                  <TableHead scope="col" className="p-4 text-sm font-bold uppercase tracking-wider text-slate">Conteúdo</TableHead>
+                  <TableHead scope="col" className="p-4 text-sm font-bold uppercase tracking-wider text-slate">Resolução</TableHead>
+                  <TableHead scope="col" className="p-4 text-sm font-bold uppercase tracking-wider text-slate">Nota Interna</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="text-base text-slate">
                 {resolvedReports.map(rep => (
-                  <tr key={rep.id}>
-                    <td className="p-4">
+                  <TableRow key={rep.id}>
+                    <TableCell className="p-4">
                       <span className="text-sm font-bold text-sky uppercase">{rep.type}</span>
                       <p className="line-clamp-2 max-w-xs leading-relaxed">{rep.preview}</p>
-                    </td>
-                    <td className="p-4">
+                    </TableCell>
+                    <TableCell className="p-4">
                       {rep.status === 'RESOLVED_KEPT' && <StatusBadge status="neutral"><Check className="w-3 h-3" /> Mantido</StatusBadge>}
                       {rep.status === 'RESOLVED_WARNED' && <StatusBadge status="warning"><AlertTriangle className="w-3 h-3" /> Advertido</StatusBadge>}
                       {rep.status === 'RESOLVED_REMOVED' && <StatusBadge status="error"><Trash2 className="w-3 h-3" /> Removido</StatusBadge>}
-                    </td>
-                    <td className="p-4 max-w-xs">
+                    </TableCell>
+                    <TableCell className="p-4 max-w-xs">
                       <p className="line-clamp-2 leading-relaxed">{rep.notes}</p>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </Card>
         </div>
       )}

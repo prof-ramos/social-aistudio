@@ -6,12 +6,19 @@ afterEach(() => {
   cleanup();
 });
 
-// Mock ResizeObserver
-global.ResizeObserver = vi.fn().mockImplementation(() => ({
-  observe: vi.fn(),
-  unobserve: vi.fn(),
-  disconnect: vi.fn(),
-}));
+// Radix UI uses pointer/scroll APIs that jsdom doesn't implement
+Element.prototype.hasPointerCapture = vi.fn(() => false);
+Element.prototype.setPointerCapture = vi.fn();
+Element.prototype.releasePointerCapture = vi.fn();
+Element.prototype.scrollIntoView = vi.fn();
+
+// Mock ResizeObserver — must be a class so Radix UI can call `new ResizeObserver(cb)`
+global.ResizeObserver = class MockResizeObserver {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+  constructor(_callback: ResizeObserverCallback) {}
+} as unknown as typeof ResizeObserver;
 
 // Mock localStorage
 const localStorageMock = (function () {

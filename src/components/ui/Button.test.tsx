@@ -3,10 +3,10 @@ import userEvent from '@testing-library/user-event';
 import { Button } from './Button';
 
 describe('Button - active/hover states', () => {
-  it('renders with active scale class', () => {
+  it('renders with active translate class', () => {
     render(<Button>Click me</Button>);
     const button = screen.getByRole('button', { name: /click me/i });
-    expect(button.className).toContain('active:scale-[0.97]');
+    expect(button.className).toContain('active:not-aria-[haspopup]:translate-y-px');
   });
 
   it('renders primary variant with hover classes', () => {
@@ -48,6 +48,6 @@ describe('Button - active/hover states', () => {
     expect(button).toBeDisabled();
     expect(button.className).toContain('disabled:bg-border-gray');
     expect(button.className).toContain('disabled:text-navy-accent');
-    expect(button.className).toContain('disabled:cursor-not-allowed');
+    expect(button.className).toContain('disabled:pointer-events-none');
   });
 });
