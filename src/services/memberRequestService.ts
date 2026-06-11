@@ -1,13 +1,5 @@
 import { supabase } from '../lib/supabase';
-
-export interface MemberRequestInput {
-  name: string;
-  email: string;
-  cpf: string;
-  matricula: string;
-  category: string;
-  currentPost: string;
-}
+import { MemberRequestInput } from '../types';
 
 export const memberRequestService = {
   createRequest: async (data: MemberRequestInput) => {

@@ -94,3 +94,69 @@ export interface Report {
   createdAt?: any;
   resolvedAt?: any;
 }
+
+export interface MemberRequestInput {
+  name: string;
+  email: string;
+  cpf: string;
+  matricula: string;
+  category: string;
+  currentPost: string;
+}
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  type: string;
+  actorName: string;
+  postId?: string;
+  message?: string;
+  link?: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface CreateNotificationParams {
+  userId: string;
+  type: string;
+  actorName: string;
+  postId?: string;
+  message?: string;
+  link?: string;
+}
+
+export interface Posto {
+  id: string;
+  name: string;
+  slug: string;
+  city?: string;
+  country?: string;
+  region?: string;
+  description?: string;
+  createdAt?: string;
+}
+
+export interface PostoReview {
+  id: string;
+  postoId: string;
+  authorId: string;
+  authorName: string | null;
+  authorRole: string | null;
+  category?: string | null;
+  body: string;
+  rating?: number | null;
+  createdAt: string;
+}
+
+export interface PostoField {
+  id: string;
+  postoId: string;
+  authorId: string;
+  authorName: string | null;
+  authorRole: string | null;
+  fieldType: string;
+  body: string;
+  experienceStart?: number;
+  experienceEnd?: number;
+  createdAt: string;
+}

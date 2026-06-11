@@ -1,16 +1,5 @@
 import { supabase } from '../lib/supabase';
-
-interface Notification {
-  id: string;
-  user_id: string;
-  type: string;
-  actor_name: string;
-  post_id?: string;
-  message?: string;
-  link?: string;
-  read: boolean;
-  created_at: string;
-}
+import { AppNotification, CreateNotificationParams } from '../types';
 
 const handleError = (error: Error | null, context: string) => {
   if (error) {
@@ -62,7 +51,7 @@ export const notificationService = {
     };
   },
 
-  subscribeToUserNotifications: (userId: string, onUpdate: (notifications: Notification[]) => void) => {
+  subscribeToUserNotifications: (userId: string, onUpdate: (notifications: AppNotification[]) => void) => {
     const fetchNotifications = async () => {
       const { data, error } = await supabase
         .from('notifications')
@@ -76,7 +65,7 @@ export const notificationService = {
         return;
       }
 
-      onUpdate((data ?? []) as Notification[]);
+      onUpdate((data ?? []) as AppNotification[]);
     };
 
     fetchNotifications();
@@ -118,7 +107,7 @@ export const notificationService = {
     }
   },
 
-  markAllAsRead: async (notifications: Notification[]) => {
+  markAllAsRead: async (notifications: AppNotification[]) => {
     const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
     if (unreadIds.length === 0) return;
 
@@ -133,14 +122,14 @@ export const notificationService = {
     }
   },
 
-  createNotification: async (data: any) => {
+  createNotification: async (data: CreateNotificationParams): Promise<AppNotification> => {
     const { data: result, error } = await supabase
       .from('notifications')
       .insert({
-        user_id: data.userId || data.user_id,
+        user_id: data.userId,
         type: data.type,
-        actor_name: data.actorName || data.actor_name,
-        post_id: data.postId || data.post_id,
+        actor_name: data.actorName,
+        post_id: data.postId,
         message: data.message,
         link: data.link,
         read: false,
@@ -153,6 +142,6 @@ export const notificationService = {
       throw error;
     }
 
-    return result as Notification;
+    return result as AppNotification;
   },
 };

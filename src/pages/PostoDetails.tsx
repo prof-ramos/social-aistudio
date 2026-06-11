@@ -252,11 +252,11 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
                     <span className="text-base font-bold text-navy">{review.authorName ?? 'Membro'}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    {renderStars(review.rating)}
+                    {renderStars(review.rating ?? 0)}
                   </div>
                 </div>
                 <span className="text-sm text-slate font-medium">
-                  {new Date(review.created_at).toLocaleDateString('pt-BR')}
+                  {new Date(review.createdAt).toLocaleDateString('pt-BR')}
                 </span>
               </div>
               <p className="text-slate leading-relaxed">{review.body}</p>

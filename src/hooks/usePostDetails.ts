@@ -1,7 +1,7 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { postService } from '../services/postService';
 import { reportService } from '../services/reportService';
-import { UserProfile } from '../types';
+import { Post, PostComment, UserProfile } from '../types';
 import { useToast } from '../components/ui/Toast';
 
 export interface ReportTarget {
@@ -12,8 +12,8 @@ export interface ReportTarget {
 
 export function usePostDetails(id: string | undefined, profile: UserProfile) {
   const { addToast } = useToast();
-  const [post, setPost] = useState<any>(null);
-  const [comments, setComments] = useState<any[]>([]);
+  const [post, setPost] = useState<Post | null>(null);
+  const [comments, setComments] = useState<PostComment[]>([]);
   const [newCommentBody, setNewCommentBody] = useState('');
   const [loading, setLoading] = useState(true);
   const [isPosting, setIsPosting] = useState(false);
