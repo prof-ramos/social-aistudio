@@ -102,16 +102,29 @@ export const userService = {
     return (data || []).map(mapUser);
   },
 
-  getUsersWithCommonPostos: async (excludeUserId: string, userPostos: string[], limitCount: number = 50): Promise<UserProfile[]> => {
-    const { data, error } = await supabase.from('users_public').select('*').limit(limitCount);
-    if (error || !data) return [];
-    const users = data.map(mapUser);
-    return users.filter(u => {
-      if (u.id === excludeUserId) return false;
-      if (u.currentPost && userPostos.includes(u.currentPost)) return true;
-      const theirPostos = u.postos || [];
-      return theirPostos.some(p => userPostos.includes(p));
-    });
+  getUsersWithCommonPostos: async (excludeUserId: string, userPostos: string[], limitCount: number = 10): Promise<UserProfile[]> => {
+    const { data, error } = await supabase
+      .rpc('get_common_posto_members', {
+        p_exclude_user_id: excludeUserId,
+        p_user_postos: userPostos,
+        p_limit: limitCount,
+      });
+
+    if (error || !data) {
+      console.error('Error fetching common posto members:', error);
+      return [];
+    }
+
+    return (data || []).map((row: any) => ({
+      id: row.id,
+      name: row.name,
+      avatarUrl: row.avatar_url,
+      role: row.role,
+      currentPost: row.current_post,
+      postos: row.postos || [],
+      isOnline: row.is_online,
+      lastOnline: row.last_online,
+    } as UserProfile));
   },
 
   toggleSavedPost: async (userId: string, postId: string): Promise<void> => {

@@ -1,7 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { userService } from './userService';
 
-const { fromMock, storageMock, channelMock, removeChannelMock } = vi.hoisted(() => ({
+const { fromMock, storageMock, channelMock, removeChannelMock, rpcMock } = vi.hoisted(() => ({
   fromMock: vi.fn(),
   storageMock: {
     from: vi.fn().mockReturnValue({
@@ -13,6 +13,7 @@ const { fromMock, storageMock, channelMock, removeChannelMock } = vi.hoisted(() 
   },
   channelMock: vi.fn(),
   removeChannelMock: vi.fn(),
+  rpcMock: vi.fn(),
 }));
 
 vi.mock('../lib/supabase', () => ({
@@ -21,6 +22,7 @@ vi.mock('../lib/supabase', () => ({
     storage: storageMock,
     channel: channelMock,
     removeChannel: removeChannelMock,
+    rpc: rpcMock,
   },
 }));
 
@@ -64,6 +66,7 @@ beforeEach(() => {
   fromMock.mockReset();
   channelMock.mockReset();
   removeChannelMock.mockReset();
+  rpcMock.mockReset();
   buildRealtimeChain();
 });
 
@@ -276,43 +279,71 @@ describe('userService.getAllUsers', () => {
 // ===================== getUsersWithCommonPostos =====================
 
 describe('userService.getUsersWithCommonPostos', () => {
-  it('excludes the requesting user and filters by common currentPost', async () => {
-    mockLimit({
+  it('calls RPC and maps returned rows to UserProfile', async () => {
+    rpcMock.mockResolvedValue({
       data: [
-        userRow({ id: 'u1', current_post: 'Genebra' }),
-        userRow({ id: 'u2', current_post: 'Genebra' }),
-        userRow({ id: 'u3', current_post: 'Paris', postos: [] }),
+        { id: 'u2', name: 'Bob', avatar_url: 'http://x/b.png', role: 'MEMBRO_ATIVO', current_post: 'Genebra', postos: ['Genebra'], is_online: true, last_online: '2026-06-10' },
+        { id: 'u3', name: 'Carol', avatar_url: null, role: 'MEMBRO_ATIVO', current_post: null, postos: ['Genebra', 'Paris'], is_online: false, last_online: null },
       ],
       error: null,
     });
 
     const users = await userService.getUsersWithCommonPostos('u1', ['Genebra'], 10);
 
-    expect(users).toHaveLength(1);
-    expect(users[0].id).toBe('u2');
-  });
-
-  it('matches by postos array when currentPost does not overlap', async () => {
-    mockLimit({
-      data: [
-        userRow({ id: 'u1', current_post: 'Genebra', postos: ['Genebra'] }),
-        userRow({ id: 'u2', current_post: 'Paris', postos: ['Genebra', 'Paris'] }),
-      ],
-      error: null,
+    expect(rpcMock).toHaveBeenCalledWith('get_common_posto_members', {
+      p_exclude_user_id: 'u1',
+      p_user_postos: ['Genebra'],
+      p_limit: 10,
     });
-
-    const users = await userService.getUsersWithCommonPostos('u1', ['Genebra'], 10);
-
-    expect(users).toHaveLength(1);
-    expect(users[0].id).toBe('u2');
+    expect(users).toHaveLength(2);
+    expect(users[0]).toMatchObject({
+      id: 'u2',
+      name: 'Bob',
+      avatarUrl: 'http://x/b.png',
+      role: 'MEMBRO_ATIVO',
+      currentPost: 'Genebra',
+      postos: ['Genebra'],
+      isOnline: true,
+      lastOnline: '2026-06-10',
+    });
+    expect(users[1]).toMatchObject({
+      id: 'u3',
+      name: 'Carol',
+      currentPost: null,
+      postos: ['Genebra', 'Paris'],
+      isOnline: false,
+    });
   });
 
-  it('returns empty array on error', async () => {
-    mockLimit({ data: null, error: new Error('fail') });
+  it('returns empty array when RPC returns empty data', async () => {
+    rpcMock.mockResolvedValue({ data: [], error: null });
 
     const users = await userService.getUsersWithCommonPostos('u1', ['Genebra']);
 
     expect(users).toEqual([]);
+  });
+
+  it('returns empty array and logs error when RPC returns an error', async () => {
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    rpcMock.mockResolvedValue({ data: null, error: { message: 'rpc fail' } });
+
+    const users = await userService.getUsersWithCommonPostos('u1', ['Genebra']);
+
+    expect(users).toEqual([]);
+    expect(consoleSpy).toHaveBeenCalledWith('Error fetching common posto members:', { message: 'rpc fail' });
+    consoleSpy.mockRestore();
+  });
+
+  it('passes custom limit as p_limit parameter', async () => {
+    rpcMock.mockResolvedValue({ data: [], error: null });
+
+    await userService.getUsersWithCommonPostos('u1', ['Genebra'], 25);
+
+    expect(rpcMock).toHaveBeenCalledWith('get_common_posto_members', {
+      p_exclude_user_id: 'u1',
+      p_user_postos: ['Genebra'],
+      p_limit: 25,
+    });
   });
 });
 
