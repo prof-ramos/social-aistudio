@@ -1,7 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button } from './Button';
+import React, { useRef, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { useFocusTrap } from '../../hooks/useFocusTrap';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './dialog';
+import { Button } from './Button';
+import { Label } from './label';
+import { Textarea } from './textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './select';
 
 const REASON_OPTIONS = [
   { value: 'Spam', label: 'Spam' },
@@ -17,113 +33,92 @@ export interface ReportDialogProps {
 }
 
 export function ReportDialog({ isOpen, onCancel, onSubmitted }: ReportDialogProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const submitButtonRef = useRef<HTMLButtonElement>(null);
   const [reason, setReason] = useState('');
   const [details, setDetails] = useState('');
+  const didSubmitRef = useRef(false);
 
-  useFocusTrap(dialogRef, isOpen);
-
-  useEffect(() => {
-    if (!isOpen) {
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      const submitted = didSubmitRef.current;
+      didSubmitRef.current = false;
       setReason('');
       setDetails('');
-      return;
+      if (!submitted) onCancel();
     }
+  };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onCancel();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    setTimeout(() => submitButtonRef.current?.focus(), 0);
-
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onCancel]);
-
-  if (!isOpen) return null;
-
-  const canSubmit = reason && details.trim();
+  const canSubmit = !!reason && !!details.trim();
 
   const handleSubmit = () => {
     if (!canSubmit) return;
+    didSubmitRef.current = true;
     onSubmitted(reason, details.trim());
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4 modal-contain">
-      <div
-        ref={dialogRef}
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="report-dialog-title"
-        aria-describedby="report-dialog-message"
-        className="bg-white w-full max-w-md mx-auto shadow-lg overflow-hidden flex flex-col"
-      >
-        <div className="flex items-start gap-4 p-6">
-          <div className="shrink-0 mt-0.5 text-danger">
-            <AlertTriangle className="w-6 h-6" aria-hidden="true" />
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent className="sm:max-w-md" showCloseButton={false}>
+        <DialogHeader>
+          <div className="flex items-start gap-4">
+            <div className="shrink-0 mt-0.5 text-danger">
+              <AlertTriangle className="w-6 h-6" aria-hidden="true" />
+            </div>
+            <div className="flex-1">
+              <DialogTitle className="text-lg font-bold text-navy">
+                Denunciar Conteúdo
+              </DialogTitle>
+              <DialogDescription className="mt-1 text-base text-slate leading-loose">
+                Sua denúncia será enviada à moderação para análise.
+              </DialogDescription>
+            </div>
           </div>
-          <div className="flex-1">
-            <h2
-              id="report-dialog-title"
-              className="text-lg font-bold text-navy mb-2"
+        </DialogHeader>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label
+              htmlFor="report-reason"
+              className="text-sm uppercase tracking-widest font-bold text-navy"
             >
-              Denunciar Conteúdo
-            </h2>
-            <p id="report-dialog-message" className="text-base text-slate leading-loose">
-              Sua denúncia será enviada à moderação para análise.
-            </p>
-
-            <div className="mt-4">
-              <label htmlFor="report-reason" className="block text-sm uppercase tracking-widest font-bold text-navy mb-1">
-                Motivo
-              </label>
-              <select
-                id="report-reason"
-                className="w-full h-11 border border-border-gray bg-white px-3 text-base text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                required
-              >
-                <option value="">Selecione um motivo</option>
+              Motivo
+            </Label>
+            <Select value={reason} onValueChange={setReason}>
+              <SelectTrigger id="report-reason">
+                <SelectValue placeholder="Selecione um motivo" />
+              </SelectTrigger>
+              <SelectContent>
                 {REASON_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
                 ))}
-              </select>
-            </div>
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div className="mt-4">
-              <label htmlFor="report-details" className="block text-sm uppercase tracking-widest font-bold text-navy mb-1">
-                Detalhes
-              </label>
-              <textarea
-                id="report-details"
-                className="w-full min-h-[80px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none leading-loose resize-y transition-colors bg-white/50"
-                placeholder="Descreva o problema..."
-                value={details}
-                onChange={(e) => setDetails(e.target.value)}
-                required
-              />
-            </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="report-details"
+              className="text-sm uppercase tracking-widest font-bold text-navy"
+            >
+              Detalhes
+            </Label>
+            <Textarea
+              id="report-details"
+              placeholder="Descreva o problema..."
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              className="min-h-[80px] resize-y"
+              required
+            />
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 pt-0">
-          <Button
-            type="button"
-            variant="ghost"
-            size="md"
-            onClick={onCancel}
-            className="w-full sm:w-auto"
-          >
+        <DialogFooter>
+          <Button variant="ghost" size="md" onClick={onCancel} className="w-full sm:w-auto">
             Cancelar
           </Button>
           <Button
-            ref={submitButtonRef}
-            type="button"
             variant="danger"
             size="md"
             onClick={handleSubmit}
@@ -132,8 +127,8 @@ export function ReportDialog({ isOpen, onCancel, onSubmitted }: ReportDialogProp
           >
             Denunciar
           </Button>
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

@@ -1,7 +1,28 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Button } from './Button';
+import React, { useRef, useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
-import { useFocusTrap } from '../../hooks/useFocusTrap';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+} from './alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './dialog';
+import { Button } from './Button';
+import { Label } from './label';
+import { Textarea } from './textarea';
+import { cn } from '@/src/lib/utils';
 
 export interface ConfirmDialogProps {
   isOpen: boolean;
@@ -17,6 +38,9 @@ export interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
+const iconColor = { danger: 'text-danger', warning: 'text-warning', info: 'text-info' };
+const confirmVariant = { danger: 'danger', warning: 'primary', info: 'primary' } as const;
+
 export function ConfirmDialog({
   isOpen,
   title,
@@ -30,124 +54,103 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const confirmButtonRef = useRef<HTMLButtonElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [inputValue, setInputValue] = useState('');
+  // track whether the dialog closed via confirm (vs cancel / escape / outside click)
+  const didConfirmRef = useRef(false);
 
-  useFocusTrap(dialogRef, isOpen);
-
-  useEffect(() => {
-    if (!isOpen) {
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      const confirmed = didConfirmRef.current;
+      didConfirmRef.current = false;
       setInputValue('');
-      return;
+      if (!confirmed) onCancel();
     }
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onCancel();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    // Focus input if present, otherwise confirm button
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      } else {
-        confirmButtonRef.current?.focus();
-      }
-    }, 0);
-
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onCancel]);
-
-  if (!isOpen) return null;
-
-  const variantStyles = {
-    danger: 'text-danger',
-    warning: 'text-warning',
-    info: 'text-info',
   };
 
-  const confirmVariants = {
-    danger: 'danger' as const,
-    warning: 'primary' as const,
-    info: 'primary' as const,
-  };
-
-  const handleConfirmClick = () => {
+  const handleConfirm = () => {
     if (inputRequired && !inputValue.trim()) return;
+    didConfirmRef.current = true;
     onConfirm(inputValue || undefined);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4 modal-contain">
-      <div
-        ref={dialogRef}
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="confirm-dialog-title"
-        aria-describedby="confirm-dialog-message"
-        className="bg-white w-full max-w-md mx-auto shadow-lg overflow-hidden flex flex-col"
-      >
-        <div className="flex items-start gap-4 p-6">
-          <div className={`shrink-0 mt-0.5 ${variantStyles[variant]}`}>
-            <AlertTriangle className="w-6 h-6" aria-hidden="true" />
-          </div>
-          <div className="flex-1">
-            <h2
-              id="confirm-dialog-title"
-              className="text-lg font-bold text-navy mb-2"
-            >
-              {title}
-            </h2>
-            <p id="confirm-dialog-message" className="text-base text-slate leading-loose">
-              {message}
-            </p>
+  const canConfirm = !inputRequired || !!inputValue.trim();
 
-            {inputLabel && (
-              <div className="mt-4">
-                <label htmlFor="confirm-dialog-input" className="block text-sm uppercase tracking-widest font-bold text-navy mb-1">
-                  {inputLabel}
-                </label>
-                <textarea
-                  ref={inputRef}
-                  id="confirm-dialog-input"
-                  className="w-full min-h-[80px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-2 focus:ring-navy focus:outline-none leading-loose resize-y transition-colors bg-white/50"
-                  placeholder={inputPlaceholder}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  required={inputRequired}
-                />
+  // With an input field: Dialog (AlertDialog prevents outside-click dismiss)
+  if (inputLabel) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+        <DialogContent className="sm:max-w-md" showCloseButton={false}>
+          <DialogHeader>
+            <div className="flex items-start gap-4">
+              <div className={cn('shrink-0 mt-0.5', iconColor[variant])}>
+                <AlertTriangle className="w-6 h-6" aria-hidden="true" />
               </div>
-            )}
+              <div className="flex-1">
+                <DialogTitle className="text-lg font-bold text-navy">{title}</DialogTitle>
+                <DialogDescription className="mt-1 text-base text-slate leading-loose">
+                  {message}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label
+              htmlFor="confirm-dialog-input"
+              className="text-sm uppercase tracking-widest font-bold text-navy"
+            >
+              {inputLabel}
+            </Label>
+            <Textarea
+              id="confirm-dialog-input"
+              placeholder={inputPlaceholder}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              className="min-h-[80px] resize-y"
+              required={inputRequired}
+              autoFocus
+            />
           </div>
-        </div>
+          <DialogFooter>
+            <Button variant="ghost" size="md" onClick={onCancel} className="w-full sm:w-auto">
+              {cancelLabel}
+            </Button>
+            <Button
+              variant={confirmVariant[variant]}
+              size="md"
+              onClick={handleConfirm}
+              disabled={!canConfirm}
+              className="w-full sm:w-auto"
+            >
+              {confirmLabel}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
-        <div className="flex flex-col sm:flex-row justify-end gap-3 p-6 pt-0">
-          <Button
-            type="button"
-            variant="ghost"
+  // Simple confirmation: AlertDialog (no outside-click dismiss by design)
+  return (
+    <AlertDialog open={isOpen} onOpenChange={handleOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogMedia className={iconColor[variant]}>
+            <AlertTriangle aria-hidden="true" />
+          </AlertDialogMedia>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{message}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel variant="ghost" size="md">{cancelLabel}</AlertDialogCancel>
+          <AlertDialogAction
+            variant={confirmVariant[variant]}
             size="md"
-            onClick={onCancel}
-            className="w-full sm:w-auto"
-          >
-            {cancelLabel}
-          </Button>
-          <Button
-            ref={confirmButtonRef}
-            type="button"
-            variant={confirmVariants[variant]}
-            size="md"
-            onClick={handleConfirmClick}
-            disabled={inputRequired && !inputValue.trim()}
-            className="w-full sm:w-auto"
+            onClick={handleConfirm}
           >
             {confirmLabel}
-          </Button>
-        </div>
-      </div>
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

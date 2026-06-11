@@ -6,6 +6,12 @@ afterEach(() => {
   cleanup();
 });
 
+// Radix UI uses pointer/scroll APIs that jsdom doesn't implement
+Element.prototype.hasPointerCapture = vi.fn(() => false);
+Element.prototype.setPointerCapture = vi.fn();
+Element.prototype.releasePointerCapture = vi.fn();
+Element.prototype.scrollIntoView = vi.fn();
+
 // Mock ResizeObserver — must be a class so Radix UI can call `new ResizeObserver(cb)`
 global.ResizeObserver = class MockResizeObserver {
   observe = vi.fn();

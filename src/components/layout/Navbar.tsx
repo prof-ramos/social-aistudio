@@ -12,6 +12,16 @@ import { useGlobalSearch } from '../../hooks/useGlobalSearch';
 import { NavbarBrand } from '../brand/NavbarBrand';
 import { BrandLockup } from '../brand/BrandLockup';
 import { GlobalSearchDropdown } from './GlobalSearchDropdown';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '../ui/alert-dialog';
 
 export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdminView?: boolean }) {
   const navigate = useNavigate();
@@ -30,8 +40,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-  const logoutDialogRef = useRef<HTMLDivElement>(null);
-  const logoutButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const unsubNotif = notificationService.subscribeToUnreadNotifications(
@@ -109,7 +117,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   }, [showLogoutDialog, query, clearQuery]);
 
   useFocusTrap(mobileMenuRef, mobileMenuOpen);
-  useFocusTrap(logoutDialogRef, showLogoutDialog);
 
   // Body scroll lock for mobile menu
   const savedScrollY = useRef(0);
@@ -271,7 +278,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
                 </div>
                 <Link to={`/perfil/${profile.id}`} className="block px-4 py-3 text-base hover:bg-ice transition-colors text-navy font-medium" onClick={() => setDropdownOpen(false)}>Meu Perfil</Link>
                 <button
-                  ref={logoutButtonRef}
                   onClick={handleLogoutClick}
                   className="w-full text-left px-4 py-3 text-base hover:bg-danger/5 hover:text-danger text-slate transition-colors flex items-center gap-2 border-t border-border-gray/50"
                 >
@@ -342,37 +348,23 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         )}
 
         {/* Logout Confirmation Dialog */}
-        {showLogoutDialog && (
-          <div
-            className="fixed inset-0 bg-navy/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-contain"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="logout-dialog-title"
-          >
-            <div
-              ref={logoutDialogRef}
-              className="bg-white border border-border-gray shadow-lg max-w-sm w-full p-6 animate-in fade-in zoom-in duration-200"
-            >
-              <h3 id="logout-dialog-title" className="text-xl font-serif font-bold text-navy mb-2">Confirmar Saída</h3>
-              <p className="text-slate mb-6">Tem certeza que deseja sair da sua conta?</p>
-              <div className="flex items-center justify-end gap-3">
-                <button
-                  onClick={() => setShowLogoutDialog(false)}
-                  className="px-4 py-2 text-slate hover:bg-ice transition-colors font-medium border border-transparent min-h-[44px]"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={performLogout}
-                  className="px-4 py-2 bg-danger text-white hover:bg-danger/90 transition-colors font-medium flex items-center gap-2 min-h-[44px]"
-                >
-                  <LogOut className="w-4 h-4" aria-hidden="true" />
-                  Sair
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Confirmar Saída</AlertDialogTitle>
+              <AlertDialogDescription>
+                Tem certeza que deseja sair da sua conta?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel variant="ghost" size="md">Cancelar</AlertDialogCancel>
+              <AlertDialogAction variant="danger" size="md" onClick={performLogout}>
+                <LogOut className="w-4 h-4" aria-hidden="true" />
+                Sair
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </nav>
     </>
   );

@@ -13,7 +13,10 @@ describe('ReportDialog', () => {
       <ReportDialog isOpen onCancel={onCancel} onSubmitted={onSubmitted} />
     );
 
-    await user.selectOptions(screen.getByLabelText(/motivo/i), 'Spam');
+    // Open the Radix Select dropdown and pick an option
+    await user.click(screen.getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: 'Spam' }));
+
     await user.type(screen.getByLabelText(/detalhes/i), 'Conteúdo repetitivo');
     await user.click(screen.getByRole('button', { name: /denunciar/i }));
 
