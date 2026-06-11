@@ -285,19 +285,19 @@ export function Profile({ profile }: { profile: UserProfile }) {
                     id="profile-phone-whatsapp"
                     label="Este número é WhatsApp"
                     checked={editForm.phoneIsWhatsapp}
-                    onChange={e => setEditForm({ ...editForm, phoneIsWhatsapp: e.target.checked })}
+                    onCheckedChange={(v) => setEditForm({ ...editForm, phoneIsWhatsapp: v === true })}
                   />
                   <Checkbox
                     id="profile-show-phone"
                     label="Mostrar meu telefone publicamente"
                     checked={editForm.showPhone}
-                    onChange={e => setEditForm({ ...editForm, showPhone: e.target.checked })}
+                    onCheckedChange={(v) => setEditForm({ ...editForm, showPhone: v === true })}
                   />
                   <Checkbox
                     id="profile-show-email"
                     label="Mostrar meu e-mail publicamente"
                     checked={editForm.showEmail}
-                    onChange={e => setEditForm({ ...editForm, showEmail: e.target.checked })}
+                    onCheckedChange={(v) => setEditForm({ ...editForm, showEmail: v === true })}
                   />
                 </div>
               </form>
