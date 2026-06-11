@@ -107,14 +107,11 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         setDropdownOpen(false);
         setAdminDropdownOpen(false);
         setMobileMenuOpen(false);
-        if (showLogoutDialog) {
-          setShowLogoutDialog(false);
-        }
       }
     }
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [showLogoutDialog, query, clearQuery]);
+  }, [query, clearQuery]);
 
   useFocusTrap(mobileMenuRef, mobileMenuOpen);
 
