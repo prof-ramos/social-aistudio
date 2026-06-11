@@ -426,6 +426,23 @@ Then import database types from `src/types/supabase.ts` for fully typed queries.
 | `infinite recursion detected in policy` | Avoid self-referencing subqueries in RLS; use a `SECURITY DEFINER` helper function |
 | `Database error saving new user` | Check trigger `handle_new_user` for missing schema prefixes (e.g., `public.user_role`) |
 | `Email not confirmed` | Update `auth.users.email_confirmed_at` via SQL or enable auto-confirm in Auth settings |
+| `function pgp_sym_encrypt does not exist (42883)` | Qualify extension functions with schema: `extensions.pgp_sym_encrypt()` not `pgp_sym_encrypt()`. Supabase installs pgcrypto in `extensions` schema. |
+| `supabase db query` fails with "connection refused" | `supabase db query` only connects to local database. For remote SQL, use Dashboard SQL Editor or `psql` with the pooler URL from `supabase/.temp/pooler-url` |
+| `current_setting('app.key', true)` returns empty | `missing_ok=true` returns `''` not NULL. Always check `<> ''` before using as encryption key or critical parameter |
+
+## Extension Schema Qualification
+
+Supabase installs PostgreSQL extensions in the `extensions` schema, not `public`. Always qualify extension function calls:
+
+- `extensions.pgp_sym_encrypt()` / `extensions.pgp_sym_decrypt()` (pgcrypto)
+- `extensions.uuid_generate_v4()` (uuid-ossp)
+- Never assume extension functions are on the default search path.
+
+## Destructive SQL Rules
+
+- Never include `DROP COLUMN` in the same migration that adds the replacement column. Create a separate follow-up migration and only apply after verifying data integrity in production.
+- `current_setting(key, true)` returns `''` (empty string) when the key doesn't exist, not NULL. Wrap encryption calls in `DO $$ IF current_setting(...) <> '' THEN ... END IF; $$` blocks.
+- Encryption keys (e.g. `app.asof_crypt_key`) must be configured as Database Session Settings in the Supabase Dashboard — never in migrations or code.
 
 ## Scripts
 

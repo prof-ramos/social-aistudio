@@ -17,11 +17,11 @@ its STOP conditions, and update your row when done.
 | 004 | Debounce feed realtime refetch storm + drop double initial fetch | P2 | M | — | DONE |
 | 005 | Characterization tests for auth / chat / notification services | P2 | M | — | DONE |
 | 006 | Untrack generated artifacts (repomix dump, screenshots, xlsx) | P3 | S | — | DONE |
-| 007 | Criptografar CPF em repouso nas tabelas member_requests e users | P1 | M | — | TODO |
-| 008 | Tornar sendMessage atômica via RPC transactional | P2 | S | — | DONE | |
-| 009 | Mover getUsersWithCommonPostos para RPC server-side | P2 | M | — | TODO |
-| 010 | Remover teste duplicado do PostEditor | P3 | S | — | TODO |
-| 011 | Eliminar tipos `any` da camada de serviços | P2 | M | — | TODO |
+| 007 | Criptografar CPF em repouso nas tabelas member_requests e users | P1 | M | — | DONE |
+| 008 | Tornar sendMessage atômica via RPC transactional | P2 | S | — | DONE |
+| 009 | Mover getUsersWithCommonPostos para RPC server-side | P2 | M | — | DONE |
+| 010 | Remover teste duplicado do PostEditor | P3 | S | — | DONE |
+| 011 | Eliminar tipos `any` da camada de serviços | P2 | M | — | DONE |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 
