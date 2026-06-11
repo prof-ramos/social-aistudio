@@ -1,20 +1,25 @@
 import { supabase } from '../lib/supabase';
 
+export interface MemberRequestInput {
+  name: string;
+  email: string;
+  cpf: string;
+  matricula: string;
+  category: string;
+  currentPost: string;
+}
+
 export const memberRequestService = {
-  createRequest: async (data: any) => {
+  createRequest: async (data: MemberRequestInput) => {
     const { data: inserted, error } = await supabase
-      .from('member_requests')
-      .insert({
-        name: data.name,
-        email: data.email,
-        cpf: data.cpf,
-        matricula: data.matricula,
-        category: data.category,
-        current_post: data.currentPost,
-        status: 'PENDING',
-      })
-      .select()
-      .single();
+      .rpc('insert_member_request', {
+        p_name: data.name,
+        p_email: data.email,
+        p_cpf: data.cpf,
+        p_matricula: data.matricula,
+        p_category: data.category,
+        p_current_post: data.currentPost,
+      });
 
     if (error) {
       console.error('Error creating member request:', error);

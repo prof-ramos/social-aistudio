@@ -41,15 +41,25 @@ export const adminService = {
   subscribeToAllRequests: (onUpdate: (requests: MemberRequest[]) => void) => {
     const fetchRequests = async () => {
       const { data, error } = await supabase
-        .from('member_requests')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(50);
+        .rpc('get_member_requests_for_admin');
       if (error) {
         console.error('Error fetching all requests:', error);
         return;
       }
-      onUpdate(data ?? []);
+      // Map rpc column names to MemberRequest interface
+      const mapped = (data ?? []).map((row: any) => ({
+        id: row.id,
+        name: row.name,
+        email: row.email,
+        cpf: row.cpf_decrypted,
+        matricula: row.matricula,
+        category: row.category,
+        currentPost: row.current_post,
+        status: row.status,
+        rejection_reason: row.rejection_reason,
+        created_at: row.created_at,
+      }));
+      onUpdate(mapped);
     };
 
     fetchRequests();
@@ -88,14 +98,14 @@ export const adminService = {
   },
 
   createUserFromRequest: async (uid: string, requestData: MemberRequest) => {
-    const { error } = await supabase.from('users').insert({
-      id: uid,
-      name: requestData.name,
-      email: requestData.email,
-      role: requestData.category,
-      cpf: requestData.cpf,
-      matricula: requestData.matricula,
-      current_post: requestData.currentPost,
+    const { error } = await supabase.rpc('create_user_from_member_request', {
+      p_uid: uid,
+      p_name: requestData.name,
+      p_email: requestData.email,
+      p_role: requestData.category,
+      p_cpf: requestData.cpf ?? '',
+      p_matricula: requestData.matricula ?? '',
+      p_current_post: requestData.currentPost ?? '',
     });
     if (error) throw error;
   },
