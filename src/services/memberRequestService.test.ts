@@ -1,30 +1,22 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { memberRequestService } from './memberRequestService';
 
-const { fromMock } = vi.hoisted(() => ({
-  fromMock: vi.fn(),
+const { rpcMock } = vi.hoisted(() => ({
+  rpcMock: vi.fn(),
 }));
 
 vi.mock('../lib/supabase', () => ({
-  supabase: { from: fromMock },
+  supabase: { rpc: rpcMock },
 }));
-
-const mockInsert = (result: { data: unknown; error: unknown }) => {
-  const single = vi.fn().mockResolvedValue(result);
-  const select = vi.fn().mockReturnValue({ single });
-  const insert = vi.fn().mockReturnValue({ select });
-  fromMock.mockReturnValue({ insert });
-  return { insert, select, single };
-};
 
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe('memberRequestService.createRequest', () => {
-  it('inserts with mapped fields and returns the row on success', async () => {
-    const row = { id: 'req-1', status: 'PENDING' };
-    const { insert } = mockInsert({ data: row, error: null });
+  it('calls insert_member_request RPC with mapped fields and returns result on success', async () => {
+    const returnedId = 'req-1';
+    rpcMock.mockResolvedValue({ data: returnedId, error: null });
 
     const data = {
       name: 'Alice',
@@ -37,20 +29,19 @@ describe('memberRequestService.createRequest', () => {
 
     const result = await memberRequestService.createRequest(data);
 
-    expect(insert).toHaveBeenCalledWith({
-      name: 'Alice',
-      email: 'alice@asof.org.br',
-      cpf: '12345678900',
-      matricula: 'M001',
-      category: 'MEMBRO_ATIVO',
-      current_post: 'Brasília',
-      status: 'PENDING',
+    expect(rpcMock).toHaveBeenCalledWith('insert_member_request', {
+      p_name: 'Alice',
+      p_email: 'alice@asof.org.br',
+      p_cpf: '12345678900',
+      p_matricula: 'M001',
+      p_category: 'MEMBRO_ATIVO',
+      p_current_post: 'Brasília',
     });
-    expect(result).toBe(row);
+    expect(result).toBe(returnedId);
   });
 
   it('throws when Supabase returns an error', async () => {
-    mockInsert({ data: null, error: new Error('insert failed') });
+    rpcMock.mockResolvedValue({ data: null, error: new Error('insert failed') });
 
     await expect(
       memberRequestService.createRequest({

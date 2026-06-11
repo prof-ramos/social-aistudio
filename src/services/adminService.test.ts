@@ -1,8 +1,9 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { adminService } from './adminService';
 
-const { fromMock, channelMock, removeChannelMock } = vi.hoisted(() => ({
+const { fromMock, rpcMock, channelMock, removeChannelMock } = vi.hoisted(() => ({
   fromMock: vi.fn(),
+  rpcMock: vi.fn(),
   channelMock: vi.fn(),
   removeChannelMock: vi.fn(),
 }));
@@ -10,6 +11,7 @@ const { fromMock, channelMock, removeChannelMock } = vi.hoisted(() => ({
 vi.mock('../lib/supabase', () => ({
   supabase: {
     from: fromMock,
+    rpc: rpcMock,
     channel: channelMock,
     removeChannel: removeChannelMock,
   },
@@ -59,6 +61,7 @@ const mockUpdateEq = (result: { error: unknown }) => {
 beforeEach(() => {
   vi.clearAllMocks();
   fromMock.mockReset();
+  rpcMock.mockReset();
   channelMock.mockReset();
   removeChannelMock.mockReset();
   buildRealtimeChain();
@@ -72,6 +75,21 @@ const requestRow = (overrides?: any) => ({
   matricula: '456',
   category: 'MEMBRO_ATIVO',
   currentPost: 'Paris',
+  status: 'PENDING',
+  rejection_reason: '',
+  created_at: '2026-06-01',
+  ...overrides,
+});
+
+// RPC rows return cpf_decrypted instead of cpf, and current_post instead of currentPost
+const rpcRequestRow = (overrides?: any) => ({
+  id: 'r1',
+  name: 'Bob',
+  email: 'bob@asof.org.br',
+  cpf_decrypted: '123',
+  matricula: '456',
+  category: 'MEMBRO_ATIVO',
+  current_post: 'Paris',
   status: 'PENDING',
   rejection_reason: '',
   created_at: '2026-06-01',
@@ -123,17 +141,20 @@ describe('adminService.subscribeToPendingRequests', () => {
 // ===================== subscribeToAllRequests =====================
 
 describe('adminService.subscribeToAllRequests', () => {
-  it('fetches requests ordered by created_at desc with limit 50', async () => {
-    const rows = [requestRow({ id: 'r1' }), requestRow({ id: 'r2' })];
-    const { limit, order } = mockSelectOrderedLimit({ data: rows, error: null });
+  it('fetches requests via RPC and maps cpf_decrypted to cpf', async () => {
+    const rows = [rpcRequestRow({ id: 'r1' }), rpcRequestRow({ id: 'r2' })];
+    rpcMock.mockResolvedValue({ data: rows, error: null });
     const onUpdate = vi.fn();
 
     const unsubscribe = adminService.subscribeToAllRequests(onUpdate);
 
     await vi.waitFor(() => expect(onUpdate).toHaveBeenCalled());
-    expect(order).toHaveBeenCalledWith('created_at', { ascending: false });
-    expect(limit).toHaveBeenCalledWith(50);
-    expect(onUpdate).toHaveBeenCalledWith(rows);
+    expect(rpcMock).toHaveBeenCalledWith('get_member_requests_for_admin');
+    // Verify mapping from RPC columns to MemberRequest interface
+    expect(onUpdate).toHaveBeenCalledWith([
+      { id: 'r1', name: 'Bob', email: 'bob@asof.org.br', cpf: '123', matricula: '456', category: 'MEMBRO_ATIVO', currentPost: 'Paris', status: 'PENDING', rejection_reason: '', created_at: '2026-06-01' },
+      { id: 'r2', name: 'Bob', email: 'bob@asof.org.br', cpf: '123', matricula: '456', category: 'MEMBRO_ATIVO', currentPost: 'Paris', status: 'PENDING', rejection_reason: '', created_at: '2026-06-01' },
+    ]);
 
     unsubscribe();
     expect(removeChannelMock).toHaveBeenCalled();
@@ -141,7 +162,7 @@ describe('adminService.subscribeToAllRequests', () => {
 
   it('does not call onUpdate when query errors', async () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    mockSelectOrderedLimit({ data: null, error: new Error('fail') });
+    rpcMock.mockResolvedValue({ data: null, error: new Error('fail') });
     const onUpdate = vi.fn();
 
     adminService.subscribeToAllRequests(onUpdate);
@@ -193,27 +214,25 @@ describe('adminService.rejectRequestWithReason', () => {
 // ===================== createUserFromRequest =====================
 
 describe('adminService.createUserFromRequest', () => {
-  it('inserts into users with snake_case fields mapped from request', async () => {
-    const insertMock = vi.fn().mockResolvedValue({ error: null });
-    fromMock.mockReturnValue({ insert: insertMock });
+  it('calls create_user_from_member_request RPC with mapped fields', async () => {
+    rpcMock.mockResolvedValue({ error: null });
 
     const req = requestRow();
     await adminService.createUserFromRequest('auth-uid-123', req);
 
-    expect(insertMock).toHaveBeenCalledWith({
-      id: 'auth-uid-123',
-      name: 'Bob',
-      email: 'bob@asof.org.br',
-      role: 'MEMBRO_ATIVO',
-      cpf: '123',
-      matricula: '456',
-      current_post: 'Paris',
+    expect(rpcMock).toHaveBeenCalledWith('create_user_from_member_request', {
+      p_uid: 'auth-uid-123',
+      p_name: 'Bob',
+      p_email: 'bob@asof.org.br',
+      p_role: 'MEMBRO_ATIVO',
+      p_cpf: '123',
+      p_matricula: '456',
+      p_current_post: 'Paris',
     });
   });
 
-  it('throws on insert error', async () => {
-    const insertMock = vi.fn().mockResolvedValue({ error: new Error('dup email') });
-    fromMock.mockReturnValue({ insert: insertMock });
+  it('throws on RPC error', async () => {
+    rpcMock.mockResolvedValue({ error: new Error('dup email') });
 
     await expect(adminService.createUserFromRequest('uid', requestRow())).rejects.toThrow('dup email');
   });
