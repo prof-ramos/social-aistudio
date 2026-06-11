@@ -59,7 +59,7 @@ Convenções: services encapsulam Supabase; hooks consomem services; `mapUser` c
 ## Scope
 
 **In scope** (the only files you should modify):
-- `supabase/migrations/` — nova migration para adicionar coluna `postos TEXT[]` à tabela `users`, GIN index, atualizar view `users_public`, e criar RPC `get_common_posto_members`
+- `supabase/migrations/` — nova migration para adicionar coluna `postos TEXT[]` à tabela `users`, GIN index, e criar RPC `get_common_posto_members`
 - `src/services/userService.ts` — substituir `getUsersWithCommonPostos` por chamada RPC
 - `src/services/userService.test.ts` — atualizar testes
 - `src/components/feed/MemberSuggestionsCard.tsx` — verificar se precisa de ajuste na interface de retorno
@@ -67,7 +67,7 @@ Convenções: services encapsulam Supabase; hooks consomem services; `mapUser` c
 **Out of scope** (do NOT touch):
 - `src/types/index.ts` — UserProfile já tem os campos necessários
 - Outros services ou hooks
-- A view `users_public` — não modificar
+- A view `users_public` — não modificar. A RPC lê da tabela `users` diretamente (SECURITY DEFINER), não da view. A view continua sem `postos`, mas isso não afeta a RPC nem os consumers migrados.
 
 ## Git workflow
 
@@ -88,7 +88,7 @@ SELECT column_name, data_type FROM information_schema.columns
 WHERE table_name = 'users' AND column_name = 'postos';
 ```
 
-Se retornar vazio, adicionar na migration:
+Se retornar vazio, criar a migration `supabase/migrations/20260611000100_add_postos_column.sql`:
 
 ```sql
 -- Adicionar coluna postos à tabela users
@@ -96,16 +96,11 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS postos TEXT[] DEFAULT '{}';
 
 -- Adicionar GIN index para suportar operador && (array overlap)
 CREATE INDEX IF NOT EXISTS idx_users_postos ON users USING GIN (postos);
-
--- Atualizar users_public view para incluir postos
-CREATE OR REPLACE VIEW users_public AS
-SELECT id, name, avatar_url, bio, current_post, postos, role, is_online, last_online, interests, created_at
-FROM public.users;
 ```
 
-NOTA: A view `users_public` atual (`20260609000300_add_profile_contact.sql:12-25`) não inclui `postos`. Sem atualizar a view, o client-side `users_public.select('*')` não retorna `postos`, quebrando o código existente que depende de `user.postos`.
+**⚠️ NÃO modificar a view `users_public`**: A view `users_public` atual (`20260609000300_add_profile_contact.sql:12-25`) inclui colunas condicionais de privacidade (`CASE WHEN show_phone THEN phone ELSE NULL END AS phone`, etc.) que seriam perdidas se a view fosse recriada sem preservá-las. A RPC lê da tabela `users` diretamente via SECURITY DEFINER, não da view, portanto a view não precisa de `postos`. O client-side `users_public.select('*')` atual não retorna `postos` — mas após a refatoração (Step 2), `getUsersWithCommonPostos` usará a RPC, não a view.
 
-**Verify**: `SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'postos'` retorna 1 row.
+**Verify**: `SELECT column_name FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'postos'` retorna 1 row. Verificar também que a view `users_public` não foi modificada: `SELECT column_name FROM information_schema.columns WHERE table_name = 'users_public' AND column_name IN ('phone', 'email')` deve retornar 2 rows (confirma que as colunas condicionais de privacidade continuam na view).
 
 ### Step 1: Criar migration com RPC `get_common_posto_members`
 
