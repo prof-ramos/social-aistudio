@@ -2,25 +2,15 @@ import { useEffect, useState, FormEvent } from 'react';
 import { postoService } from '../services/postoService';
 import { reportService } from '../services/reportService';
 import { STATIC_POSTOS } from '../data/postosData';
+import { Posto, PostoReview, PostoField } from '../types';
 import { useToast } from '../components/ui/Toast';
 import { ReportTarget } from './usePostDetails';
 
-export interface Review {
-  id: string;
-  posto_id: string;
-  author_id: string;
-  body: string;
-  rating: number;
-  created_at: string;
-  authorName?: string | null;
-  authorRole?: string | null;
-}
-
 export function usePostoDetails(slug: string | undefined, profileId: string) {
   const { addToast } = useToast();
-  const [posto, setPosto] = useState<any>(null);
-  const [fields, setFields] = useState<any[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [posto, setPosto] = useState<Posto | null>(null);
+  const [fields, setFields] = useState<PostoField[]>([]);
+  const [reviews, setReviews] = useState<PostoReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [reportTarget, setReportTarget] = useState<ReportTarget | null>(null);
 
@@ -29,7 +19,7 @@ export function usePostoDetails(slug: string | undefined, profileId: string) {
   const [newFieldBody, setNewFieldBody] = useState('');
 
   const averageRating = reviews.length > 0
-    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+    ? reviews.reduce((sum, r) => sum + (r.rating ?? 0), 0) / reviews.length
     : null;
 
   useEffect(() => {
@@ -78,7 +68,7 @@ export function usePostoDetails(slug: string | undefined, profileId: string) {
      }
   };
 
-  const hasExistingReview = reviews.some(r => r.author_id === profileId);
+  const hasExistingReview = reviews.some(r => r.authorId === profileId);
 
   const handleCreateReview = async (body: string, rating: number) => {
     if (!posto) return;

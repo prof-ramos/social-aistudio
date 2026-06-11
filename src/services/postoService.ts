@@ -1,11 +1,12 @@
 import { supabase } from '../lib/supabase';
+import { Posto, PostoReview, PostoField } from '../types';
 
 const POSTOS_TABLE = 'postos';
 const REVIEWS_TABLE = 'reviews';
 const POSTO_FIELDS_TABLE = 'posto_fields';
 
 export const postoService = {
-  subscribeToPostos: (onUpdate: (postos: any[]) => void) => {
+  subscribeToPostos: (onUpdate: (postos: Posto[]) => void) => {
     const fetchPostos = async () => {
       const { data, error } = await supabase
         .from(POSTOS_TABLE)
@@ -17,7 +18,7 @@ export const postoService = {
         return;
       }
 
-      onUpdate(data ?? []);
+      onUpdate((data ?? []) as Posto[]);
     };
 
     fetchPostos();
@@ -38,7 +39,7 @@ export const postoService = {
     };
   },
 
-  subscribeToPostoReviews: (postoId: string, onUpdate: (reviews: any[]) => void) => {
+  subscribeToPostoReviews: (postoId: string, onUpdate: (reviews: PostoReview[]) => void) => {
     const fetchReviews = async () => {
       const { data, error } = await supabase
         .from(REVIEWS_TABLE)
@@ -52,10 +53,16 @@ export const postoService = {
         return;
       }
 
-      const mapped = (data ?? []).map((r: any) => ({
-        ...r,
-        authorName: r.users_public?.name ?? null,
-        authorRole: r.users_public?.role ?? null,
+      const mapped: PostoReview[] = (data ?? []).map((r: Record<string, unknown>) => ({
+        id: r.id as string,
+        postoId: r.posto_id as string,
+        authorId: r.author_id as string,
+        authorName: (r.users_public as Record<string, unknown> | null)?.name as string ?? null,
+        authorRole: (r.users_public as Record<string, unknown> | null)?.role as string ?? null,
+        category: r.category as string | null ?? null,
+        body: r.body as string,
+        rating: r.rating as number | null ?? null,
+        createdAt: r.created_at as string,
       }));
 
       onUpdate(mapped);
@@ -147,7 +154,7 @@ export const postoService = {
     };
   },
 
-  subscribeToPostoFields: (postoId: string, onUpdate: (fields: any[]) => void) => {
+  subscribeToPostoFields: (postoId: string, onUpdate: (fields: PostoField[]) => void) => {
     const fetchFields = async () => {
       const { data, error } = await supabase
         .from(POSTO_FIELDS_TABLE)
@@ -160,10 +167,17 @@ export const postoService = {
         return;
       }
 
-      const mapped = (data ?? []).map((f: any) => ({
-        ...f,
-        authorName: f.users_public?.name ?? null,
-        authorRole: f.users_public?.role ?? null,
+      const mapped: PostoField[] = (data ?? []).map((f: Record<string, unknown>) => ({
+        id: f.id as string,
+        postoId: f.posto_id as string,
+        authorId: f.author_id as string,
+        authorName: (f.users_public as Record<string, unknown> | null)?.name as string ?? null,
+        authorRole: (f.users_public as Record<string, unknown> | null)?.role as string ?? null,
+        fieldType: f.field_type as string,
+        body: f.body as string,
+        experienceStart: f.experience_start as number | undefined,
+        experienceEnd: f.experience_end as number | undefined,
+        createdAt: f.created_at as string,
       }));
 
       onUpdate(mapped);

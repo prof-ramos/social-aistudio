@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { notificationService } from '../services/notificationService';
+import { AppNotification } from '../types';
 
 export function useNotifications(userId: string) {
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   useEffect(() => {
     const unsub = notificationService.subscribeToUserNotifications(userId, (notifs) => {
