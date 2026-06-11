@@ -2,17 +2,29 @@
 -- Migration: 20260611000000_encrypt_cpf.sql
 
 -- 1. Enable pgcrypto extension (available on all Supabase plans)
+-- Supabase installs pgcrypto in the `extensions` schema, so all function
+-- calls must be schema-qualified: extensions.pgp_sym_encrypt(), etc.
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- 2. Add cpf_encrypted BYTEA column to member_requests
 ALTER TABLE member_requests ADD COLUMN IF NOT EXISTS cpf_encrypted BYTEA;
 
--- 3. Migrate existing plaintext CPFs to encrypted format
--- IMPORTANT: The app.asof_crypt_key must be configured as a Database Session Setting
--- in Supabase Dashboard -> Settings -> Database before running this migration.
-UPDATE member_requests
-SET cpf_encrypted = pgp_sym_encrypt(cpf, current_setting('app.asof_crypt_key', true))
-WHERE cpf IS NOT NULL AND cpf_encrypted IS NULL;
+-- 3. Migrate existing plaintext CPFs to encrypted format (conditional)
+-- Only runs if: (a) there are rows with plaintext CPF, AND (b) the crypt key is configured.
+-- If the key is not yet set, current_setting returns empty string and pgp_sym_encrypt
+-- would fail — so we skip the migration and rely on the app to backfill later.
+DO $$
+BEGIN
+  IF current_setting('app.asof_crypt_key', true) <> '' THEN
+    UPDATE member_requests
+    SET cpf_encrypted = extensions.pgp_sym_encrypt(cpf, current_setting('app.asof_crypt_key', true))
+    WHERE cpf IS NOT NULL AND cpf_encrypted IS NULL;
+    RAISE NOTICE 'Migrated % existing CPFs to encrypted format', found;
+  ELSE
+    RAISE NOTICE 'app.asof_crypt_key not configured — skipping plaintext CPF migration. Backfill manually after setting the key.';
+  END IF;
+END;
+$$;
 
 -- 4. Add cpf_encrypted and matricula columns to users table
 -- (Schema gap: adminService.createUserFromRequest already inserts cpf and matricula
@@ -39,7 +51,7 @@ BEGIN
   INSERT INTO member_requests (name, email, cpf_encrypted, matricula, category, current_post, status)
   VALUES (
     p_name, p_email,
-    pgp_sym_encrypt(p_cpf, current_setting('app.asof_crypt_key', true)),
+    extensions.pgp_sym_encrypt(p_cpf, current_setting('app.asof_crypt_key', true)),
     p_matricula, p_category::user_role, p_current_post, 'PENDING'
   )
   RETURNING id INTO new_id;
@@ -63,7 +75,7 @@ BEGIN
     mr.id,
     mr.name,
     mr.email,
-    pgp_sym_decrypt(mr.cpf_encrypted, current_setting('app.asof_crypt_key', true)) AS cpf_decrypted,
+    extensions.pgp_sym_decrypt(mr.cpf_encrypted, current_setting('app.asof_crypt_key', true)) AS cpf_decrypted,
     mr.matricula,
     mr.category,
     mr.current_post,
@@ -93,13 +105,13 @@ BEGIN
   INSERT INTO users (id, name, email, role, cpf_encrypted, matricula, current_post)
   VALUES (
     p_uid, p_name, p_email, p_role::user_role,
-    pgp_sym_encrypt(p_cpf, current_setting('app.asof_crypt_key', true)),
+    extensions.pgp_sym_encrypt(p_cpf, current_setting('app.asof_crypt_key', true)),
     p_matricula, p_current_post
   );
 END;
 $$;
 
--- 8. Drop plaintext cpf column from member_requests
--- (After verifying cpf_encrypted is populated; this is safe because the
---  insert_member_request RPC no longer writes to the cpf column.)
-ALTER TABLE member_requests DROP COLUMN IF EXISTS cpf;
+-- NOTE: The plaintext `cpf` column on member_requests is intentionally kept
+-- for now. It will be dropped in a follow-up migration after verifying that
+-- cpf_encrypted is fully populated and all RPCs work correctly in production.
+-- See Plan 007 Step 6.
