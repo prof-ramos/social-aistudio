@@ -1,33 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
-import { Camera, Save, MapPin, BookOpen, MessageSquare, Bookmark, X, Star, Lock, Phone, Mail, FileEdit } from 'lucide-react';
+import { Camera, Save, MapPin, BookOpen, MessageSquare, Bookmark, Star, Lock, Phone, Mail, FileEdit } from 'lucide-react';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useUserContent } from '../hooks/useUserContent';
 import { useEditProfile } from '../hooks/useEditProfile';
 import { Card, PageTitle, Button, Alert, StatusBadge, Breadcrumb, AvatarUpload, Checkbox } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
-import { useFocusTrap } from '../hooks/useFocusTrap';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '../components/ui/dialog';
 
 export function Profile({ profile }: { profile: UserProfile }) {
   const { id } = useParams();
   const navigate = useNavigate();
-  const editDialogRef = useRef<HTMLDivElement>(null);
   const { user, loading, isOwnProfile } = useUserProfile(id, profile);
   const { savedPosts, userPosts } = useUserContent(user, id);
   const { isEditing, setIsEditing, editForm, setEditForm, saving, handleSave } = useEditProfile(user, id, isOwnProfile);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isEditing) {
-        setIsEditing(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isEditing, setIsEditing]);
-
-  useFocusTrap(editDialogRef, isEditing);
 
   useEffect(() => {
     if (loading || !user) return;
@@ -195,29 +188,16 @@ export function Profile({ profile }: { profile: UserProfile }) {
         </div>
       </Card>
 
-      {isEditing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy/80 backdrop-blur-sm p-4 modal-contain">
-          <div
-            ref={editDialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="edit-profile-title"
-            className="mx-auto flex max-h-[90dvh] w-full max-w-xl flex-col overflow-hidden bg-white shadow-lg"
-          >
-            <div className="flex items-center justify-between p-6 border-b border-border-gray/50 bg-ice/30">
-              <PageTitle as="h2" size="lg" id="edit-profile-title">Editar Perfil</PageTitle>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsEditing(false)}
-                aria-label="Fechar modal"
-              >
-                <X className="w-5 h-5" /> Fechar
-              </Button>
-            </div>
+      <Dialog open={isEditing} onOpenChange={(open) => !open && setIsEditing(false)}>
+        <DialogContent className="max-w-xl rounded-none p-0 flex flex-col max-h-[90dvh]">
+          <DialogHeader className="px-6 py-5 border-b border-border-gray/50 bg-ice/30 shrink-0">
+            <DialogTitle>
+              <PageTitle as="h2" size="lg">Editar Perfil</PageTitle>
+            </DialogTitle>
+          </DialogHeader>
 
-            <div className="p-6 overflow-y-auto">
-              <form id="edit-profile-form" onSubmit={handleSave} className="space-y-6">
+          <div className="px-6 py-6 overflow-y-auto flex-1">
+            <form id="edit-profile-form" onSubmit={handleSave} className="space-y-6">
                 <div className="flex flex-col items-center gap-2 text-left">
                   <AvatarUpload
                     currentAvatarUrl={editForm.avatarUrl || user.avatarUrl}
@@ -301,32 +281,31 @@ export function Profile({ profile }: { profile: UserProfile }) {
                   />
                 </div>
               </form>
-            </div>
-
-            <div className="p-6 border-t border-border-gray/50 bg-ice/30 flex flex-col sm:flex-row justify-end gap-3 shrink-0">
-               <Button
-                 type="button"
-                 variant="ghost"
-                 size="md"
-                 onClick={() => setIsEditing(false)}
-                 className="w-full sm:w-auto"
-               >
-                 Cancelar
-               </Button>
-               <Button
-                 type="submit"
-                 form="edit-profile-form"
-                 disabled={saving}
-                 isLoading={saving}
-                 size="md"
-                 className="w-full sm:w-auto"
-               >
-                 <Save className="w-4 h-4" /> Salvar Alterações
-               </Button>
-            </div>
           </div>
-        </div>
-      )}
+
+          <DialogFooter className="px-6 py-5 border-t border-border-gray/50 bg-ice/30 shrink-0 flex flex-col sm:flex-row gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="md"
+              onClick={() => setIsEditing(false)}
+              className="w-full sm:w-auto"
+            >
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              form="edit-profile-form"
+              disabled={saving}
+              isLoading={saving}
+              size="md"
+              className="w-full sm:w-auto"
+            >
+              <Save className="w-4 h-4" /> Salvar Alterações
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Card variant="elevated" padding="lg" className="mt-6">
           <div id="posts" className="flex items-center gap-2 mb-6 border-b border-border-gray/50 pb-4">

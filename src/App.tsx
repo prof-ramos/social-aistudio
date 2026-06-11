@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { systemService } from './services/systemService';
 import { AuthProvider } from './contexts/AuthContext';
 import { ToastProvider } from './components/ui/Toast';
+import { Toaster } from './components/ui/sonner';
+import { TooltipProvider } from './components/ui/tooltip';
 import { AppRoutes } from './routes/RouteConfig';
 
 export default function App() {
@@ -12,7 +14,10 @@ export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <AppRoutes />
+        <TooltipProvider>
+          <AppRoutes />
+          <Toaster position="bottom-right" richColors />
+        </TooltipProvider>
       </ToastProvider>
     </AuthProvider>
   );
