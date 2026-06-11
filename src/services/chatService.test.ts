@@ -41,34 +41,23 @@ describe('chatService.getOrCreateChat', () => {
 });
 
 describe('chatService.sendMessage', () => {
-  it('inserts the message then updates the chat session', async () => {
-    const insert = vi.fn().mockResolvedValue({ error: null });
-    const eq = vi.fn().mockResolvedValue({ error: null });
-    const update = vi.fn().mockReturnValue({ eq });
-    fromMock.mockImplementation((table: string) => {
-      if (table === 'chat_messages') return { insert };
-      if (table === 'chat_sessions') return { update };
-      throw new Error(`unexpected table ${table}`);
+  it('calls the send_chat_message RPC and returns the message id', async () => {
+    rpcMock.mockResolvedValue({ data: 'msg-uuid-1', error: null });
+
+    const result = await chatService.sendMessage('chat-1', 'u1', 'olá');
+
+    expect(rpcMock).toHaveBeenCalledWith('send_chat_message', {
+      p_chat_id: 'chat-1',
+      p_sender_id: 'u1',
+      p_body: 'olá',
     });
-
-    await chatService.sendMessage('chat-1', 'u1', 'olá');
-
-    expect(insert).toHaveBeenCalledWith({ chat_id: 'chat-1', sender_id: 'u1', body: 'olá', read: false });
-    expect(update).toHaveBeenCalledWith(expect.objectContaining({ last_message: 'olá' }));
-    expect(eq).toHaveBeenCalledWith('id', 'chat-1');
+    expect(result).toBe('msg-uuid-1');
   });
 
-  it('throws and does not update the session when the insert fails', async () => {
-    const insert = vi.fn().mockResolvedValue({ error: new Error('insert failed') });
-    const update = vi.fn();
-    fromMock.mockImplementation((table: string) => {
-      if (table === 'chat_messages') return { insert };
-      if (table === 'chat_sessions') return { update };
-      throw new Error(`unexpected table ${table}`);
-    });
+  it('throws when the RPC returns an error', async () => {
+    rpcMock.mockResolvedValue({ data: null, error: new Error('rpc failed') });
 
-    await expect(chatService.sendMessage('chat-1', 'u1', 'x')).rejects.toThrow('insert failed');
-    expect(update).not.toHaveBeenCalled();
+    await expect(chatService.sendMessage('chat-1', 'u1', 'x')).rejects.toThrow('rpc failed');
   });
 });
 

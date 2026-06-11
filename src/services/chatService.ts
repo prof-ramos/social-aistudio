@@ -103,32 +103,18 @@ export const chatService = {
   },
 
   sendMessage: async (chatId: string, senderId: string, body: string) => {
-    const { error: msgError } = await supabase
-      .from('chat_messages')
-      .insert({
-        chat_id: chatId,
-        sender_id: senderId,
-        body,
-        read: false,
-      });
+    const { data, error } = await supabase.rpc('send_chat_message', {
+      p_chat_id: chatId,
+      p_sender_id: senderId,
+      p_body: body,
+    });
 
-    if (msgError) {
-      console.error('Error sending message:', msgError);
-      throw msgError;
+    if (error) {
+      console.error('Error sending message:', error);
+      throw error;
     }
 
-    const { error: updateError } = await supabase
-      .from('chat_sessions')
-      .update({
-        updated_at: new Date().toISOString(),
-        last_message: body,
-      })
-      .eq('id', chatId);
-
-    if (updateError) {
-      console.error('Error updating chat session:', updateError);
-      throw updateError;
-    }
+    return data as string;
   },
 
   markMessagesAsRead: async (chatId: string, userId: string) => {
