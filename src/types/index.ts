@@ -14,9 +14,9 @@ export interface UserProfile {
   bio?: string;
   savedPosts?: string[];
   postos?: string[];
-  createdAt?: any;
+  createdAt?: string;
   isOnline?: boolean;
-  lastOnline?: any;
+  lastOnline?: string | null;
   currentPost?: string;
   interests?: string;
   phone?: string;
@@ -36,7 +36,7 @@ export interface Post {
   authorRole: UserRole | string;
   authorId: string;
   pinned: boolean;
-  createdAt: any;
+  createdAt: string;
   reactions?: Record<string, string[]>;
   commentCount?: number;
 }
@@ -45,7 +45,7 @@ export interface ChatMessage {
   id: string;
   senderId: string;
   body: string;
-  createdAt: any;
+  createdAt: string;
   read?: boolean;
 }
 
@@ -53,7 +53,7 @@ export interface ChatSession {
   id: string;
   participants: string[];
   participantNames?: Record<string, string>;
-  updatedAt: any;
+  updatedAt: string;
   lastMessage?: string;
   unreadCount?: number;
 }
@@ -66,7 +66,7 @@ export interface PostComment {
   authorName: string;
   authorRole: UserRole | string;
   body: string;
-  createdAt: any;
+  createdAt: string;
 }
 
 export interface MemberRequest {
@@ -79,7 +79,7 @@ export interface MemberRequest {
   currentPost?: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   rejection_reason?: string;
-  created_at?: any;
+  created_at?: string;
 }
 
 export interface Report {
@@ -91,8 +91,8 @@ export interface Report {
   reason: string;
   status: 'PENDING' | 'RESOLVED_KEPT' | 'RESOLVED_WARNED' | 'RESOLVED_REMOVED';
   notes?: string;
-  createdAt?: any;
-  resolvedAt?: any;
+  createdAt?: string;
+  resolvedAt?: string | null;
 }
 
 export interface MemberRequestInput {
