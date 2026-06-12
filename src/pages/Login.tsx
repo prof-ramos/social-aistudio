@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import React, { useState } from 'react';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
@@ -84,7 +84,7 @@ export function Login() {
           isLoading={loading}
           className="mt-6"
         >
-          {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : 'Entrar'}
+          Entrar
         </Button>
       </form>
 
