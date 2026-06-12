@@ -87,3 +87,33 @@
 ### Riscos
 - Rotação de chave de criptografia requer nova migration
 - Reações de outros usuários não aparecem em real-time (só na próxima carga) — trade-off aceito para eliminar flicker
+
+## 2026-06-12 — Karpathy Guidelines + docs sync + issues
+
+### O que foi feito
+- Aplicou Karpathy Guidelines ao projeto (Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution)
+- Executou 4 tarefas em paralelo via agents nativos (postService throw, AuthProvider timeout, window.confirm, vitest exclusion)
+- Commit `3fbbbf6`: AuthProvider timeout 8s→5s + AuthContext.test.tsx (2 tests)
+- Commit `d91e7f9`: sincronização de documentação (PAGES.md, GUIA_DESENVOLVEDOR.md, READY-TO.md, ARCHITECTURE.md, SHADCN-MIGRATION.md)
+- Upgrade claude-code 2.1.173 → 2.1.175
+- Criou/corrigiu 3 issues: #20 (Dockerfile), #22 (code-splitting), #23 (shadcn Sprint 0)
+
+### Problemas encontrados
+1. `omc team` CLI falhou no cmux surface → fallback para `Agent()` nativo
+2. `gh issue create --body` com Dockerfile no body → shell executou comandos, body corrompido → usou `--body-file`
+3. `replace_all: true` em Edit trocou mais ocorrências do que esperado em SHADCN-MIGRATION.md
+4. Subagente (#2 AuthProvider) não conseguiu editar arquivos (restrição de ferramentas) → apliquei manualmente no contexto principal
+5. Issue duplicata #21 criada por comando background com body malformado → fechada
+
+### Decisões tomadas
+- Usar agents nativos em vez de omc-teams CLI quando o cmux surface falha
+- Usar `--body-file` para todos os `gh issue create` com código no body
+- Preferir `replace_all: false` com strings específicas em Edits multi-ocorrência
+- Commitar docs e código separadamente (docs primeiro, depois código)
+
+### Pendências
+- Issue #9 (TanStack Query) — aberta, requer planejamento dedicado
+- Issues #20, #22, #23 — criadas mas não implementadas
+
+### Riscos
+- Nenhum novo. Sessão foi puramente de manutenção, documentação e planejamento.

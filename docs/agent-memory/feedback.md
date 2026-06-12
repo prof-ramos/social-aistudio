@@ -53,3 +53,30 @@
 - **Evidência da sessão**: `ERROR: type "user_role" does not exist` e `ERROR: function get_crypt_key() does not exist` em produção, cada um exigindo migration adicional.
 - **Regra preventiva**: Ao escrever SECURITY DEFINER `SET search_path = ''`, qualificar TODAS as referências upfront: tabelas (`public.users`), funções (`public.get_crypt_key()`), funções de extensão (`extensions.pgp_sym_encrypt()`), e tipos enum (`public.user_role`). Listar todas as referências antes de escrever o SQL.
 - **Confiança**: alta
+
+## 2026-06-12 — `gh issue create --body` corrompido por shell metacharacters
+
+- **Tipo**: erro do agente
+- **Escopo**: qualquer uso de `gh issue create` com body contendo código
+- **Memória**: Criei `gh issue create --title "B2: Dockerfile" --body "...` com um Dockerfile no body. O shell zsh interpretou `$()`, backticks, e comandos do Dockerfile antes de passar para o `gh`. Resultado: issue #20 criada com body contendo `ENV` dump do shell + comandos executados. Tive que editar a issue depois com `gh issue edit --body-file`.
+- **Evidência da sessão**: Issue #20 body continha `AUTOJUMP_ERROR_PATH=...`, `MANPATH=...`, `CMUX_BUNDLED_CLI_PATH=...` (dump de ENV) em vez do texto Markdown esperado.
+- **Regra preventiva**: SEMPRE usar `gh issue create --body-file /tmp/issue.md` quando o body contém código, backticks, `$()`, ou qualquer caractere interpretável pelo shell. Nunca passar body inline para `gh issue create`.
+- **Confiança**: alta
+
+## 2026-06-12 — `omc team` CLI falha no cmux surface
+
+- **Tipo**: erro do agente / limitação de ambiente
+- **Escopo**: uso de `/oh-my-claudecode:omc-teams` em cmux surface
+- **Memória**: Tentativa de lançar `omc team 4:claude "task"` falhou com `error connecting to /private/tmp/tmux-501/default (No such file or directory)` e `can't find pane: DAAB64AB-1A2C-46A1-AFBF-363426B4DB93`. O omc-teams skill espera tmux mas o cmux surface usa native splits com IDs diferentes.
+- **Evidência da sessão**: 2 tentativas de `omc team` falharam. Fallback para `Agent()` nativo do Claude Code funcionou perfeitamente com 4 workers em paralelo.
+- **Regra preventiva**: Se `omc team` falhar no cmux, não insistir. Usar `Agent()` com `run_in_background: true` para workers paralelos. Criar `TeamCreate` + `TaskCreate` para rastrear progresso se necessário.
+- **Confiança**: alta
+
+## 2026-06-12 — `replace_all: true` em Edit substitui mais ocorrências do que esperado
+
+- **Tipo**: erro do agente
+- **Escopo**: uso de Edit com `replace_all: true`
+- **Memória**: Usei `replace_all: true` para trocar `171` por `173` no `docs/SHADCN-MIGRATION.md`. A ferramenta trocou TODAS as ocorrências de `171` no arquivo, incluindo algumas que não deveriam ser alteradas. Depois precisei de Edits manuais adicionais para corrigir.
+- **Evidência da sessão**: Primeiro Edit com `replace_all: true` trocou múltiplas linhas; 3 Edits subsequentes falharam com "String to replace not found" porque o estado do arquivo já havia mudado.
+- **Regra preventiva**: Evitar `replace_all: true` em arquivos com múltiplas ocorrências. Preferir `replace_all: false` com strings específicas e suficientemente longas (ex: incluir contexto da linha inteira). Se precisar de replace_all, verificar o arquivo depois.
+- **Confiança**: alta

@@ -64,6 +64,19 @@
 - `supabase projects list` — lista projetos (requer login)
 - `supabase db query` — conecta APENAS ao banco local (não funciona para remoto)
 
+## AuthProvider timeout reduzido para 5s + test coverage
+
+- `AUTH_TIMEOUT_MS` em `src/contexts/AuthContext.tsx` reduzido de `8000` para `5000` (commit `3fbbbf6`).
+- Novo arquivo `src/contexts/AuthContext.test.tsx` com 2 tests: timeout + early resolution.
+- **Contagem de tests atualizada**: 34 arquivos, 173 tests passando (era 33 arquivos / 171 tests).
+
+## Issues abertas pós-sessão (2026-06-12)
+
+- **#9** — TanStack Query para cache e reduzir re-fetch redundante (já existia, bem detalhada)
+- **#20** — B2: Dockerfile multi-stage para deploy reprodutível
+- **#22** — B3: Code-splitting para reduzir chunk inicial de 553KB
+- **#23** — Sprint 0: Configurar base shadcn/ui
+
 ## Projeto Supabase linkado
 
 - Project ref: `xgghwjumuuxlppjspbhj` (asof-space)
