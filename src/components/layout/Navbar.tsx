@@ -7,8 +7,16 @@ import { notificationService } from '../../services/notificationService';
 import { adminService } from '../../services/adminService';
 import { cn } from '../../lib/utils';
 import { useDarkMode } from '../../hooks/useDarkMode';
-import { useFocusTrap } from '../../hooks/useFocusTrap';
 import { useGlobalSearch } from '../../hooks/useGlobalSearch';
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+  SheetClose,
+} from '../ui/sheet';
 import { NavbarBrand } from '../brand/NavbarBrand';
 import { BrandLockup } from '../brand/BrandLockup';
 import { GlobalSearchDropdown } from './GlobalSearchDropdown';
@@ -42,7 +50,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
 
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const unsubNotif = notificationService.subscribeToUnreadNotifications(
@@ -108,31 +115,6 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     return () => document.removeEventListener('keydown', handleEscape);
   }, [query, clearQuery]);
 
-  useFocusTrap(mobileMenuRef, mobileMenuOpen);
-
-  // Body scroll lock for mobile menu
-  const savedScrollY = useRef(0);
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      savedScrollY.current = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.top = `-${savedScrollY.current}px`;
-    } else {
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.top = '';
-      window.scrollTo(0, savedScrollY.current);
-    }
-    return () => {
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.top = '';
-      if (mobileMenuOpen) {
-        window.scrollTo(0, savedScrollY.current);
-      }
-    };
-  }, [mobileMenuOpen]);
 
   const handleLogoutClick = () => {
     setShowLogoutDialog(true);
@@ -280,63 +262,67 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
         </div>
 
         {/* Mobile state */}
-        <div className="md:hidden text-navy flex items-center">
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
-            aria-label="Abrir menu de navegação"
-            aria-expanded={mobileMenuOpen}
-          >
-            <Menu className="w-6 h-6" strokeWidth={1.5} aria-hidden="true" />
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div
-            ref={mobileMenuRef}
-            className="fixed inset-0 z-50 flex flex-col bg-white p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))] modal-contain"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Menu de navegação"
-          >
-            <div className="flex justify-between items-center mb-8 h-12 text-navy border-b border-border-gray pb-4">
-               <BrandLockup
-                 theme={isDarkMode ? 'dark' : 'light'}
-                 variant="wordmark"
-                 size="compact"
-                 align="start"
-                 showTagline={false}
-                 showSocialBadge={false}
-               />
-               <button
-                 onClick={() => setMobileMenuOpen(false)}
-                 className="p-2 text-slate font-medium min-h-[44px] min-w-[44px]"
-                 aria-label="Fechar menu"
-               >
-                 Fechar
-               </button>
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <button
+              className="md:hidden p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-navy"
+              aria-label="Abrir menu de navegação"
+            >
+              <Menu className="w-6 h-6" strokeWidth={1.5} aria-hidden="true" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[300px] sm:w-[350px] bg-white p-0 flex flex-col">
+            <SheetHeader className="p-4 border-b border-border-gray">
+              <SheetTitle className="sr-only">Menu de navegação</SheetTitle>
+              <BrandLockup
+                theme={isDarkMode ? 'dark' : 'light'}
+                variant="wordmark"
+                size="compact"
+                align="start"
+                showTagline={false}
+                showSocialBadge={false}
+              />
+            </SheetHeader>
+            <div className="flex flex-col gap-2 text-lg text-slate p-4 overflow-y-auto">
+              <SheetClose asChild>
+                <Link to="/feed" className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Home className="w-5 h-5" aria-hidden="true" /> Feed</Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link to="/mensagens" className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><MessageSquare className="w-5 h-5" aria-hidden="true" /> Mensagens</Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link to="/postos" className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Compass className="w-5 h-5" aria-hidden="true" /> Postos</Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link to="/notificacoes" className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Bell className="w-5 h-5" aria-hidden="true" /> Notificações{unreadNotifications > 0 && <span className="ml-auto text-base bg-danger text-white px-2 py-0.5 rounded-full">{unreadNotifications}</span>}</Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link to={`/perfil/${profile.id}`} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><User className="w-5 h-5" aria-hidden="true" /> Meu Perfil</Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <button onClick={toggleDarkMode} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 text-left min-h-[44px]">
+                  {isDarkMode ? <Sun className="w-5 h-5" aria-hidden="true" /> : <Moon className="w-5 h-5" aria-hidden="true" />}
+                  {isDarkMode ? 'Modo Claro' : 'Modo Escuro'}
+                </button>
+              </SheetClose>
+              {profile.role === 'ADMIN' && (
+                <>
+                  <SheetClose asChild>
+                    <Link to="/admin/membros" className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Shield className="w-5 h-5" aria-hidden="true" /> Painel Admin - Membros</Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link to="/admin/moderacao" className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Shield className="w-5 h-5" aria-hidden="true" /> Painel Admin - Moderação</Link>
+                  </SheetClose>
+                </>
+              )}
             </div>
-            <div className="flex flex-col gap-2 text-lg text-slate">
-               <Link to="/feed" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Home className="w-5 h-5" aria-hidden="true" /> Feed</Link>
-               <Link to="/mensagens" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><MessageSquare className="w-5 h-5" aria-hidden="true" /> Mensagens</Link>
-               <Link to="/postos" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Compass className="w-5 h-5" aria-hidden="true" /> Postos</Link>
-               <Link to="/notificacoes" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Bell className="w-5 h-5" aria-hidden="true" /> Notificações{unreadNotifications > 0 && <span className="ml-auto text-base bg-danger text-white px-2 py-0.5 rounded-full">{unreadNotifications}</span>}</Link>
-               <Link to={`/perfil/${profile.id}`} onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><User className="w-5 h-5" aria-hidden="true" /> Meu Perfil</Link>
-               <button onClick={toggleDarkMode} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 text-left min-h-[44px]">
-                 {isDarkMode ? <Sun className="w-5 h-5" aria-hidden="true" /> : <Moon className="w-5 h-5" aria-hidden="true" />}
-                 {isDarkMode ? 'Modo Claro' : 'Modo Escuro'}
-               </button>
-               {profile.role === 'ADMIN' && (
-                  <>
-                    <Link to="/admin/membros" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Shield className="w-5 h-5" aria-hidden="true" /> Painel Admin - Membros</Link>
-                    <Link to="/admin/moderacao" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 border-b border-border-gray/50 hover:bg-ice font-bold text-navy flex items-center gap-3 min-h-[44px]"><Shield className="w-5 h-5" aria-hidden="true" /> Painel Admin - Moderação</Link>
-                  </>
-               )}
-               <button onClick={handleLogoutClick} className="px-4 py-3 text-left border-border-gray/50 hover:bg-danger/5 hover:text-danger font-bold text-slate flex items-center gap-3 border-t mt-auto min-h-[44px]"><LogOut className="w-5 h-5" aria-hidden="true" /> Sair</button>
-            </div>
-          </div>
-        )}
+            <SheetFooter className="p-4 border-t border-border-gray mt-auto">
+              <SheetClose asChild>
+                <button onClick={handleLogoutClick} className="w-full text-left px-4 py-3 hover:bg-danger/5 hover:text-danger font-bold text-slate flex items-center gap-3 min-h-[44px]"><LogOut className="w-5 h-5" aria-hidden="true" /> Sair</button>
+              </SheetClose>
+            </SheetFooter>
+          </SheetContent>
+        </Sheet>
 
         {/* Logout Confirmation Dialog */}
         <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>

@@ -2,7 +2,7 @@ import { UserProfile } from '../types';
 import { Link } from 'react-router-dom';
 import { Bell, Check, Info } from 'lucide-react';
 import { useNotifications } from '../hooks/useNotifications';
-import { Button, Card, PageTitle } from '../components/ui';
+import { Button, Card, PageTitle, ScrollArea } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 
 function isExternalLink(url: string): boolean {
@@ -34,38 +34,40 @@ export function Notifications({ profile }: { profile: UserProfile }) {
             <p className="text-base text-slate max-w-sm mx-auto leading-relaxed">Você não possui novas atualizações no momento.</p>
           </div>
         ) : (
-          <div className="divide-y divide-border-gray">
-            {notifications.map(n => (
-              <div key={n.id} className={`p-5 flex gap-4 transition-colors ${n.read ? 'opacity-80' : 'bg-ice/30'}`}>
-                <div className="w-10 h-10 shrink-0 bg-ice border border-border-gray flex items-center justify-center text-navy rounded-full">
-                  {n.type === 'APPROVAL' ? <Check className="w-5 h-5 text-success" /> : n.type === 'MENTION_POST' || n.type === 'MENTION_COMMENT' ? <span className="font-bold text-lg text-sky">@</span> : <Info className="w-5 h-5" />}
-                </div>
-                <div className="flex-1">
-                  <p className="text-base text-slate mb-1 leading-relaxed">{n.message}</p>
-                  <div className="flex items-center gap-4 text-sm font-medium text-slate">
-                     <span>{new Date(n.createdAt).toLocaleDateString()}</span>
-                     {n.link && (
-                       isExternalLink(n.link) ? (
-                         <a href={n.link} target="_blank" rel="noopener noreferrer" className="text-navy hover:text-sky transition-colors">Acessar</a>
-                       ) : (
-                         <Link to={n.link} className="text-navy hover:text-sky transition-colors">Acessar</Link>
-                       )
-                     )}
+          <ScrollArea className="max-h-[60vh]">
+            <div className="divide-y divide-border-gray">
+              {notifications.map(n => (
+                <div key={n.id} className={`p-5 flex gap-4 transition-colors ${n.read ? 'opacity-80' : 'bg-ice/30'}`}>
+                  <div className="w-10 h-10 shrink-0 bg-ice border border-border-gray flex items-center justify-center text-navy rounded-full">
+                    {n.type === 'APPROVAL' ? <Check className="w-5 h-5 text-success" /> : n.type === 'MENTION_POST' || n.type === 'MENTION_COMMENT' ? <span className="font-bold text-lg text-sky">@</span> : <Info className="w-5 h-5" />}
                   </div>
+                  <div className="flex-1">
+                    <p className="text-base text-slate mb-1 leading-relaxed">{n.message}</p>
+                    <div className="flex items-center gap-4 text-sm font-medium text-slate">
+                       <span>{new Date(n.createdAt).toLocaleDateString()}</span>
+                       {n.link && (
+                         isExternalLink(n.link) ? (
+                           <a href={n.link} target="_blank" rel="noopener noreferrer" className="text-navy hover:text-sky transition-colors">Acessar</a>
+                         ) : (
+                           <Link to={n.link} className="text-navy hover:text-sky transition-colors">Acessar</Link>
+                         )
+                       )}
+                    </div>
+                  </div>
+                  {!n.read && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => markAsRead(n.id)}
+                      className="self-start whitespace-nowrap"
+                    >
+                      MARCAR LIDA
+                    </Button>
+                  )}
                 </div>
-                {!n.read && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => markAsRead(n.id)}
-                    className="self-start whitespace-nowrap"
-                  >
-                    MARCAR LIDA
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </ScrollArea>
         )}
       </Card>
     </PageContainer>

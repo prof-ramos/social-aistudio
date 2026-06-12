@@ -110,7 +110,10 @@ describe('PostCard - sanitizeHtml', () => {
       />
     );
 
-    const deleteButton = screen.getByLabelText('Excluir publicação');
+    const actionsButton = screen.getByLabelText('Ações da publicação');
+    await user.click(actionsButton);
+
+    const deleteButton = await screen.findByText('Excluir');
     await user.click(deleteButton);
 
     expect(screen.getByText('Excluir publicação')).toBeInTheDocument();

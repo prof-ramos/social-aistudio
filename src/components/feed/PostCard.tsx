@@ -2,12 +2,18 @@ import React, { useState } from 'react';
 import { sanitizeHtml } from '../../lib/sanitize';
 import { Post, UserProfile } from '../../types';
 import { canEdit, canDelete } from '../../policies/postPolicy';
-import { Pin, MessageSquare, Bookmark, Pencil, Trash2 } from 'lucide-react';
+import { Pin, MessageSquare, Bookmark, Pencil, Trash2, MoreHorizontal, Clock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ReactionButtons } from './ReactionButtons';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
 interface PostCardProps {
   post: Post;
@@ -43,35 +49,44 @@ function PostCardComponent({ post, profile, isSaved, onToggleSaved, onEdit, onDe
            <div className="flex items-center gap-2 mt-0.5">
                <p className="text-xs uppercase text-slate font-bold tracking-wider">#{post.category}</p>
                <span className="text-xs text-slate/50">•</span>
-               <p className="text-xs text-slate/60">{new Date(post.createdAt).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</p>
+               <p className="text-xs text-slate/60 flex items-center gap-1">
+                 <Clock className="w-3 h-3" strokeWidth={1.5} />
+                 {new Date(post.createdAt).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+               </p>
            </div>
          </div>
          <div className="flex items-center gap-1 shrink-0">
            {canEditPost && (onEdit || onDelete) && (
-             <div className="flex items-center gap-1">
-               {onEdit && (
+             <DropdownMenu>
+               <DropdownMenuTrigger asChild>
                  <Button
                    variant="ghost"
                    size="sm"
-                   onClick={() => onEdit(post)}
                    className="min-h-[44px] min-w-[44px] p-0 text-slate hover:text-navy"
-                   aria-label="Editar publicação"
+                   aria-label="Ações da publicação"
                  >
-                   <Pencil className="w-4 h-4" />
+                   <MoreHorizontal className="w-4 h-4" />
                  </Button>
-               )}
-               {onDelete && (
-                 <Button
-                   variant="ghost"
-                   size="sm"
-                   onClick={() => setShowDeleteConfirm(true)}
-                   className="min-h-[44px] min-w-[44px] p-0 text-slate hover:text-navy"
-                   aria-label="Excluir publicação"
-                 >
-                   <Trash2 className="w-4 h-4" />
-                 </Button>
-               )}
-             </div>
+               </DropdownMenuTrigger>
+               <DropdownMenuContent align="end" className="rounded-none border-border-gray">
+                 {onEdit && (
+                   <DropdownMenuItem
+                     className="rounded-none px-4 py-3 text-base text-navy hover:bg-ice focus:bg-ice focus:text-navy cursor-pointer flex items-center gap-2"
+                     onClick={() => onEdit(post)}
+                   >
+                     <Pencil className="w-4 h-4" /> Editar
+                   </DropdownMenuItem>
+                 )}
+                 {onDelete && (
+                   <DropdownMenuItem
+                     className="rounded-none px-4 py-3 text-base text-danger hover:bg-danger/5 focus:bg-danger/5 focus:text-danger cursor-pointer flex items-center gap-2"
+                     onClick={() => setShowDeleteConfirm(true)}
+                   >
+                     <Trash2 className="w-4 h-4" /> Excluir
+                   </DropdownMenuItem>
+                 )}
+               </DropdownMenuContent>
+             </DropdownMenu>
            )}
            <Button
              variant="ghost"

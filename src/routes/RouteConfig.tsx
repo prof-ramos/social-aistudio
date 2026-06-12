@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { CommandPalette } from '../components/layout/CommandPalette';
 import { Login } from '../pages/Login';
 import { RegisterRequest } from '../pages/RegisterRequest';
 import ForgotPassword from '../pages/ForgotPassword';
@@ -58,6 +59,7 @@ export function AppRoutes() {
           </Route>
         </Routes>
       </Suspense>
+      <CommandPalette />
     </BrowserRouter>
   );
 }
