@@ -429,6 +429,7 @@ Then import database types from `src/types/supabase.ts` for fully typed queries.
 | `function pgp_sym_encrypt does not exist (42883)` | Qualify extension functions with schema: `extensions.pgp_sym_encrypt()` not `pgp_sym_encrypt()`. Supabase installs pgcrypto in `extensions` schema. |
 | `supabase db query` fails with "connection refused" | `supabase db query` only connects to local database. For remote SQL, use Dashboard SQL Editor or `psql` with the pooler URL from `supabase/.temp/pooler-url` |
 | `current_setting('app.key', true)` returns empty | `missing_ok=true` returns `''` not NULL. Always check `<> ''` before using as encryption key or critical parameter |
+| `relation "X" does not exist` in SECURITY DEFINER function | `SET search_path = ''` removes ALL schemas including `public`. Qualify every table, function, and type reference: `public.users`, `public.get_crypt_key()`, `public.user_role`, `extensions.pgp_sym_encrypt()`. |
 
 ## Extension Schema Qualification
 
@@ -441,8 +442,9 @@ Supabase installs PostgreSQL extensions in the `extensions` schema, not `public`
 ## Destructive SQL Rules
 
 - Never include `DROP COLUMN` in the same migration that adds the replacement column. Create a separate follow-up migration and only apply after verifying data integrity in production.
-- `current_setting(key, true)` returns `''` (empty string) when the key doesn't exist, not NULL. Wrap encryption calls in `DO $$ IF current_setting(...) <> '' THEN ... END IF; $$` blocks.
-- Encryption keys (e.g. `app.asof_crypt_key`) must be configured as Database Session Settings in the Supabase Dashboard — never in migrations or code.
+- Encryption keys are embedded in a `SECURITY DEFINER` function (`get_crypt_key()`) with `SET search_path = ''`. Key rotation requires a new migration that replaces the function body. Never expose the key client-side.
+- `SET search_path = ''` is required for SECURITY DEFINER functions (prevents search path injection), but it removes ALL schemas from the path — qualify every reference: tables (`public.users`), functions (`public.get_crypt_key()`), extension functions (`extensions.pgp_sym_encrypt()`), and enum types (`public.user_role`).
+- `ALTER DATABASE SET "app.asof_crypt_key"` fails on Free/Nano plans (no superuser). Use the `get_crypt_key()` SECURITY DEFINER approach instead.
 
 ## Scripts
 
