@@ -1,10 +1,12 @@
 import { cn } from '../../lib/utils';
+import { Skeleton as ShadcnSkeleton } from './shadcn/skeleton';
 
-export function Skeleton({ className }: { className?: string }) {
+export function Skeleton({ className, ...props }: React.ComponentProps<typeof ShadcnSkeleton>) {
   return (
-    <div
+    <ShadcnSkeleton
       data-slot="skeleton"
-      className={cn('animate-pulse rounded-none bg-muted', className)}
+      className={cn('rounded-none', className)}
+      {...props}
     />
   );
 }

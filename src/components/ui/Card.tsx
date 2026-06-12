@@ -1,28 +1,15 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
+import {
+  Card as ShadcnCard,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from './shadcn/card';
 
-// shadcn card primitives (inline to avoid casing conflict with card.tsx)
-export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div data-slot="card-header" className={cn('flex flex-col gap-1.5 px-6 py-4', className)} {...props} />;
-}
-
-export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div data-slot="card-title" className={cn('leading-none font-semibold', className)} {...props} />;
-}
-
-export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div data-slot="card-description" className={cn('text-sm text-muted-foreground', className)} {...props} />;
-}
-
-export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div data-slot="card-content" className={cn('px-6 py-4', className)} {...props} />;
-}
-
-export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div data-slot="card-footer" className={cn('flex items-center px-6 py-4', className)} {...props} />;
-}
-
-// ASOF Card wrapper
+export { CardHeader, CardTitle, CardDescription, CardContent, CardFooter };
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'elevated' | 'featured' | 'outlined';

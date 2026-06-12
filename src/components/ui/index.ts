@@ -10,3 +10,16 @@ export { ReportDialog } from './ReportDialog';
 export { Skeleton } from './Skeleton';
 export { StatusBadge } from './StatusBadge';
 export { ToastProvider, useToast } from './Toast';
+
+// shadcn primitives (ASOF-customized)
+export { Input } from './input';
+export { Textarea } from './textarea';
+export { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectScrollDownButton, SelectScrollUpButton, SelectSeparator, SelectTrigger, SelectValue } from './select';
+export { Label } from './label';
+export { Switch } from './switch';
+export { Sheet, SheetTrigger, SheetClose, SheetContent, SheetHeader, SheetFooter, SheetTitle, SheetDescription } from './sheet';
+export { Badge } from './badge';
+export { Separator } from './separator';
+export { Avatar, AvatarFallback, AvatarImage } from './avatar';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export { ScrollArea, ScrollBar } from './scroll-area';
