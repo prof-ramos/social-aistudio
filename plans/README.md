@@ -22,6 +22,7 @@ its STOP conditions, and update your row when done.
 | 009 | Mover getUsersWithCommonPostos para RPC server-side | P2 | M | — | DONE |
 | 010 | Remover teste duplicado do PostEditor | P3 | S | — | DONE |
 | 011 | Eliminar tipos `any` da camada de serviços | P2 | M | — | DONE |
+| 012 | Finalizar CPF encryption e cleanup (DROP COLUMN cpf) | P1 | S | 007 | BLOCKED (Steps 0-2 manual: crypt key config + backfill + RPC verify — GitHub #16-18) |
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (one-line reason) | REJECTED (one-line rationale)
 
