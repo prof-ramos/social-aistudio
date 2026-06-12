@@ -11,7 +11,7 @@ export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLDivE
 }
 
 export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div data-slot="card-description" className={cn('text-sm text-muted-foreground', className)} {...props} />;
+  return <div data-slot="card-description" className={cn('text-base text-muted-foreground', className)} {...props} />;
 }
 
 export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {

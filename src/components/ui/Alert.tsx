@@ -20,11 +20,12 @@ const alertVariants = cva(
 function ShadcnAlert({
   className,
   variant,
+  role = 'alert',
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>) {
   return (
     <div
-      role="alert"
+      role={role}
       className={cn(alertVariants({ variant }), className)}
       {...props}
     />
@@ -64,6 +65,7 @@ export function Alert({ variant = 'error', title, className, children, ...props 
   const Icon = icons[variant];
   return (
     <ShadcnAlert
+      role={variant === 'error' ? 'alert' : 'status'}
       aria-live={variant === 'error' ? 'assertive' : 'polite'}
       className={cn('flex items-start gap-3 shadow-sm', variantClasses[variant], className)}
       {...props}

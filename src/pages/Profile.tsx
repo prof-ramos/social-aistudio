@@ -188,10 +188,10 @@ export function Profile({ profile }: { profile: UserProfile }) {
         </div>
       </Card>
 
-      <Dialog open={isEditing} onOpenChange={(open) => !open && setIsEditing(false)}>
-        <DialogContent className="max-w-xl rounded-none p-0 flex flex-col max-h-[90dvh]">
+      <Dialog open={isEditing} onOpenChange={(open) => !open && !saving && setIsEditing(false)}>
+        <DialogContent className="max-w-xl rounded-none p-0 flex flex-col max-h-[90dvh]" showCloseButton={false}>
           <DialogHeader className="px-6 py-5 border-b border-border-gray/50 bg-ice/30 shrink-0">
-            <DialogTitle>
+            <DialogTitle asChild>
               <PageTitle as="h2" size="lg">Editar Perfil</PageTitle>
             </DialogTitle>
           </DialogHeader>
