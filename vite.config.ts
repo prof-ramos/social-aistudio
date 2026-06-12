@@ -23,8 +23,9 @@ export default defineConfig(() => {
       rollupOptions: {
         output: {
           manualChunks: {
-            react: ['react', 'react-dom', 'react-router-dom'],
-            ui: ['lucide-react', '@tiptap/react', '@tiptap/starter-kit'],
+            router: ['react', 'react-dom', 'react-router-dom'],
+            editor: ['@tiptap/react', '@tiptap/starter-kit', '@tiptap/extension-placeholder'],
+            icons: ['lucide-react'],
             supabase: ['@supabase/supabase-js'],
           },
         },
