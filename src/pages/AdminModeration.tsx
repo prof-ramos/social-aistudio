@@ -1,11 +1,7 @@
 import React from 'react';
 import { ShieldAlert, Check, AlertTriangle, Trash2, ArrowRight } from 'lucide-react';
-import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { useAdminModeration, type Report } from '../hooks/useAdminModeration';
-import { Card } from '../components/ui/Card';
-import { PageTitle } from '../components/ui/PageTitle';
-import { Button } from '../components/ui/Button';
-import { StatusBadge } from '../components/ui/StatusBadge';
+import { Card, PageTitle, Button, StatusBadge, Breadcrumb, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea, Label } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import {
   Table,
@@ -90,28 +86,28 @@ export default function AdminModeration() {
                       {resolvingId === rep.id ? (
                         <form onSubmit={(e) => handleResolve(rep.id, e)} className="bg-ice p-3 rounded-none border border-border-gray space-y-3 min-w-[250px]">
                           <div>
-                            <label htmlFor="acao" className="block text-sm font-bold text-slate mb-1">Ação</label>
-                            <select
-                              id="acao"
-                              className="w-full min-h-[44px] border border-border-gray rounded text-base px-2 focus:ring-2 focus:ring-navy focus:outline-none"
-                              value={action}
-                              onChange={e => setAction(e.target.value as Report['status'])}
-                            >
-                              <option value="RESOLVED_KEPT">Manter Conteúdo (Rejeitar Denúncia)</option>
-                              <option value="RESOLVED_WARNED">Advertir Autor (Manter Conteúdo)</option>
-                              <option value="RESOLVED_REMOVED">Remover Conteúdo (Ocultar)</option>
-                            </select>
+                            <Label htmlFor="acao" className="block text-sm font-bold text-slate mb-1">Ação</Label>
+                            <Select value={action} onValueChange={v => setAction(v as Report['status'])}>
+                              <SelectTrigger id="acao" className="w-full">
+                                <SelectValue placeholder="Selecione uma ação" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="RESOLVED_KEPT">Manter Conteúdo (Rejeitar Denúncia)</SelectItem>
+                                <SelectItem value="RESOLVED_WARNED">Advertir Autor (Manter Conteúdo)</SelectItem>
+                                <SelectItem value="RESOLVED_REMOVED">Remover Conteúdo (Ocultar)</SelectItem>
+                              </SelectContent>
+                            </Select>
                           </div>
                           <div>
-                            <label htmlFor="nota-interna" className="block text-sm font-bold text-slate mb-1">Nota Interna (Obrigatório)</label>
-                            <textarea
+                            <Label htmlFor="nota-interna" className="block text-sm font-bold text-slate mb-1">Nota Interna (Obrigatório)</Label>
+                            <Textarea
                               id="nota-interna"
                               required
-                              className="w-full min-h-[60px] border border-border-gray rounded text-base p-2 focus:ring-2 focus:ring-navy focus:outline-none resize-none"
+                              className="min-h-[60px] resize-none"
                               value={notes}
                               onChange={e => setNotes(e.target.value)}
                               placeholder="Descreva a razão da decisão..."
-                            ></textarea>
+                            />
                           </div>
                           <div className="flex gap-2">
                              <Button type="button" variant="ghost" size="sm" fullWidth onClick={() => setResolvingId(null)} className="min-h-[44px]">Cancelar</Button>

@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { UserProfile } from '../types';
 import { ChevronLeft, Plus, AlertTriangle, Star } from 'lucide-react';
 import { usePostoDetails } from '../hooks/usePostoDetails';
-import { Card, PageTitle, Button, Alert } from '../components/ui';
+import { Card, PageTitle, Button, Alert, Textarea, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui';
 import { ReportDialog } from '../components/ui/ReportDialog';
 import { PageContainer } from '../components/layout/PageContainer';
 
@@ -115,20 +115,25 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
            <form onSubmit={handleAddField}>
               <h3 className="font-bold text-navy mb-4">Novo Relato de Experiência</h3>
               <div className="mb-4">
-                <label htmlFor="field-type" className="block text-base font-medium text-slate mb-1">Tópico</label>
-                <select id="field-type" className="w-full h-11 border border-border-gray rounded-none bg-white px-3 focus:ring-2 focus:ring-navy focus:outline-none" value={newFieldType} onChange={e=>setNewFieldType(e.target.value)}>
-                   <option value="GERAL">Geral</option>
-                   <option value="SEGURANCA">Segurança</option>
-                   <option value="CUSTO_VIDA">Custo de Vida</option>
-                   <option value="SAUDE">Saúde</option>
-                   <option value="EDUCACAO">Educação</option>
-                   <option value="MORADIA">Moradia</option>
-                   <option value="TRANSPORTE">Transporte</option>
-                </select>
+                <Label htmlFor="field-type" className="block text-base font-medium text-slate mb-1">Tópico</Label>
+                <Select value={newFieldType} onValueChange={v => setNewFieldType(v)}>
+                  <SelectTrigger id="field-type" className="w-full">
+                    <SelectValue placeholder="Selecione um tópico" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="GERAL">Geral</SelectItem>
+                    <SelectItem value="SEGURANCA">Segurança</SelectItem>
+                    <SelectItem value="CUSTO_VIDA">Custo de Vida</SelectItem>
+                    <SelectItem value="SAUDE">Saúde</SelectItem>
+                    <SelectItem value="EDUCACAO">Educação</SelectItem>
+                    <SelectItem value="MORADIA">Moradia</SelectItem>
+                    <SelectItem value="TRANSPORTE">Transporte</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="mb-4">
-                <label htmlFor="field-body" className="block text-base font-medium text-slate mb-1">Sua percepção</label>
-                <textarea id="field-body" required className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-2 focus:ring-navy focus:outline-none" value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)}></textarea>
+                <Label htmlFor="field-body" className="block text-base font-medium text-slate mb-1">Sua percepção</Label>
+                <Textarea id="field-body" required value={newFieldBody} onChange={e=>setNewFieldBody(e.target.value)} />
                 <p className="text-sm text-slate font-medium mt-1 leading-relaxed">Por padrão, gravaremos seu período de experiência declarado no seu perfil.</p>
               </div>
               <div className="flex justify-end gap-3">
@@ -219,11 +224,10 @@ export function PostoDetails({ profile }: { profile: UserProfile }) {
               </div>
             </div>
             <div className="mb-4">
-              <label htmlFor="review-body" className="block text-base font-medium text-slate mb-1">Sua avaliação</label>
-              <textarea
+              <Label htmlFor="review-body" className="block text-base font-medium text-slate mb-1">Sua avaliação</Label>
+              <Textarea
                 id="review-body"
                 required
-                className="w-full min-h-[120px] border border-border-gray rounded-none p-3 focus:ring-2 focus:ring-navy focus:outline-none"
                 value={reviewBody}
                 onChange={e => setReviewBody(e.target.value)}
               />

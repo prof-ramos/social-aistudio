@@ -3,7 +3,7 @@ import { UserProfile } from '../types';
 import { chatService } from '../services/chatService';
 import { ChevronLeft, Send, MessageSquare } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
-import { Button, Card, PageTitle } from '../components/ui';
+import { Button, Card, PageTitle, Input, Label, ScrollArea } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useVisualViewportOffset } from '../hooks/useVisualViewportOffset';
 import { useChatList } from '../hooks/useChatList';
@@ -80,7 +80,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
               Mensagens
             </PageTitle>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <ScrollArea className="min-h-0 flex-1">
             {chats.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center p-8 text-center text-base text-slate">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-ice">
@@ -127,7 +127,7 @@ export function Messages({ profile }: { profile: UserProfile }) {
                 );
               })
             )}
-          </div>
+          </ScrollArea>
         </div>
 
         {/* Main - Chat Area */}
@@ -180,46 +180,45 @@ export function Messages({ profile }: { profile: UserProfile }) {
                   })()}
               </div>
 
-              <div
-                role="log"
-                aria-live="polite"
-                className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4"
-              >
-                {messages.map((msg, i) => {
-                  const isMe = msg.senderId === profile.id;
-                  return (
-                    <div key={msg.id || i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                      <div
-                        className={`relative max-w-[85%] px-4 py-2.5 text-[15px] shadow-sm sm:max-w-[70%] ${
-                          isMe
-                            ? 'rounded-t-2xl rounded-l-2xl rounded-br-sm bg-navy text-white'
-                            : 'rounded-t-2xl rounded-r-2xl rounded-bl-sm border border-border-gray/50 bg-white text-slate'
-                        }`}
-                      >
-                        <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.body}</p>
+              <ScrollArea className="min-h-0 flex-1">
+                <div role="log" aria-live="polite" className="space-y-4 p-4">
+                  {messages.map((msg, i) => {
+                    const isMe = msg.senderId === profile.id;
+                    return (
+                      <div key={msg.id || i} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                        <div
+                          className={`relative max-w-[85%] px-4 py-2.5 text-[15px] shadow-sm sm:max-w-[70%] ${
+                            isMe
+                              ? 'rounded-t-2xl rounded-l-2xl rounded-br-sm bg-navy text-white'
+                              : 'rounded-t-2xl rounded-r-2xl rounded-bl-sm border border-border-gray/50 bg-white text-slate'
+                          }`}
+                        >
+                          <p className="whitespace-pre-wrap break-words leading-relaxed">{msg.body}</p>
+                        </div>
+                        <span className="mt-1 px-1 text-sm text-slate font-medium">
+                          {formatTime(msg.createdAt)}
+                        </span>
                       </div>
-                      <span className="mt-1 px-1 text-sm text-slate font-medium">
-                        {formatTime(msg.createdAt)}
-                      </span>
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} className="h-1" />
-              </div>
+                    );
+                  })}
+                  <div ref={messagesEndRef} className="h-1" />
+                </div>
+              </ScrollArea>
 
               <div
                 className="sticky bottom-0 z-10 shrink-0 border-t border-border-gray bg-white p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
                 style={{ transform: keyboardOffset ? `translateY(-${keyboardOffset}px)` : undefined }}
               >
                 <form onSubmit={handleSendMessage} className="mx-auto flex max-w-4xl gap-2">
-                  <input
+                  <Label htmlFor="message-input" className="sr-only">Nova mensagem</Label>
+                  <Input
+                    id="message-input"
                     type="text"
                     placeholder="Escreva sua mensagem..."
-                    className="h-12 flex-1 rounded-full border border-border-gray/50 bg-ice/50 px-5 text-base transition-all focus:border-navy focus:bg-white focus:outline-none focus:ring-2 focus:ring-navy/20"
+                    className="h-12 flex-1 rounded-full border-border-gray/50 bg-ice/50 px-5 focus:bg-white focus:ring-2 focus:ring-navy/20"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     disabled={sending}
-                    aria-label="Nova mensagem"
                   />
                   <Button
                     type="submit"

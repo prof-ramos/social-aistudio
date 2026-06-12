@@ -9,7 +9,7 @@ import { postService } from '../services/postService';
 import { PostEditor } from '../components/feed/PostEditor';
 import { ReactionButtons } from '../components/feed/ReactionButtons';
 import { useSavedPosts } from '../hooks/useSavedPosts';
-import { Card, PageTitle, Button, Alert, Breadcrumb } from '../components/ui';
+import { Card, PageTitle, Button, Alert, Breadcrumb, Textarea, Label } from '../components/ui';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { ReportDialog } from '../components/ui/ReportDialog';
 import { PageContainer } from '../components/layout/PageContainer';
@@ -216,15 +216,15 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
 
         <Card variant="default" padding="md" className="mb-8">
           <form onSubmit={handleAddComment}>
-            <label htmlFor="comment-body" className="sr-only">Seu comentário</label>
-            <textarea
+            <Label htmlFor="comment-body" className="sr-only">Seu comentário</Label>
+            <Textarea
               id="comment-body"
-              className="w-full min-h-[100px] border border-border-gray p-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none resize-y mb-4"
+              className="mb-4 resize-y min-h-[100px]"
               placeholder="Adicione um comentário à discussão..."
               value={newCommentBody}
               onChange={e => setNewCommentBody(e.target.value)}
               required
-            ></textarea>
+            />
             <div className="flex justify-end">
               <Button
                  type="submit"

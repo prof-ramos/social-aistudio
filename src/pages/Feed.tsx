@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { UserProfile } from '../types';
-import { MessageSquare, Bookmark, PenLine, Search, SlidersHorizontal } from 'lucide-react';
+import { MessageSquare, Bookmark, PenLine, Search, SlidersHorizontal, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { PostEditor } from '../components/feed/PostEditor';
 import { PostCard } from '../components/feed/PostCard';
 import { PostoHighlightCard } from '../components/feed/PostoHighlightCard';
 import { AdminAlertCard } from '../components/feed/AdminAlertCard';
 import { MemberSuggestionsCard } from '../components/feed/MemberSuggestionsCard';
-import { Button } from '../components/ui/Button';
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useFeed, FeedFilter } from '../hooks/useFeed';
 import { useSavedPosts } from '../hooks/useSavedPosts';
@@ -37,6 +37,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
 
   const saved = useSavedPosts(profile.id, profile.savedPosts ?? []);
   const [postCount, setPostCount] = useState<number | null>(null);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export function Feed({ profile }: { profile: UserProfile }) {
   useEffect(() => {
     function handleShortcut(e: KeyboardEvent) {
       const target = e.target as HTMLElement;
-      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable || !!target.closest('[role="combobox"]');
       if (e.key === 'n' && !isInput && !e.metaKey && !e.ctrlKey) {
         e.preventDefault();
         setShowEditor(true);
@@ -133,36 +134,36 @@ export function Feed({ profile }: { profile: UserProfile }) {
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-4 w-4 text-slate/60" strokeWidth={1.5} aria-hidden="true" />
             </div>
-            <input
+            <Input
               type="text"
               placeholder="Buscar no feed..."
               aria-label="Buscar no feed"
-              className="w-full h-11 border border-border-gray pl-10 pr-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none placeholder:text-slate/50 bg-white"
+              className="pl-10"
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
           </div>
-          <div className="relative min-w-[180px]">
+          <div className="relative min-w-[180px] hidden md:block">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <SlidersHorizontal className="h-4 w-4 text-slate/60" strokeWidth={1.5} aria-hidden="true" />
             </div>
-            <select
-              className="w-full h-11 border border-border-gray bg-white pl-10 pr-3 text-base text-slate focus:ring-2 focus:ring-navy focus:outline-none appearance-none cursor-pointer"
-              aria-label="Filtrar por categoria"
-              value={filterCategory}
-              onChange={e => setFilterCategory(e.target.value)}
-            >
-              <option value="TODOS">Todas as Categorias</option>
-              <option value="POSTOS">Postos</option>
-              <option value="CARREIRA">Carreira</option>
-              <option value="VIDA_EXTERIOR">Vida no Exterior</option>
-              <option value="APOSENTADORIA">Aposentadoria</option>
-              <option value="GERAL">Geral</option>
-            </select>
+            <Select value={filterCategory} onValueChange={v => setFilterCategory(v)}>
+              <SelectTrigger className="w-full pl-10" aria-label="Filtrar por categoria">
+                <SelectValue placeholder="Todas as Categorias" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="TODOS">Todas as Categorias</SelectItem>
+                <SelectItem value="POSTOS">Postos</SelectItem>
+                <SelectItem value="CARREIRA">Carreira</SelectItem>
+                <SelectItem value="VIDA_EXTERIOR">Vida no Exterior</SelectItem>
+                <SelectItem value="APOSENTADORIA">Aposentadoria</SelectItem>
+                <SelectItem value="GERAL">Geral</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="hidden md:flex gap-2 flex-wrap">
           {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
              <button
                key={filterKey}
@@ -173,6 +174,54 @@ export function Feed({ profile }: { profile: UserProfile }) {
                {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
              </button>
           ))}
+        </div>
+
+        {/* Mobile Filters Sheet */}
+        <div className="flex md:hidden justify-end">
+          <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="min-h-[44px]">
+                <Filter className="w-4 h-4 mr-2" /> Filtros
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="bg-white">
+              <SheetHeader className="pb-4 border-b border-border-gray">
+                <SheetTitle>Filtros</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-4 py-4">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <SlidersHorizontal className="h-4 w-4 text-slate/60" strokeWidth={1.5} aria-hidden="true" />
+                  </div>
+                  <Select value={filterCategory} onValueChange={v => { setFilterCategory(v); setMobileFiltersOpen(false); }}>
+                    <SelectTrigger className="w-full pl-10" aria-label="Filtrar por categoria">
+                      <SelectValue placeholder="Todas as Categorias" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="TODOS">Todas as Categorias</SelectItem>
+                      <SelectItem value="POSTOS">Postos</SelectItem>
+                      <SelectItem value="CARREIRA">Carreira</SelectItem>
+                      <SelectItem value="VIDA_EXTERIOR">Vida no Exterior</SelectItem>
+                      <SelectItem value="APOSENTADORIA">Aposentadoria</SelectItem>
+                      <SelectItem value="GERAL">Geral</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex gap-2 flex-wrap">
+                  {(['RECENTES', 'MAIS_COMENTADOS', 'MEUS_POSTOS'] as FeedFilter[]).map(filterKey => (
+                     <button
+                       key={filterKey}
+                        onClick={() => { setActiveFilter(filterKey); setMobileFiltersOpen(false); }}
+                        aria-pressed={activeFilter === filterKey}
+                        className={`min-h-[44px] px-4 py-2 text-sm font-medium border transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-navy ${activeFilter === filterKey ? 'bg-navy text-white border-navy' : 'bg-white text-slate border-border-gray hover:bg-ice/60'}`}
+                     >
+                       {filterKey === 'RECENTES' ? 'Recentes' : filterKey === 'MAIS_COMENTADOS' ? 'Mais comentados' : 'Meus postos'}
+                     </button>
+                  ))}
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
 

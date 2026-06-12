@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Search, MapPin } from 'lucide-react';
 import { usePostos } from '../hooks/usePostos';
-import { Card, PageTitle } from '../components/ui';
+import { Card, PageTitle, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import { getFlagCode } from '../lib/countryFlags';
 
@@ -25,30 +25,30 @@ export function Postos() {
 
         <div className="flex flex-col md:flex-row w-full md:w-auto gap-4">
           <div className="relative w-full md:w-80">
-             <Search className="w-5 h-5 absolute left-3 top-3.5 text-navy" />
-             <label htmlFor="search-postos" className="sr-only">Buscar por nome, país ou região</label>
-             <input
+             <Search className="w-5 h-5 absolute left-3 top-3.5 text-navy z-10" />
+             <Label htmlFor="search-postos" className="sr-only">Buscar por nome, país ou região</Label>
+             <Input
                id="search-postos"
                type="text"
                placeholder="Buscar por nome, país ou região..."
-               className="w-full h-12 border border-border-gray bg-white pl-10 pr-4 text-slate text-base font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all placeholder:text-slate"
+               className="pl-10 h-12"
                value={search}
                onChange={e => setSearch(e.target.value)}
              />
           </div>
           <div className="w-full md:w-48">
-            <label htmlFor="region-filter" className="sr-only">Filtrar por região</label>
-            <select
-              id="region-filter"
-              value={regionFilter}
-              onChange={e => setRegionFilter(e.target.value)}
-              className="w-full h-12 border border-border-gray bg-white px-3 text-slate text-base font-medium focus:border-navy focus:ring-1 focus:ring-navy focus:outline-none transition-all"
-            >
-              <option value="">Todas as Regiões</option>
-              {regions.map(r => (
-                <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
+            <Label htmlFor="region-filter" className="sr-only">Filtrar por região</Label>
+            <Select value={regionFilter} onValueChange={v => setRegionFilter(v)}>
+              <SelectTrigger id="region-filter" className="w-full h-12">
+                <SelectValue placeholder="Todas as Regiões" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Todas as Regiões</SelectItem>
+                {regions.map(r => (
+                  <SelectItem key={r} value={r}>{r}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
