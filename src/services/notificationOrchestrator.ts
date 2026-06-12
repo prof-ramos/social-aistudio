@@ -3,6 +3,21 @@ import { notificationService } from './notificationService';
 
 export type MentionType = 'MENTION_POST' | 'MENTION_COMMENT';
 
+/**
+ * Regex to extract @mentions from text.
+ * Uses Unicode property escapes to handle accented Portuguese names (João, André, etc.).
+ * Matches: @João, @André, @O'Connor, @Mary-Jane
+ * Does NOT use \b (ASCII-only, breaks on accented chars) or multi-word capture (causes false matches).
+ */
+/** Lookbehind ensures @ is not mid-word (e.g. email@example.com). */
+const MENTION_REGEX = /(?<!\S)@([\p{L}\p{M}\p{N}'-]+)/gu;
+
+/** Extract deduplicated mention names (without @ prefix) from text. */
+export function extractMentions(text: string): string[] {
+  const matches = [...text.matchAll(MENTION_REGEX)];
+  return [...new Set(matches.map(m => m[1]))];
+}
+
 export const notifyMentions = async (
   text: string,
   type: MentionType,
@@ -11,18 +26,14 @@ export const notifyMentions = async (
   actorId: string
 ): Promise<void> => {
   try {
-    const mentionRegex = /@([\wÀ-ú]+(?:\s+[\wÀ-ú]+)*)\b/g;
-    const matches = [...text.matchAll(mentionRegex)];
-    const mentionedNames = new Set(
-      matches.map(m => m[1].toLowerCase().trim())
-    );
+    const mentionedNames = extractMentions(text);
 
-    if (mentionedNames.size === 0) return;
+    if (mentionedNames.length === 0) return;
 
     const { data: users, error: usersError } = await supabase
       .from('users_public')
       .select('id, name')
-      .in('name', [...mentionedNames])
+      .in('name', mentionedNames)
       .neq('id', actorId);
 
     if (usersError || !users) {
@@ -30,16 +41,9 @@ export const notifyMentions = async (
       return;
     }
 
-    const mentionedIds = new Set<string>();
     for (const user of users) {
-      if (mentionedNames.has(user.name.toLowerCase().trim())) {
-        mentionedIds.add(user.id);
-      }
-    }
-
-    for (const userId of mentionedIds) {
       await notificationService.createNotification({
-        userId,
+        userId: user.id,
         type,
         actorName,
         postId,

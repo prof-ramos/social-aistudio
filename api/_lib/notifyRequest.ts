@@ -2,9 +2,11 @@
 // Imported by both server.ts (Express, dev/long-running) and api/notify-request.ts
 // (Vercel serverless). Keep it framework-free so both callers can use it.
 import { createClient, type VercelKV } from '@vercel/kv';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 5;
+const MAX_FIELD_LENGTH = 100;
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
 // Lazy-initialised Redis client (only created when KV_URL is present).
@@ -85,7 +87,45 @@ export function validateNotifyRequest(
     return { ok: false, error: 'E-mail inválido.' };
   if (typeof matricula !== 'string' || matricula.trim().length === 0)
     return { ok: false, error: 'Matrícula é obrigatória.' };
-  return { ok: true, fields: { name: name.trim(), email: email.trim(), matricula: matricula.trim() } };
+
+  const trimmedName = name.trim();
+  const trimmedEmail = email.trim();
+  const trimmedMatricula = matricula.trim();
+
+  if (trimmedName.length > MAX_FIELD_LENGTH)
+    return { ok: false, error: 'Nome deve ter no máximo 100 caracteres.' };
+  if (trimmedEmail.length > MAX_FIELD_LENGTH)
+    return { ok: false, error: 'E-mail deve ter no máximo 100 caracteres.' };
+  if (trimmedMatricula.length > MAX_FIELD_LENGTH)
+    return { ok: false, error: 'Matrícula deve ter no máximo 100 caracteres.' };
+
+  return { ok: true, fields: { name: trimmedName, email: trimmedEmail, matricula: trimmedMatricula } };
+}
+
+export type MemberCheckResult =
+  | { ok: true }
+  | { ok: false; status: number; error: string };
+
+/** Check that a PENDING member request exists for the given email. */
+export async function checkMemberRequest(
+  supabase: SupabaseClient,
+  email: string,
+): Promise<MemberCheckResult> {
+  const { data, error } = await supabase
+    .from('member_requests')
+    .select('id,status')
+    .eq('email', email)
+    .single();
+
+  if (error || !data) {
+    return { ok: false, status: 404, error: 'Solicitação não encontrada' };
+  }
+
+  if (data.status !== 'PENDING') {
+    return { ok: false, status: 409, error: 'Solicitação já processada' };
+  }
+
+  return { ok: true };
 }
 
 // Reset hook for tests (the rate-limit Map is module-level state).

@@ -96,9 +96,9 @@ export const postRepository = {
     };
 
     // The first page is loaded once by the consumer (useFeed.fetchInitial); this
-    // subscription only streams subsequent changes. A trailing debounce collapses
-    // a burst of posts/reactions events into a single refetch instead of one full
-    // feed refetch (posts query + reactions batch) per event.
+    // subscription only streams subsequent post changes. A trailing debounce collapses
+    // a burst of events into a single refetch instead of one per event.
+    // Reactions are handled optimistically in the UI — no Realtime refetch needed.
     let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     const scheduleFetch = () => {
       if (debounceTimer) clearTimeout(debounceTimer);
@@ -115,11 +115,6 @@ export const postRepository = {
         schema: 'public',
         table: 'posts',
       }, scheduleFetch)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'reactions',
-      }, scheduleFetch)
       .subscribe((status, err) => {
         if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           onError(err ?? new Error(`Feed channel status: ${status}`));
@@ -132,22 +127,14 @@ export const postRepository = {
     };
   },
 
-  fetchMorePosts: async (lastCreatedAt: string | null, lastId: string | null, pageSize: number = 10): Promise<{ posts: Post[]; lastCreatedAt: string | null; lastId: string | null }> => {
-    let query = supabase
+  fetchMorePosts: async (offset: number, pageSize: number = 10): Promise<{ posts: Post[]; hasMore: boolean }> => {
+    const { data, error } = await supabase
       .from('posts')
       .select('*, users_public!author_id(name, role)')
       .order('created_at', { ascending: false })
       .order('id', { ascending: false })
-      .limit(pageSize);
+      .range(offset, offset + pageSize - 1);
 
-    if (lastCreatedAt && lastId) {
-      query = query
-        .or(`and(created_at.lt.${lastCreatedAt}),and(created_at.eq.${lastCreatedAt},id.lt.${lastId})`);
-    } else if (lastCreatedAt) {
-      query = query.lt('created_at', lastCreatedAt);
-    }
-
-    const { data, error } = await query;
     if (error) {
       console.error('Error fetching more posts:', error);
       throw error;
@@ -156,12 +143,10 @@ export const postRepository = {
     const rows = data || [];
     let posts = rows.map(mapPostRow);
     posts = await reactionRepository.attachToPosts(posts);
-    const lastRow = rows.length > 0 ? rows[rows.length - 1] : null;
 
     return {
       posts,
-      lastCreatedAt: lastRow ? lastRow.created_at : null,
-      lastId: lastRow ? lastRow.id : null,
+      hasMore: rows.length >= pageSize,
     };
   },
 
@@ -225,14 +210,6 @@ export const postRepository = {
         schema: 'public',
         table: 'posts',
         filter: `id=eq.${id}`,
-      }, () => {
-        fetchPost();
-      })
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'reactions',
-        filter: `post_id=eq.${id}`,
       }, () => {
         fetchPost();
       })

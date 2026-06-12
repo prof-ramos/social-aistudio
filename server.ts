@@ -2,7 +2,8 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import nodemailer from "nodemailer";
-import { checkRateLimit, validateNotifyRequest } from "./api/_lib/notifyRequest";
+import { checkRateLimit, validateNotifyRequest, checkMemberRequest } from "./api/_lib/notifyRequest";
+import { getSupabaseServerClient } from "./api/_lib/supabaseServer";
 
 async function startServer() {
   const app = express();
@@ -13,7 +14,7 @@ async function startServer() {
   // API route for email notifications
   app.post("/api/admin/notify-request", async (req, res) => {
     const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
-    if (!checkRateLimit(clientIp)) {
+    if (!(await checkRateLimit(clientIp))) {
       res.status(429).json({ error: 'Muitas requisições. Tente novamente em um minuto.' });
       return;
     }
@@ -25,6 +26,14 @@ async function startServer() {
         return;
       }
       const { name, email, matricula } = result.fields;
+
+      // Verify that a PENDING member request exists for this email
+      const supabase = getSupabaseServerClient();
+      const memberCheck = await checkMemberRequest(supabase, email);
+      if (!memberCheck.ok) {
+        res.status(memberCheck.status).json({ error: memberCheck.error });
+        return;
+      }
 
       const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.hostinger.com',

@@ -24,8 +24,7 @@ vi.mock('../services/postService', () => ({
     }),
     fetchMorePosts: vi.fn(async () => ({
       posts: [...MOCK_POSTS],
-      lastCreatedAt: '2026-01-01',
-      lastId: '1'
+      hasMore: true
     })),
     createPost: vi.fn()
   }

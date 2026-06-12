@@ -10,6 +10,7 @@ vi.mock('../lib/supabase', () => ({
       is: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
+      range: vi.fn().mockReturnThis(),
       lt: vi.fn().mockReturnThis(),
       or: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: null, error: null }),
@@ -344,7 +345,7 @@ describe('postRepository', () => {
       await Promise.resolve();
       await Promise.resolve();
 
-      expect(handlers.length).toBe(2); // posts + reactions handlers registered
+      expect(handlers.length).toBe(1); // posts handler only (reactions are optimistic)
       expect(onUpdate).not.toHaveBeenCalled(); // no eager refetch
       unsubscribe();
     });
@@ -356,9 +357,9 @@ describe('postRepository', () => {
 
       const unsubscribe = postRepository.subscribeToFeed(onUpdate, vi.fn(), 10);
 
-      // Fire both handlers twice in quick succession (a burst of 4 events).
-      handlers.forEach((h) => h());
-      handlers.forEach((h) => h());
+      // Fire the handler multiple times in quick succession (a burst of events).
+      handlers[0]();
+      handlers[0]();
       expect(onUpdate).not.toHaveBeenCalled(); // nothing before the window elapses
 
       await vi.advanceTimersByTimeAsync(250);
@@ -380,6 +381,54 @@ describe('postRepository', () => {
       await vi.advanceTimersByTimeAsync(250);
       expect(onUpdate).not.toHaveBeenCalled();
       vi.useRealTimers();
+    });
+  });
+
+  describe('fetchMorePosts', () => {
+    const buildQueryChain = (resolver: () => Promise<any>) => {
+      const chain: any = {
+        select: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        range: vi.fn().mockImplementation(() => resolver()),
+      };
+      return chain;
+    };
+
+    it('uses offset-based pagination with range', async () => {
+      const mockRows = [
+        { id: 'p3', title: 'Third', body: 'b3', category: 'GERAL', author_id: 'u1', pinned: false, created_at: '2026-01-03', comment_count: 0, users_public: { name: 'A', role: 'ADMIN' } },
+        { id: 'p2', title: 'Second', body: 'b2', category: 'GERAL', author_id: 'u1', pinned: false, created_at: '2026-01-02', comment_count: 0, users_public: { name: 'A', role: 'ADMIN' } },
+      ];
+      const chain = buildQueryChain(() => Promise.resolve({ data: mockRows, error: null }));
+
+      vi.mocked(supabase.from).mockReturnValue(chain);
+
+      const result = await postRepository.fetchMorePosts(10, 10);
+
+      expect(chain.range).toHaveBeenCalledWith(10, 19);
+      expect(result.posts).toHaveLength(2);
+      expect(result.hasMore).toBe(false); // fewer rows than pageSize
+    });
+
+    it('returns hasMore=true when rows fill the page', async () => {
+      const mockRows = Array.from({ length: 10 }, (_, i) => ({
+        id: `p${i}`, title: `Post ${i}`, body: 'b', category: 'GERAL', author_id: 'u1', pinned: false, created_at: '2026-01-01', comment_count: 0, users_public: { name: 'A', role: 'ADMIN' },
+      }));
+      const chain = buildQueryChain(() => Promise.resolve({ data: mockRows, error: null }));
+
+      vi.mocked(supabase.from).mockReturnValue(chain);
+
+      const result = await postRepository.fetchMorePosts(0, 10);
+
+      expect(result.hasMore).toBe(true);
+    });
+
+    it('throws on database error', async () => {
+      const chain = buildQueryChain(() => Promise.resolve({ data: null, error: new Error('db fail') }));
+
+      vi.mocked(supabase.from).mockReturnValue(chain);
+
+      await expect(postRepository.fetchMorePosts(0, 10)).rejects.toThrow('db fail');
     });
   });
 

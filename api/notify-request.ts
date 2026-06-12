@@ -1,6 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
 import nodemailer from "nodemailer";
-import { checkRateLimit, validateNotifyRequest } from "./_lib/notifyRequest";
+import { checkRateLimit, validateNotifyRequest, checkMemberRequest } from "./_lib/notifyRequest";
+import { getSupabaseServerClient } from "./_lib/supabaseServer";
 
 function readBody(req: IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
@@ -38,7 +39,7 @@ export default async function handler(
     req.socket.remoteAddress ||
     "unknown";
 
-  if (!checkRateLimit(clientIp)) {
+  if (!(await checkRateLimit(clientIp))) {
     return json(res, 429, {
       error: "Muitas requisições. Tente novamente em um minuto.",
     });
@@ -51,6 +52,13 @@ export default async function handler(
       return json(res, 400, { error: result.error });
     }
     const { name, email, matricula } = result.fields;
+
+    // Verify that a PENDING member request exists for this email
+    const supabase = getSupabaseServerClient();
+    const memberCheck = await checkMemberRequest(supabase, email);
+    if (!memberCheck.ok) {
+      return json(res, memberCheck.status, { error: memberCheck.error });
+    }
 
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || "smtp.hostinger.com",

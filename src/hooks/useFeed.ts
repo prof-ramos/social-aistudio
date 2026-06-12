@@ -20,8 +20,7 @@ export function useFeed(profile: UserProfile) {
   const [activeFilter, setActiveFilter] = useState<FeedFilter>('RECENTES');
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const lastCreatedAtRef = useRef<string | null>(null);
-  const lastIdRef = useRef<string | null>(null);
+  const offsetRef = useRef<number>(0);
 
   // Real-time subscription via postService.subscribeToFeed
   useEffect(() => {
@@ -29,12 +28,11 @@ export function useFeed(profile: UserProfile) {
 
     const fetchInitial = async () => {
       try {
-        const { posts: newPosts, lastCreatedAt, lastId } = await postService.fetchMorePosts(null, null, PAGE_SIZE);
+        const { posts: newPosts, hasMore: initialHasMore } = await postService.fetchMorePosts(0, PAGE_SIZE);
         if (!isMounted) return;
         setRecentPosts(newPosts);
-        lastCreatedAtRef.current = lastCreatedAt;
-        lastIdRef.current = lastId;
-        setHasMore(newPosts.length >= PAGE_SIZE);
+        offsetRef.current = PAGE_SIZE;
+        setHasMore(initialHasMore);
       } catch (e) {
         console.error('Error loading initial feed:', e);
       }
@@ -107,15 +105,12 @@ export function useFeed(profile: UserProfile) {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     try {
-      const { posts: newPosts, lastCreatedAt, lastId } = await postService.fetchMorePosts(lastCreatedAtRef.current, lastIdRef.current, PAGE_SIZE);
+      const { posts: newPosts, hasMore: moreAvailable } = await postService.fetchMorePosts(offsetRef.current, PAGE_SIZE);
       if (newPosts.length > 0) {
         setOlderPosts(prev => [...prev, ...newPosts]);
-        lastCreatedAtRef.current = lastCreatedAt;
-        lastIdRef.current = lastId;
+        offsetRef.current += PAGE_SIZE;
       }
-      if (newPosts.length < PAGE_SIZE) {
-        setHasMore(false);
-      }
+      setHasMore(moreAvailable);
     } catch (e) {
       console.error('Error loading more posts:', e);
     } finally {

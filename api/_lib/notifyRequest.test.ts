@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { checkRateLimit, validateNotifyRequest, _resetRateLimit, _setRedis } from './notifyRequest';
+import { checkRateLimit, validateNotifyRequest, checkMemberRequest, _resetRateLimit, _setRedis } from './notifyRequest';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 describe('validateNotifyRequest', () => {
   it('accepts valid input and returns trimmed fields', () => {
@@ -118,5 +119,104 @@ describe('checkRateLimit (KV path)', () => {
       expect(await checkRateLimit('1.2.3.4', now)).toBe(true);
     }
     expect(await checkRateLimit('1.2.3.4', now)).toBe(false);
+  });
+});
+
+describe('validateNotifyRequest — field length limits', () => {
+  it('rejects name exceeding 100 characters', () => {
+    const longName = 'a'.repeat(101);
+    expect(validateNotifyRequest({ name: longName, email: 'a@b.com', matricula: '1' })).toEqual({
+      ok: false,
+      error: 'Nome deve ter no máximo 100 caracteres.',
+    });
+  });
+
+  it('accepts name at exactly 100 characters', () => {
+    const name = 'a'.repeat(100);
+    const result = validateNotifyRequest({ name, email: 'a@b.com', matricula: '1' });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.fields.name).toBe(name);
+  });
+
+  it('rejects email exceeding 100 characters', () => {
+    const longEmail = `${'a'.repeat(90)}@${'b'.repeat(20)}.com`; // > 100 chars
+    expect(validateNotifyRequest({ name: 'João', email: longEmail, matricula: '1' })).toEqual({
+      ok: false,
+      error: 'E-mail deve ter no máximo 100 caracteres.',
+    });
+  });
+
+  it('rejects matricula exceeding 100 characters', () => {
+    const longMatricula = '1'.repeat(101);
+    expect(validateNotifyRequest({ name: 'João', email: 'a@b.com', matricula: longMatricula })).toEqual({
+      ok: false,
+      error: 'Matrícula deve ter no máximo 100 caracteres.',
+    });
+  });
+
+  it('accepts matricula at exactly 100 characters', () => {
+    const matricula = '1'.repeat(100);
+    const result = validateNotifyRequest({ name: 'João', email: 'a@b.com', matricula });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.fields.matricula).toBe(matricula);
+  });
+});
+
+function makeMockSupabase(selectResult: { data: unknown | null; error: unknown | null }) {
+  return {
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          single: vi.fn().mockResolvedValue(selectResult),
+        }),
+      }),
+    }),
+  } as unknown as SupabaseClient;
+}
+
+describe('checkMemberRequest', () => {
+  it('returns ok for a PENDING request', async () => {
+    const mock = makeMockSupabase({
+      data: { id: '1', status: 'PENDING' },
+      error: null,
+    });
+    const result = await checkMemberRequest(mock, 'test@example.com');
+    expect(result).toEqual({ ok: true });
+  });
+
+  it('returns 404 when no request exists', async () => {
+    const mock = makeMockSupabase({
+      data: null,
+      error: { code: 'PGRST116' },
+    });
+    const result = await checkMemberRequest(mock, 'nonexistent@example.com');
+    expect(result).toEqual({ ok: false, status: 404, error: 'Solicitação não encontrada' });
+  });
+
+  it('returns 409 when request is already APPROVED', async () => {
+    const mock = makeMockSupabase({
+      data: { id: '1', status: 'APPROVED' },
+      error: null,
+    });
+    const result = await checkMemberRequest(mock, 'approved@example.com');
+    expect(result).toEqual({ ok: false, status: 409, error: 'Solicitação já processada' });
+  });
+
+  it('returns 409 when request is already REJECTED', async () => {
+    const mock = makeMockSupabase({
+      data: { id: '1', status: 'REJECTED' },
+      error: null,
+    });
+    const result = await checkMemberRequest(mock, 'rejected@example.com');
+    expect(result).toEqual({ ok: false, status: 409, error: 'Solicitação já processada' });
+  });
+
+  it('returns 404 on generic Supabase error', async () => {
+    const mock = makeMockSupabase({
+      data: null,
+      error: { message: 'connection refused' },
+    });
+    const result = await checkMemberRequest(mock, 'test@example.com');
+    expect(result).toEqual({ ok: false, status: 404, error: 'Solicitação não encontrada' });
   });
 });
