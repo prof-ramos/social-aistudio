@@ -26,26 +26,26 @@ graph TD
 
 ### Login (`/src/pages/Login.tsx`)
 - **Função:** Porta de entrada para usuários já registrados com contas ativas e aprovadas e fluxo de acesso restrito.
-- **Features Principais:** Autenticação via Email/Senha (Firebase Auth).
+- **Features Principais:** Autenticação via Email/Senha (Supabase Auth).
 - **Requisitos de Funcionalidade:**
   - Deve validar adequadamente credenciais corretas e redirecionar para o `Feed`.
   - Deve exibir mensagens de erro amigáveis para credenciais inválidas ou e-mails não validados.
   - A proteção de rotas deve ocultar completamente o shell e painéis de controle quando o usuário não estiver logado.
 
 ### Solicitação de Acesso (`/src/pages/RegisterRequest.tsx`)
-- **Função:** Permite que novos usuários solicitem participação e acesso à rede privada.
+- **Função:** Permite que novos usuários solicitarem participação e acesso à rede privada.
 - **Features Principais:** Formulário com identificador corporativo (ex: CPF, matrícula) e justificativa.
 - **Requisitos de Funcionalidade:**
   - Validar campos obrigatórios antes da submissão.
-  - Registrar a requisição na coleção do Firestore com status de `PENDING` ao concluir o processo.
+  - Registrar a requisição na tabela `member_requests` do PostgreSQL com status de `PENDING` ao concluir o processo.
   - Redirecionar o usuário para uma tela final de sucesso sem conceder entrada ao sistema até liberação de um administrador.
 
 ### Recuperação de Senha (`/src/pages/ForgotPassword.tsx`)
 - **Função:** Solicitação de redefinição de segurança.
-- **Features Principais:** Firebase Password Reset.
+- **Features Principais:** Supabase Password Reset.
 - **Requisitos de Funcionalidade:**
   - Validar email do usuário.
-  - Confirmar sucesso ao disparar o email padrão via Firebase.
+  - Confirmar sucesso ao disparar o email padrão via Supabase Auth.
 
 ---
 
@@ -69,7 +69,7 @@ graph TD
 - **Features Principais:** Conteúdo do tópico e fluxo de Comentários Aninhados.
 - **Requisitos de Funcionalidade:**
   - Deve renderizar e decodificar perfeitamente o campo HTML interno ou Markdown do post.
-  - Exibição de Respostas (Comments) via listener (`onSnapshot`) em tempo real.
+  - Exibição de Respostas (Comments) via subscription Realtime do Supabase.
   - Permite aos criadores ou perfis de administrador excluírem de forma segura os dados do post e subtópicos.
 
 ---
@@ -101,14 +101,14 @@ graph TD
 - **Requisitos de Funcionalidade:**
   - Renderizar Posts Salvos apenas caso o usuário visualizando seja o próprio dono do perfil (IsOwner).
   - Exigir re-autenticação em fluxos se edição de e-mail sensível for introduzida futuramente.
-  - As atualizações (como a Bio) devem ser guardadas com `updateDoc` e refletir em tempo real.
+  - As atualizações (como a Bio) devem ser guardadas via `userService.updateProfile()` e refletir no estado local.
 
 ### Mensagens Diretas (`/src/pages/Messages.tsx`)
 - **Função:** Comunicação point-to-point (P2P) entre membros da plataforma.
 - **Features Principais:** Painel de chat (Histórico lateral) e Chatbox com timestamps contínuos.
 - **Requisitos de Funcionalidade:**
-  - Uso rígido de observadores (Sockets / Snapshots Firebase) sem expiração que garantam envio bidirecional com fluidez.
-  - Restrições de Firestore Security Rules válidas para evitar espiamentos: `request.auth.uid in resource.data.participants`.
+  - Uso rígido de subscriptions Realtime do Supabase para garantir envio bidirecional com fluidez.
+  - Restrições de RLS (Row Level Security) válidas para evitar espiamentos: participantes da sessão têm acesso exclusivo.
 
 ### Notificações (`/src/pages/Notifications.tsx`)
 - **Função:** Bandeja de logs ativados por gatilhos.
@@ -123,10 +123,10 @@ graph TD
 
 ### Membros - Painel ADM (`/src/pages/AdminMembers.tsx`)
 - **Função:** Autoridade da centralização onde o controle de acesso ao aplicativo restrito é feito ativamente.
-- **Features Principais:** Tabela/Lista interativa e Avaliadora de Perfis Solicitantes (`memberRequests`).
+- **Features Principais:** Tabela/Lista interativa e Avaliadora de Perfis Solicitantes (`member_requests`).
 - **Requisitos de Funcionalidade:**
-  - Disponibilidade total garantida pelas Regras Firebase: somentes uids marcados como "isAdmin" no documento têm permissão de leitura.
-  - Controles lógicos para APROVAR (criando auth profile) e REPROVAR, processando do banco permanentemente.
+  - Disponibilidade total garantida pelas RLS policies: somente usuários com `role = 'ADMIN'` têm permissão de leitura.
+  - Controles lógicos para APROVAR (criando auth profile e usuário no PostgreSQL) e REPROVAR, processando do banco permanentemente.
 
 ### Moderação Central (`/src/pages/AdminModeration.tsx`)
 - **Função:** Fiscalização sanitária em conteúdo do fórum e controle sobre comportamentos destrutivos ou anti-éticos.

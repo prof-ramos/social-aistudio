@@ -114,7 +114,7 @@ The backend consists of two layers:
 ### 4.2. Storage
 **Name:** Supabase Storage
 **Purpose:** Avatar image uploads and file attachments.
-**Bucket:** `avatars` — profile pictures.
+**Buckets:** `avatars` — profile pictures; `logos` — institutional brand assets.
 
 ## 5. External Integrations / APIs
 
@@ -163,11 +163,13 @@ The backend consists of two layers:
 - Implement CI/CD test runner in GitHub Actions
 - Generate `src/types/supabase.ts` from live database schema
 - Create ADRs (Architecture Decision Records) for key migrations
+- Migrate UI components to shadcn/ui (Sprints 0-6 documented in `docs/SHADCN-MIGRATION.md`)
+- Add Docker containerization for reproducible deployments
 
 ## 10. Project Identification
 
 **Project Name:** Social-ASOF
-**Last Architecture Update:** 2026-06-10
+**Last Architecture Update:** 2026-06-12
 **Maintainer:** ASOF — Associação dos Oficiais de Chancelaria
 
 ## 11. Glossary / Acronyms

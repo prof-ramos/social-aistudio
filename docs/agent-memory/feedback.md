@@ -44,3 +44,12 @@
 - **Evidência da sessão**: `supabase db execute` não existe como subcomando; `supabase db query` falhou com "dial tcp 127.0.0.1:54322: connect: connection refused".
 - **Regra preventiva**: Para rodar SQL contra banco remoto Supabase, usar Dashboard SQL Editor ou `psql` com a URL de pooler (requer senha). `supabase db push` funciona para migrations, mas não para queries ad-hoc.
 - **Confiança**: alta
+
+## 2026-06-12 — Migrations incrementais por erro de schema qualification
+
+- **Tipo**: erro do agente
+- **Escopo**: qualquer migration PostgreSQL com SECURITY DEFINER
+- **Memória**: Ao criar funções SECURITY DEFINER com `SET search_path = ''`, esqueceu-se de qualificar tipos enum (`user_role`, `request_status`) e chamadas de função (`get_crypt_key()`) com `public.`. Resultado: 3 migrations incrementais (00400-00600) para corrigir um problema que deveria ter sido capturado na primeira tentativa.
+- **Evidência da sessão**: `ERROR: type "user_role" does not exist` e `ERROR: function get_crypt_key() does not exist` em produção, cada um exigindo migration adicional.
+- **Regra preventiva**: Ao escrever SECURITY DEFINER `SET search_path = ''`, qualificar TODAS as referências upfront: tabelas (`public.users`), funções (`public.get_crypt_key()`), funções de extensão (`extensions.pgp_sym_encrypt()`), e tipos enum (`public.user_role`). Listar todas as referências antes de escrever o SQL.
+- **Confiança**: alta

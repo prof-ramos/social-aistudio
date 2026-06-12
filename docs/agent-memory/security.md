@@ -16,8 +16,10 @@
 - **Ação tomada**: Removido o DROP COLUMN da migration. A coluna `cpf` será removida em migration follow-up após verificação.
 - **Regra**: Nunca incluir `DROP COLUMN` na mesma migration que adiciona a coluna de substituição. Criar migration separada para remover colunas, e só aplicar após confirmar que dados migrados estão íntegros.
 
-## Configuração de chave de criptografia é ação manual no Dashboard
+## Configuração de chave de criptografia — abordagem SECURITY DEFINER
 
-- A variável `app.asof_crypt_key` (usada por `pgp_sym_encrypt`/`pgp_sym_decrypt`) **deve** ser configurada como Database Session Setting no Supabase Dashboard (Settings → Database → Session settings) antes de a aplicação usar as RPCs de criptografia.
-- Não é possível configurar essa chave via CLI ou migration — ela não deve ser incluída no código.
-- **Pendente**: A chave ainda não foi configurada. As RPCs `insert_member_request`, `get_member_requests_for_admin` e `create_user_from_member_request` vão falhar até que seja.
+- `app.asof_crypt_key` via `ALTER DATABASE SET` **NÃO funciona** no plano Free/Nano (permission denied, mesmo via Dashboard SQL Editor). `current_setting()` também não funciona.
+- **Abordagem vigente**: `get_crypt_key()` — função SECURITY DEFINER com `SET search_path = ''` que retorna a chave diretamente.
+- `vault.decrypted_secrets` é protegida por RLS — SECURITY DEFINER functions **não conseguem ler** no plano Free/Nano. Não usar vault para chaves de criptografia.
+- **Rotação de chave**: criar nova migration que substitui o body de `get_crypt_key()` com a nova chave.
+- As 3 RPCs (`insert_member_request`, `get_member_requests_for_admin`, `create_user_from_member_request`) usam `public.get_crypt_key()` com todas as referências schema-qualificadas.

@@ -22,11 +22,27 @@
 - **Pendente**: `app.asof_crypt_key` não configurado; backfill de CPFs existentes será manual via Dashboard SQL Editor após configurar a chave.
 - **Pendente**: coluna `cpf` em texto plano em `member_requests` será removida em migration follow-up (Plan 007 Step 6).
 
-## Plans 007-011 — status DONE
+## Plans 001-012 — todos DONE
 
-- Todos os 5 plans (007-011) foram implementados, merged em main e migrations aplicadas.
-- Branches locais e remotas `advisor/007` a `advisor/011` foram deletadas.
-- `plans/README.md` atualizado com status DONE para 007, 009, 010, 011.
+- Todos os 12 plans (001-012) estão DONE. Nenhum plan pendente.
+- Plan 012 completou a finalização de CPF encryption (DROP COLUMN, get_crypt_key() SECURITY DEFINER, schema qualification).
+- `plans/README.md` atualizado com status DONE para todos.
+
+## Migrations 20260612 aplicadas ao banco remoto
+
+- `20260612000000` — DROP COLUMN cpf (com safety check que impede DROP se CPFs não criptografados existem)
+- `20260612000100` — vault approach (obsoleta, substituída por 00200)
+- `20260612000200` — `get_crypt_key()` SECURITY DEFINER com chave embutida (abordagem final)
+- `20260612000300` — fix column ambiguity em `get_member_requests_for_admin`
+- `20260612000400` a `20260612000600` — schema-qualify all refs (iterações: tabelas, funções, tipos enum)
+
+## Bugs resolvidos (GitHub issues)
+
+- **#5** Feed flicker: remoção de subscription de reactions do Realtime; UI otimista
+- **#6** notifyMentions: regex Unicode (`[\p{L}\p{M}\p{N}'-]+`) + query `.in()` por nomes, sem `getAllUsers()`
+- **#7** Paginação: offset-based `.range()` em vez de cursor `(created_at, id)`
+- **#8** notify-request: validação de campos, verificação de existência/status (404/409)
+- **#9** TanStack Query: aberta — mudança arquitetural, requer planejamento dedicado
 
 ## Supabase Storage — bucket `logos`
 

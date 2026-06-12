@@ -1,6 +1,6 @@
 # Ready-to: Checklist de Deploy
 
-> Gerado em: 2026-06-10
+> Gerado em: 2026-06-12
 > Projeto: Social-ASOF
 > Branch: `main`
 > Stack: React 19 + Supabase + Express 5 + Vite
@@ -10,7 +10,7 @@
 ## ✅ Verificações ok
 
 - **TypeScript**: compila sem erros com strict mode ativo
-- **Testes**: 33 arquivos, 171/171 passando
+- **Testes**: 34 arquivos, 173/173 passando
 - **Build**: Vite 6 + esbuild — sucesso
 - **Git**: `main` limpa, synced com `origin/main`
 - **CI**: GitHub Actions presente (`ci.yml` com tsc + test + build)

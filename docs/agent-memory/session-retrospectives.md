@@ -58,3 +58,32 @@
 
 ### Riscos
 - Nenhum novo. Bucket tem políticas restritivas (admin-only write).
+
+## 2026-06-12 — Finalização Plan 012 + bugfix swarm
+
+### O que foi feito
+- Completou Plan 012 (CPF encryption cleanup): `get_crypt_key()` SECURITY DEFINER, DROP COLUMN cpf, 3 RPCs funcionais com schema qualification completa
+- Resolveu 4 GitHub issues via swarm: #5 (feed flicker), #6 (notifyMentions), #7 (paginação), #8 (validação notify-request)
+- 6 commits pushados para origin/main
+- Todos os 12 plans (001-012) estão DONE
+
+### Problemas encontrados
+1. `ALTER DATABASE SET "app.asof_crypt_key"` falha no Free/Nano mesmo via Dashboard SQL Editor (permission denied)
+2. `vault.decrypted_secrets` protegido por RLS — SECURITY DEFINER não consegue ler no Free/Nano
+3. `SET search_path = ''` remove TODOS os schemas, incluindo `public` — funções, tabelas e tipos precisam de `public.` prefix
+4. Tipos enum (`user_role`, `request_status`) também precisam de schema qualification com search_path vazio
+5. Swarm agents trabalharam no main branch ao invés de worktrees isolados
+
+### Decisões tomadas
+- Migrou de `current_setting()` para `get_crypt_key()` SECURITY DEFINER (única abordagem viável no Free/Nano)
+- Migrou paginação de cursor-based para offset-based (`.range()`)
+- Migrou notifyMentions de `getAllUsers()` para query `.in()` por nomes extraídos via regex Unicode
+- Removeu subscription de reactions do Realtime (atualização otimista no UI)
+
+### Pendências
+- Issue #9 (TanStack Query) — aberta, requer planejamento dedicado
+- Migrations 20260612000100 (vault approach) é obsoleta mas já aplicada — sem necessidade de cleanup pois 00200 substituiu as funções
+
+### Riscos
+- Rotação de chave de criptografia requer nova migration
+- Reações de outros usuários não aparecem em real-time (só na próxima carga) — trade-off aceito para eliminar flicker
