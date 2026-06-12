@@ -11,7 +11,6 @@ import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, Select
 import { PageContainer } from '../components/layout/PageContainer';
 import { useFeed, FeedFilter } from '../hooks/useFeed';
 import { useSavedPosts } from '../hooks/useSavedPosts';
-import { postService } from '../services/postService';
 
 export function Feed({ profile }: { profile: UserProfile }) {
   const {
@@ -31,21 +30,14 @@ export function Feed({ profile }: { profile: UserProfile }) {
     editingPost,
     activeFilter,
     setActiveFilter,
+    postCount,
     loadMore,
     hasMore
   } = useFeed(profile);
 
   const saved = useSavedPosts(profile.id, profile.savedPosts ?? []);
-  const [postCount, setPostCount] = useState<number | null>(null);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setPostCount(null);
-    postService.getPostCountByAuthor(profile.id)
-      .then(setPostCount)
-      .catch(() => setPostCount(null));
-  }, [profile.id]);
 
   useEffect(() => {
     function handleShortcut(e: KeyboardEvent) {

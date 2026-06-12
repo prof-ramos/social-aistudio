@@ -15,9 +15,9 @@ Custom React hooks that encapsulate business logic, Supabase Realtime subscripti
 | `useNotifications.ts` | Notification list with unread count badge |
 | `useChatConversation.ts` | Chat conversation with real-time message subscription |
 | `useChatList.ts` | Chat session list management |
-| `useProfile.ts` | User profile loading and display |
 | `useUserProfile.ts` | Other users' profile lookup |
 | `useEditProfile.ts` | Profile editing form state and submission |
+| `useSavedPosts.ts` | Optimistic saved-post state and persistence |
 | `useGlobalSearch.ts` | Cross-entity search with debounced input |
 | `useAdminMembers.ts` | Member management for admin panel |
 | `useAdminModeration.ts` | Report queue and moderation actions |

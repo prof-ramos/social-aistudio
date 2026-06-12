@@ -26,7 +26,8 @@ vi.mock('../services/postService', () => ({
       posts: [...MOCK_POSTS],
       hasMore: true
     })),
-    createPost: vi.fn()
+    createPost: vi.fn(),
+    getPostCountByAuthor: vi.fn(async () => 2)
   }
 }));
 
@@ -70,5 +71,12 @@ describe('useFeed Hook', () => {
 
     await waitFor(() => expect(result.current.filteredPosts).toHaveLength(1));
     expect(result.current.filteredPosts[0].id).toBe('1');
+  });
+
+  it('loads the author post count for the profile sidebar', async () => {
+    const { result } = renderHook(() => useFeed(profile), { wrapper });
+
+    await waitFor(() => expect(result.current.postCount).toBe(2));
+    expect(postService.getPostCountByAuthor).toHaveBeenCalledWith('u1');
   });
 });

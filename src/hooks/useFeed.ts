@@ -20,6 +20,7 @@ export function useFeed(profile: UserProfile) {
   const [activeFilter, setActiveFilter] = useState<FeedFilter>('RECENTES');
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [postCount, setPostCount] = useState<number | null>(null);
   const offsetRef = useRef<number>(0);
 
   // Real-time subscription via postService.subscribeToFeed
@@ -56,6 +57,24 @@ export function useFeed(profile: UserProfile) {
       unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    setPostCount(null);
+    postService.getPostCountByAuthor(profile.id)
+      .then((count) => {
+        if (isMounted) setPostCount(count);
+      })
+      .catch((error) => {
+        console.error('Error loading profile post count:', error);
+        if (isMounted) setPostCount(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [profile.id]);
 
   // Update search state if URL query param changes
   useEffect(() => {
@@ -184,6 +203,7 @@ export function useFeed(profile: UserProfile) {
     handleCloseEditor,
     activeFilter,
     setActiveFilter,
+    postCount,
     loadMore,
     hasMore,
     loadingMore

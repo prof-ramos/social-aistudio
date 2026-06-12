@@ -78,6 +78,7 @@ describe('Feed', () => {
       handleCreatePost: vi.fn(),
       activeFilter: 'RECENTES',
       setActiveFilter: vi.fn(),
+      postCount: 0,
       loadMore: vi.fn(),
       hasMore: false
     });
@@ -115,6 +116,7 @@ describe('Feed', () => {
       handleCreatePost: vi.fn(),
       activeFilter: 'RECENTES',
       setActiveFilter: vi.fn(),
+      postCount: 1,
       loadMore: vi.fn(),
       hasMore: false
     });
