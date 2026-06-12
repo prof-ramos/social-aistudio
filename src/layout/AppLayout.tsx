@@ -88,7 +88,7 @@ export function AppLayout({ profile, isAdminView }: { profile: UserProfile; isAd
               isMessagesRoute ? 'min-h-0 flex-1' : 'gap-8',
             )}
           >
-            <Outlet />
+            <Outlet context={profile} />
           </div>
         </section>
       </main>
