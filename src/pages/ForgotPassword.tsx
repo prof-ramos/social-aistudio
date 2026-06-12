@@ -4,6 +4,7 @@ import { authService } from '../services/authService';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Alert } from '../components/ui/Alert';
+import { Input, Label } from '../components/ui';
 import { AuthShell } from '../components/brand/AuthShell';
 
 export default function ForgotPassword() {
@@ -53,8 +54,8 @@ export default function ForgotPassword() {
           {error && <Alert variant="error">{error}</Alert>}
 
           <div>
-            <label htmlFor="email" className="mb-1 block text-base font-medium text-slate">E-mail</label>
-            <input
+            <Label htmlFor="email" className="mb-1 block text-base font-medium text-slate">E-mail</Label>
+            <Input
               id="email"
               type="email"
               inputMode="email"
@@ -62,7 +63,6 @@ export default function ForgotPassword() {
               autoCapitalize="none"
               enterKeyHint="go"
               required
-              className="w-full h-11 rounded-none border border-border-gray bg-white/80 px-3 text-slate transition-colors focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />

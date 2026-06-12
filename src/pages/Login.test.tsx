@@ -61,3 +61,24 @@ describe('Login - password toggle', () => {
     expect(newToggleButton).toBeInTheDocument();
   });
 });
+
+describe('Login - submit', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('submits email and password to authService.signIn', async () => {
+    const user = userEvent.setup();
+    renderWithRouter(<Login />);
+
+    const emailInput = screen.getByLabelText('E-mail');
+    const passwordInput = screen.getByLabelText('Senha');
+    const submitButton = screen.getByRole('button', { name: /entrar/i });
+
+    await user.type(emailInput, 'test@asof.org');
+    await user.type(passwordInput, 'senha123');
+    await user.click(submitButton);
+
+    expect(authService.signIn).toHaveBeenCalledWith('test@asof.org', 'senha123');
+  });
+});

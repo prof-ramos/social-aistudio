@@ -1,10 +1,11 @@
 /// <reference types="vite/client" />
 import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
 import { Alert } from '../components/ui/Alert';
+import { Input, Label } from '../components/ui';
 import { AuthShell } from '../components/brand/AuthShell';
 
 export function Login() {
@@ -37,8 +38,8 @@ export function Login() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="email" className="block text-base font-medium text-slate mb-1">E-mail</label>
-          <input
+          <Label htmlFor="email" className="block text-base font-medium text-slate mb-1">E-mail</Label>
+          <Input
             id="email"
             type="email"
             inputMode="email"
@@ -46,22 +47,21 @@ export function Login() {
             autoCapitalize="none"
             enterKeyHint="next"
             required
-            className="w-full h-11 border border-border-gray rounded-none px-3 text-slate focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 bg-white/80 transition-all duration-200 ease-out focus:shadow-[0_0_0_3px_rgba(5,82,141,0.12)]"
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-base font-medium text-slate mb-1">Senha</label>
+          <Label htmlFor="password" className="block text-base font-medium text-slate mb-1">Senha</Label>
           <div className="relative">
-            <input
+            <Input
               id="password"
               type={showPassword ? 'text' : 'password'}
               autoComplete="current-password"
               enterKeyHint="go"
               required
-              className="w-full h-11 border border-border-gray rounded-none px-3 pr-10 text-slate focus:border-navy focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2 bg-white/80 transition-all duration-200 ease-out focus:shadow-[0_0_0_3px_rgba(5,82,141,0.12)]"
+              className="pr-10"
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
@@ -84,7 +84,7 @@ export function Login() {
           isLoading={loading}
           className="mt-6"
         >
-          {loading ? 'Entrando...' : 'Entrar'}
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : 'Entrar'}
         </Button>
       </form>
 
