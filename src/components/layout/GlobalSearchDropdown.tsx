@@ -22,6 +22,9 @@ interface GlobalSearchDropdownProps {
 export function GlobalSearchDropdown({ query, results, isSearching, onClose, inputRef }: GlobalSearchDropdownProps) {
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(-1);
+  // Ref mirrors state so handleKeyDown can read it without being in its dep array,
+  // preventing the listener from being torn down/re-added on every arrow key press.
+  const activeIndexRef = useRef(-1);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const allItems = useMemo(() => [
@@ -34,31 +37,44 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
 
   useEffect(() => {
     setActiveIndex(-1);
+    activeIndexRef.current = -1;
   }, [query]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') {
+      e.stopPropagation(); // prevent Navbar's document-level Escape handler from also firing
       onClose();
       return;
     }
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (allItems.length === 0) return;
-      setActiveIndex(prev => (prev + 1) % allItems.length);
+      setActiveIndex(prev => {
+        const next = (prev + 1) % allItems.length;
+        activeIndexRef.current = next;
+        return next;
+      });
       return;
     }
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (allItems.length === 0) return;
-      setActiveIndex(prev => prev <= 0 ? allItems.length - 1 : prev - 1);
+      setActiveIndex(prev => {
+        const next = prev <= 0 ? allItems.length - 1 : prev - 1;
+        activeIndexRef.current = next;
+        return next;
+      });
       return;
     }
-    if (e.key === 'Enter' && activeIndex >= 0 && activeIndex < allItems.length) {
-      e.preventDefault();
-      navigate(allItems[activeIndex].navigateTo);
-      onClose();
+    if (e.key === 'Enter') {
+      const idx = activeIndexRef.current;
+      if (idx >= 0 && idx < allItems.length) {
+        e.preventDefault();
+        navigate(allItems[idx].navigateTo);
+        onClose();
+      }
     }
-  }, [allItems, activeIndex, navigate, onClose]);
+  }, [allItems, navigate, onClose]); // activeIndex removed — read via ref instead
 
   useEffect(() => {
     const input = inputRef.current;
@@ -93,13 +109,17 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
     >
       <Command shouldFilter={false} className="rounded-none!">
         <CommandList className="max-h-80">
-          {(query.length < 2 || isSearching || !hasResults) ? (
+          {query.length < 2 ? (
             <CommandEmpty className="py-3 px-4 text-base text-slate text-left">
-              {query.length < 2
-                ? 'Digite pelo menos 2 caracteres...'
-                : isSearching
-                  ? 'Buscando...'
-                  : 'Nenhum resultado encontrado.'}
+              Digite pelo menos 2 caracteres...
+            </CommandEmpty>
+          ) : !hasResults && isSearching ? (
+            <CommandEmpty className="py-3 px-4 text-base text-slate text-left">
+              Buscando...
+            </CommandEmpty>
+          ) : !hasResults ? (
+            <CommandEmpty className="py-3 px-4 text-base text-slate text-left">
+              Nenhum resultado encontrado.
             </CommandEmpty>
           ) : (
             <>

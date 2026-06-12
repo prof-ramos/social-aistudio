@@ -41,13 +41,13 @@ export function BreadcrumbSeparator({ className, children, ...props }: React.Com
 
 // ASOF Breadcrumb wrapper (keeps the existing items-array API)
 
-export interface BreadcrumbItem {
+export interface BreadcrumbItemDef {
   label: string;
   href?: string;
 }
 
 interface BreadcrumbProps {
-  items: BreadcrumbItem[];
+  items: BreadcrumbItemDef[];
 }
 
 export function Breadcrumb({ items }: BreadcrumbProps) {

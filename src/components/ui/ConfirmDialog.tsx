@@ -146,6 +146,7 @@ export function ConfirmDialog({
             variant={confirmVariant[variant]}
             size="md"
             onClick={handleConfirm}
+            disabled={!canConfirm}
           >
             {confirmLabel}
           </AlertDialogAction>

@@ -65,10 +65,10 @@ export function Alert({ variant = 'error', title, className, children, ...props 
   const Icon = icons[variant];
   return (
     <ShadcnAlert
+      {...props}
       role={variant === 'error' ? 'alert' : 'status'}
       aria-live={variant === 'error' ? 'assertive' : 'polite'}
       className={cn('flex items-start gap-3 shadow-sm', variantClasses[variant], className)}
-      {...props}
     >
       <Icon className="w-5 h-5 shrink-0 mt-0.5" aria-hidden="true" />
       <div className="flex-1">

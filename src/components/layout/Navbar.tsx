@@ -93,11 +93,15 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     return () => document.removeEventListener('keydown', handleSlash);
   }, []);
 
+  // Stable ref so the Escape handler doesn't re-register on every keystroke
+  const queryRef = useRef(query);
+  useEffect(() => { queryRef.current = query; }, [query]);
+
   // Escape key handling
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        if (query) {
+        if (queryRef.current) {
           clearQuery();
           return;
         }
@@ -106,12 +110,15 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
     }
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [query, clearQuery]);
+  }, [clearQuery]);
 
   useFocusTrap(mobileMenuRef, mobileMenuOpen);
 
   // Body scroll lock for mobile menu
   const savedScrollY = useRef(0);
+  // When closing the mobile menu to show the logout dialog, skip scroll restore
+  // to avoid a visible page jump behind the AlertDialog overlay.
+  const skipScrollRestore = useRef(false);
   useEffect(() => {
     if (mobileMenuOpen) {
       savedScrollY.current = window.scrollY;
@@ -122,7 +129,10 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
       document.body.style.position = '';
       document.body.style.width = '';
       document.body.style.top = '';
-      window.scrollTo(0, savedScrollY.current);
+      if (!skipScrollRestore.current) {
+        window.scrollTo(0, savedScrollY.current);
+      }
+      skipScrollRestore.current = false;
     }
     return () => {
       document.body.style.position = '';
@@ -135,12 +145,17 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   }, [mobileMenuOpen]);
 
   const handleLogoutClick = () => {
+    skipScrollRestore.current = true;
     setShowLogoutDialog(true);
     setMobileMenuOpen(false);
   };
 
   const performLogout = async () => {
-    await authService.signOut();
+    try {
+      await authService.signOut();
+    } catch {
+      // sign-out failure; navigate to login regardless to clear UI
+    }
     navigate('/login');
   };
 
@@ -253,7 +268,7 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
               >
                 <div className="text-right hidden sm:block">
                   <p className="text-base font-bold text-navy group-hover:text-sky transition-colors">{profile.name.split(' ')[0]}</p>
-                  <p className="text-sm text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : 'Admin'}</p>
+                  <p className="text-sm text-slate uppercase tracking-wider">{profile.role === 'MEMBRO_ATIVO' ? 'Membro' : profile.role === 'MEMBRO_APOSENTADO' ? 'Aposentado' : profile.role === 'ADMIN' ? 'Admin' : 'Pendente'}</p>
                 </div>
                 <div className="w-11 h-11 bg-ice border border-border-gray flex items-center justify-center text-navy font-bold uppercase overflow-hidden">
                   {profile.avatarUrl ? <img src={profile.avatarUrl} alt={profile.name} className="w-full h-full object-cover" /> : profile.name.charAt(0)}

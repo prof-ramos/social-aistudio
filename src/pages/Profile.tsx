@@ -288,7 +288,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
               type="button"
               variant="ghost"
               size="md"
-              onClick={() => setIsEditing(false)}
+              onClick={() => !saving && setIsEditing(false)}
               className="w-full sm:w-auto"
             >
               Cancelar
