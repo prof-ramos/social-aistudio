@@ -83,6 +83,18 @@ export function usePostDetails(id: string | undefined, profile: UserProfile) {
     }
   };
 
+  const handleUpdatePost = async (postId: string, title: string, bodyHTML: string, category: string) => {
+    try {
+      const updated = await postService.updatePost(postId, { title, body: bodyHTML, category });
+      setPost(updated);
+      return updated;
+    } catch (e) {
+      console.error(e);
+      addToast('Erro ao atualizar publicação.', 'error');
+      throw e;
+    }
+  };
+
   return {
     post,
     setPost,
@@ -96,6 +108,7 @@ export function usePostDetails(id: string | undefined, profile: UserProfile) {
     reportTarget,
     setReportTarget,
     submitReport,
-    handleDeletePost
+    handleDeletePost,
+    handleUpdatePost
   };
 }

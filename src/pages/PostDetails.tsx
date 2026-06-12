@@ -5,7 +5,6 @@ import { UserProfile, Post } from '../types';
 import { canEdit } from '../policies/postPolicy';
 import { ArrowLeft, MessageSquare, ThumbsUp, AlertTriangle, Bookmark, Pencil, Trash2 } from 'lucide-react';
 import { usePostDetails } from '../hooks/usePostDetails';
-import { postService } from '../services/postService';
 import { PostEditor } from '../components/feed/PostEditor';
 import { ReactionButtons } from '../components/feed/ReactionButtons';
 import { useSavedPosts } from '../hooks/useSavedPosts';
@@ -35,7 +34,8 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
     reportTarget,
     setReportTarget,
     submitReport,
-    handleDeletePost
+    handleDeletePost,
+    handleUpdatePost
   } = usePostDetails(id, profile);
 
   const canModify = post && canEdit(profile, post);
@@ -124,7 +124,7 @@ export default function PostDetails({ profile }: { profile: UserProfile }) {
           onCancel={handleEditCancel}
           onEditComplete={handleEditComplete}
           onSubmit={async () => {}}
-          onUpdate={async (postId, title, bodyHTML, category) => postService.updatePost(postId, { title, body: bodyHTML, category })}
+          onUpdate={handleUpdatePost}
           isPosting={false}
         />
       ) : (
