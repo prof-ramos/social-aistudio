@@ -3,20 +3,10 @@ import { adminService } from '../services/adminService';
 import { postService } from '../services/postService';
 import { postoService } from '../services/postoService';
 import { useToast } from '../components/ui/Toast';
+import type { Report } from '../types';
 
-// Extract this interface to types if needed, but for now keeping it self-contained
-export interface Report {
-  id: string;
-  type: string;
-  contentId: string;
-  preview: string;
-  reportedBy: string;
-  reason: string;
-  status: 'PENDING' | 'RESOLVED_KEPT' | 'RESOLVED_REMOVED' | 'RESOLVED_WARNED';
-  notes?: string;
-  createdAt: any;
-  resolvedAt?: any;
-}
+// Re-exported so existing consumers can keep importing Report from this hook.
+export type { Report };
 
 export function useAdminModeration() {
   const { addToast } = useToast();
