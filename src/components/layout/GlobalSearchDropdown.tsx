@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, FileText, Compass } from 'lucide-react';
+import { cn } from '../../lib/utils';
 import { SearchResult } from '../../services/searchService';
 import {
   Command,
@@ -21,6 +22,9 @@ interface GlobalSearchDropdownProps {
 export function GlobalSearchDropdown({ query, results, isSearching, onClose, inputRef }: GlobalSearchDropdownProps) {
   const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(-1);
+  // Ref mirrors state so handleKeyDown can read it without being in its dep array,
+  // preventing the listener from being torn down/re-added on every arrow key press.
+  const activeIndexRef = useRef(-1);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const allItems = useMemo(() => [
@@ -33,30 +37,44 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
 
   useEffect(() => {
     setActiveIndex(-1);
+    activeIndexRef.current = -1;
   }, [query]);
 
-  const handleKeyDown = useCallback((e: Event) => {
-    const ke = e as KeyboardEvent;
-    if (ke.key === 'Escape') {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation(); // prevent Navbar's document-level Escape handler from also firing
       onClose();
       return;
     }
-    if (ke.key === 'ArrowDown') {
-      ke.preventDefault();
-      setActiveIndex(prev => (prev + 1) % Math.max(allItems.length, 1));
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (allItems.length === 0) return;
+      setActiveIndex(prev => {
+        const next = (prev + 1) % allItems.length;
+        activeIndexRef.current = next;
+        return next;
+      });
       return;
     }
-    if (ke.key === 'ArrowUp') {
-      ke.preventDefault();
-      setActiveIndex(prev => prev <= 0 ? allItems.length - 1 : prev - 1);
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (allItems.length === 0) return;
+      setActiveIndex(prev => {
+        const next = prev <= 0 ? allItems.length - 1 : prev - 1;
+        activeIndexRef.current = next;
+        return next;
+      });
       return;
     }
-    if (ke.key === 'Enter' && activeIndex >= 0 && activeIndex < allItems.length) {
-      ke.preventDefault();
-      navigate(allItems[activeIndex].navigateTo);
-      onClose();
+    if (e.key === 'Enter') {
+      const idx = activeIndexRef.current;
+      if (idx >= 0 && idx < allItems.length) {
+        e.preventDefault();
+        navigate(allItems[idx].navigateTo);
+        onClose();
+      }
     }
-  }, [allItems, activeIndex, navigate, onClose]);
+  }, [allItems, navigate, onClose]); // activeIndex removed — read via ref instead
 
   useEffect(() => {
     const input = inputRef.current;
@@ -77,10 +95,12 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
   const postItems = allItems.filter(i => i.type === 'post');
   const postoItems = allItems.filter(i => i.type === 'posto');
 
-  // Compute global indices aligned with allItems order (users → posts → postos)
   const userOffset = 0;
   const postOffset = userItems.length;
   const postoOffset = userItems.length + postItems.length;
+
+  const groupHeadingClass = "[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:border-b [&_[cmdk-group-heading]]:border-border-gray/50";
+  const itemBaseClass = "rounded-none! px-3 py-2.5 min-h-[44px] text-base text-navy gap-3 cursor-pointer";
 
   return (
     <div
@@ -89,20 +109,24 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
     >
       <Command shouldFilter={false} className="rounded-none!">
         <CommandList className="max-h-80">
-          {(query.length < 2 || isSearching || !hasResults) ? (
+          {query.length < 2 ? (
             <CommandEmpty className="py-3 px-4 text-base text-slate text-left">
-              {query.length < 2
-                ? 'Digite pelo menos 2 caracteres...'
-                : isSearching
-                  ? 'Buscando...'
-                  : 'Nenhum resultado encontrado.'}
+              Digite pelo menos 2 caracteres...
+            </CommandEmpty>
+          ) : !hasResults && isSearching ? (
+            <CommandEmpty className="py-3 px-4 text-base text-slate text-left">
+              Buscando...
+            </CommandEmpty>
+          ) : !hasResults ? (
+            <CommandEmpty className="py-3 px-4 text-base text-slate text-left">
+              Nenhum resultado encontrado.
             </CommandEmpty>
           ) : (
             <>
               {userItems.length > 0 && (
                 <CommandGroup
-                  heading={<span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate"><User className="w-3.5 h-3.5" aria-hidden="true" />Membros</span>}
-                  className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:border-b [&_[cmdk-group-heading]]:border-border-gray/50"
+                  heading={<span className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-navy"><User className="w-4 h-4" aria-hidden="true" />Membros</span>}
+                  className={groupHeadingClass}
                 >
                   {userItems.map((item, i) => {
                     const idx = userOffset + i;
@@ -111,10 +135,9 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
                       <CommandItem
                         key={`user-${item.id}`}
                         data-index={idx}
-                        data-selected={isActive ? '' : undefined}
                         value={`user-${item.id}`}
                         onSelect={() => { navigate(item.navigateTo); onClose(); }}
-                        className="rounded-none! px-3 py-2.5 min-h-[44px] text-base text-navy gap-3 data-selected:bg-ice data-selected:text-navy cursor-pointer"
+                        className={cn(itemBaseClass, isActive && "bg-ice")}
                       >
                         {item.avatarUrl ? (
                           <img src={item.avatarUrl} alt="" className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
@@ -134,8 +157,8 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
               )}
               {postItems.length > 0 && (
                 <CommandGroup
-                  heading={<span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate"><FileText className="w-3.5 h-3.5" aria-hidden="true" />Posts</span>}
-                  className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:border-b [&_[cmdk-group-heading]]:border-border-gray/50"
+                  heading={<span className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-navy"><FileText className="w-4 h-4" aria-hidden="true" />Posts</span>}
+                  className={groupHeadingClass}
                 >
                   {postItems.map((item, i) => {
                     const idx = postOffset + i;
@@ -144,10 +167,9 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
                       <CommandItem
                         key={`post-${item.id}`}
                         data-index={idx}
-                        data-selected={isActive ? '' : undefined}
                         value={`post-${item.id}`}
                         onSelect={() => { navigate(item.navigateTo); onClose(); }}
-                        className="rounded-none! px-3 py-2.5 min-h-[44px] text-base text-navy gap-3 data-selected:bg-ice data-selected:text-navy cursor-pointer"
+                        className={cn(itemBaseClass, isActive && "bg-ice")}
                       >
                         <FileText className="w-4 h-4 text-slate flex-shrink-0" strokeWidth={1.5} aria-hidden="true" />
                         <div className="min-w-0 flex-1">
@@ -161,8 +183,8 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
               )}
               {postoItems.length > 0 && (
                 <CommandGroup
-                  heading={<span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate"><Compass className="w-3.5 h-3.5" aria-hidden="true" />Postos</span>}
-                  className="[&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:py-2 [&_[cmdk-group-heading]]:border-b [&_[cmdk-group-heading]]:border-border-gray/50"
+                  heading={<span className="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-navy"><Compass className="w-4 h-4" aria-hidden="true" />Postos</span>}
+                  className={groupHeadingClass}
                 >
                   {postoItems.map((item, i) => {
                     const idx = postoOffset + i;
@@ -171,10 +193,9 @@ export function GlobalSearchDropdown({ query, results, isSearching, onClose, inp
                       <CommandItem
                         key={`posto-${item.id}`}
                         data-index={idx}
-                        data-selected={isActive ? '' : undefined}
                         value={`posto-${item.id}`}
                         onSelect={() => { navigate(item.navigateTo); onClose(); }}
-                        className="rounded-none! px-3 py-2.5 min-h-[44px] text-base text-navy gap-3 data-selected:bg-ice data-selected:text-navy cursor-pointer"
+                        className={cn(itemBaseClass, isActive && "bg-ice")}
                       >
                         <Compass className="w-4 h-4 text-slate flex-shrink-0" strokeWidth={1.5} aria-hidden="true" />
                         <div className="min-w-0 flex-1">

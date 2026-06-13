@@ -231,7 +231,7 @@ shadcn usa exatamente esse padrão. **Nenhuma alteração necessária.**
 - [ ] `src/index.css` com variáveis shadcn mapeadas para tokens `--app-*`
 - [ ] `npx shadcn@latest add button` executa sem erro e gera `src/components/ui/button.tsx`
 - [ ] `npm run lint` passa sem novos erros
-- [ ] `npm test` passa (173 testes)
+- [ ] `npm test` passa (171 testes)
 
 ---
 
@@ -1074,7 +1074,7 @@ import { ScrollArea } from '@/src/components/ui/scroll-area';
 - [ ] `Breadcrumb.tsx` usa componente shadcn
 - [ ] `ScrollArea` em uso nos containers de lista longa
 - [ ] `npm run lint` passa
-- [ ] `npm test` passa (173 testes)
+- [ ] `npm test` passa (171 testes)
 
 ---
 
@@ -1131,7 +1131,7 @@ Aplicáveis a **todos os sprints**:
 - [ ] `npm run lint` (tsc --noEmit) sem erros
 
 ### Testes
-- [ ] `npm test` passa com 173 testes (ou mais, se novos testes foram adicionados)
+- [ ] `npm test` passa com 171 testes (ou mais, se novos testes foram adicionados)
 - [ ] Testes de componentes que usam portais do Radix (Dialog, DropdownMenu) usam `within(document.body)` para encontrar elementos no portal
 
 ### Acessibilidade

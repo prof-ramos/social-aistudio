@@ -1,25 +1,53 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { Slot } from 'radix-ui';
 import { cn } from '../../lib/utils';
-import {
-  Breadcrumb as ShadcnBreadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from './shadcn/breadcrumb';
 
-export { BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator };
+// shadcn breadcrumb primitives (inline to avoid casing conflict with breadcrumb.tsx)
+export function BreadcrumbRoot({ className, ...props }: React.ComponentProps<'nav'>) {
+  return <nav aria-label="breadcrumb" className={className} {...props} />;
+}
 
-export interface BreadcrumbItem {
+export function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {
+  return (
+    <ol
+      className={cn('flex flex-wrap items-center gap-1.5 text-base text-muted-foreground sm:gap-2.5 break-words', className)}
+      {...props}
+    />
+  );
+}
+
+export function BreadcrumbItem({ className, ...props }: React.ComponentProps<'li'>) {
+  return <li className={cn('inline-flex items-center gap-1.5', className)} {...props} />;
+}
+
+export function BreadcrumbLink({ className, asChild, ...props }: React.ComponentProps<'a'> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot.Root : 'a';
+  return <Comp className={cn('hover:text-foreground transition-colors', className)} {...props} />;
+}
+
+export function BreadcrumbPage({ className, ...props }: React.ComponentProps<'span'>) {
+  return <span aria-current="page" className={cn('font-normal text-foreground', className)} {...props} />;
+}
+
+export function BreadcrumbSeparator({ className, children, ...props }: React.ComponentProps<'li'>) {
+  return (
+    <li role="presentation" aria-hidden="true" className={cn('[&>svg]:w-3.5 [&>svg]:h-3.5', className)} {...props}>
+      {children ?? <ChevronRight />}
+    </li>
+  );
+}
+
+// ASOF Breadcrumb wrapper (keeps the existing items-array API)
+
+export interface BreadcrumbItemDef {
   label: string;
   href?: string;
 }
 
 interface BreadcrumbProps {
-  items: BreadcrumbItem[];
+  items: BreadcrumbItemDef[];
 }
 
 export function Breadcrumb({ items }: BreadcrumbProps) {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '../../lib/utils';
-import { Badge } from './badge';
+import { cn } from '@/src/lib/utils';
+import { Badge } from '@/src/components/ui/badge';
 
 export interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   status: 'success' | 'warning' | 'error' | 'info' | 'neutral';

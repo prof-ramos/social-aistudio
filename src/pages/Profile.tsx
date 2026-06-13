@@ -5,7 +5,7 @@ import { Camera, Save, MapPin, BookOpen, MessageSquare, Bookmark, Star, Lock, Ph
 import { useUserProfile } from '../hooks/useUserProfile';
 import { useUserContent } from '../hooks/useUserContent';
 import { useEditProfile } from '../hooks/useEditProfile';
-import { Card, PageTitle, Button, Alert, StatusBadge, Breadcrumb, AvatarUpload, Checkbox, Input, Textarea, Label, Switch } from '../components/ui';
+import { Card, PageTitle, Button, Alert, StatusBadge, Breadcrumb, AvatarUpload, Checkbox } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import {
   Dialog,
@@ -188,10 +188,10 @@ export function Profile({ profile }: { profile: UserProfile }) {
         </div>
       </Card>
 
-      <Dialog open={isEditing} onOpenChange={(open) => !open && setIsEditing(false)}>
-        <DialogContent className="max-w-xl rounded-none p-0 flex flex-col max-h-[90dvh]">
+      <Dialog open={isEditing} onOpenChange={(open) => !open && !saving && setIsEditing(false)}>
+        <DialogContent className="max-w-xl rounded-none p-0 flex flex-col max-h-[90dvh]" showCloseButton={false}>
           <DialogHeader className="px-6 py-5 border-b border-border-gray/50 bg-ice/30 shrink-0">
-            <DialogTitle>
+            <DialogTitle asChild>
               <PageTitle as="h2" size="lg">Editar Perfil</PageTitle>
             </DialogTitle>
           </DialogHeader>
@@ -207,10 +207,11 @@ export function Profile({ profile }: { profile: UserProfile }) {
                   />
                 </div>
                 <div className="space-y-1 text-left">
-                  <Label htmlFor="profile-bio" className="block text-sm uppercase tracking-widest font-bold text-navy">Mini-biografia</Label>
-                  <Textarea
+                  <label htmlFor="profile-bio" className="block text-sm uppercase tracking-widest font-bold text-navy">Mini-biografia</label>
+                  <textarea
                     id="profile-bio"
                     autoComplete="off"
+                    className="w-full min-h-[120px] border border-border-gray p-3 text-base text-slate focus:border-navy focus:ring-2 focus:ring-navy focus:outline-none leading-relaxed resize-y max-h-[400px] transition-colors bg-white/50"
                     placeholder="Conte um pouco sobre sua trajetória profissional e postos anteriores..."
                     value={editForm.bio}
                     onChange={e => setEditForm({ ...editForm, bio: e.target.value })}
@@ -218,12 +219,13 @@ export function Profile({ profile }: { profile: UserProfile }) {
                   <p className="text-sm text-slate font-medium leading-relaxed">Escreva um breve resumo da sua carreira.</p>
                 </div>
                 <div className="space-y-1 text-left">
-                  <Label htmlFor="profile-interests" className="block text-sm uppercase tracking-widest font-bold text-navy">Áreas de Interesse</Label>
-                  <Input
+                  <label htmlFor="profile-interests" className="block text-sm uppercase tracking-widest font-bold text-navy">Áreas de Interesse</label>
+                  <input
                     id="profile-interests"
                     type="text"
                     autoComplete="off"
                     enterKeyHint="done"
+                    className="w-full h-11 border border-border-gray px-3 text-base text-slate focus:border-navy focus:ring-2 focus:ring-navy focus:outline-none transition-colors bg-white/50"
                     placeholder="Ex: Política Externa, Economia, Direitos Humanos"
                     value={editForm.interests}
                     onChange={e => setEditForm({ ...editForm, interests: e.target.value })}
@@ -237,24 +239,25 @@ export function Profile({ profile }: { profile: UserProfile }) {
                     Usamos seus dados de contato apenas para que colegas possam falar com você. Seu dado não será compartilhado sem sua autorização.
                   </p>
                   <div className="space-y-1">
-                    <Label htmlFor="profile-phone" className="block text-sm uppercase tracking-widest font-bold text-navy">Telefone</Label>
-                    <Input
+                    <label htmlFor="profile-phone" className="block text-sm uppercase tracking-widest font-bold text-navy">Telefone</label>
+                    <input
                       id="profile-phone"
                       type="tel"
                       inputMode="tel"
                       autoComplete="tel"
+                      className="w-full h-11 border border-border-gray px-3 text-base text-slate focus:border-navy focus:ring-2 focus:ring-navy focus:outline-none transition-colors bg-white/50"
                       placeholder="(61) 99999-9999"
                       value={editForm.phone}
                       onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label htmlFor="profile-email" className="block text-sm uppercase tracking-widest font-bold text-navy">E-mail</Label>
-                    <Input
+                    <label htmlFor="profile-email" className="block text-sm uppercase tracking-widest font-bold text-navy">E-mail</label>
+                    <input
                       id="profile-email"
                       type="email"
                       readOnly
-                      className="cursor-not-allowed"
+                      className="w-full h-11 border border-border-gray px-3 text-base text-slate bg-ice/50 cursor-not-allowed"
                       value={user.email}
                     />
                   </div>
@@ -264,14 +267,18 @@ export function Profile({ profile }: { profile: UserProfile }) {
                     checked={editForm.phoneIsWhatsapp}
                     onCheckedChange={(v) => setEditForm({ ...editForm, phoneIsWhatsapp: v === true })}
                   />
-                  <div className="flex items-center space-x-2">
-                    <Switch id="profile-show-phone" checked={editForm.showPhone} onCheckedChange={v => setEditForm({...editForm, showPhone: v})} />
-                    <Label htmlFor="profile-show-phone">Mostrar meu telefone publicamente</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch id="profile-show-email" checked={editForm.showEmail} onCheckedChange={v => setEditForm({...editForm, showEmail: v})} />
-                    <Label htmlFor="profile-show-email">Mostrar meu e-mail publicamente</Label>
-                  </div>
+                  <Checkbox
+                    id="profile-show-phone"
+                    label="Mostrar meu telefone publicamente"
+                    checked={editForm.showPhone}
+                    onCheckedChange={(v) => setEditForm({ ...editForm, showPhone: v === true })}
+                  />
+                  <Checkbox
+                    id="profile-show-email"
+                    label="Mostrar meu e-mail publicamente"
+                    checked={editForm.showEmail}
+                    onCheckedChange={(v) => setEditForm({ ...editForm, showEmail: v === true })}
+                  />
                 </div>
               </form>
           </div>
@@ -281,7 +288,7 @@ export function Profile({ profile }: { profile: UserProfile }) {
               type="button"
               variant="ghost"
               size="md"
-              onClick={() => setIsEditing(false)}
+              onClick={() => !saving && setIsEditing(false)}
               className="w-full sm:w-auto"
             >
               Cancelar
