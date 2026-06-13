@@ -13,22 +13,20 @@ export function RegisterRequest() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [notificationWarning, setNotificationWarning] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setNotificationWarning('');
     try {
-      await memberRequestService.createRequest(formData);
-
-      await fetch('/api/admin/notify-request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formData.name, email: formData.email, matricula: formData.matricula })
-      });
-
+      const result = await memberRequestService.submitRequest(formData);
+      if (!result.adminNotified) {
+        setNotificationWarning(result.notificationError || 'A solicitação foi registrada, mas o aviso automático para a administração falhou.');
+      }
       setSuccess(true);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       setError('Erro ao enviar solicitação.');
     } finally {
@@ -42,6 +40,11 @@ export function RegisterRequest() {
         title="Solicitação recebida"
         description="A ASOF avaliará os dados e entrará em contato em breve."
       >
+        {notificationWarning && (
+          <Alert variant="warning" className="mb-4">
+            {notificationWarning} Sua solicitação está salva; se precisar, fale com a ASOF pelo canal oficial.
+          </Alert>
+        )}
         <p className="text-base leading-relaxed text-slate">
           Sua solicitação foi registrada com sucesso. O acesso à plataforma é restrito e passa por validação institucional.
         </p>
