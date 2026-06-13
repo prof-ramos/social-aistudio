@@ -148,7 +148,8 @@ describe('postRepository', () => {
         }],
         error: null,
       });
-      const mockSelect = vi.fn().mockReturnValue({ in: mockIn });
+      const mockIs = vi.fn().mockReturnValue({ in: mockIn });
+      const mockSelect = vi.fn().mockReturnValue({ is: mockIs });
 
       vi.mocked(supabase.from).mockReturnValue({
         select: mockSelect,
@@ -157,6 +158,7 @@ describe('postRepository', () => {
       const result = await postRepository.getPostsByIds(['p1']);
 
       expect(mockSelect).toHaveBeenCalledWith('*, users_public!author_id(name, role)');
+      expect(mockIs).toHaveBeenCalledWith('deleted_at', null);
       expect(mockIn).toHaveBeenCalledWith('id', ['p1']);
       expect(result.length).toBe(1);
       expect(result[0].id).toBe('p1');
@@ -164,7 +166,8 @@ describe('postRepository', () => {
 
     it('throws when DB returns error', async () => {
       const mockIn = vi.fn().mockResolvedValue({ data: null, error: new Error('db fail') });
-      const mockSelect = vi.fn().mockReturnValue({ in: mockIn });
+      const mockIs = vi.fn().mockReturnValue({ in: mockIn });
+      const mockSelect = vi.fn().mockReturnValue({ is: mockIs });
 
       vi.mocked(supabase.from).mockReturnValue({
         select: mockSelect,
@@ -210,7 +213,8 @@ describe('postRepository', () => {
         data: null,
         error: { code: 'PGRST116', message: 'Not found' },
       });
-      const mockEq = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockIs = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockEq = vi.fn().mockReturnValue({ is: mockIs });
       const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
 
       vi.mocked(supabase.from).mockReturnValue({
@@ -219,6 +223,8 @@ describe('postRepository', () => {
 
       const result = await postRepository.getPost('p1');
       expect(result).toBeNull();
+      expect(mockEq).toHaveBeenCalledWith('id', 'p1');
+      expect(mockIs).toHaveBeenCalledWith('deleted_at', null);
     });
 
     it('throws on unexpected DB error', async () => {
@@ -226,7 +232,8 @@ describe('postRepository', () => {
         data: null,
         error: new Error('db error'),
       });
-      const mockEq = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockIs = vi.fn().mockReturnValue({ single: mockSingle });
+      const mockEq = vi.fn().mockReturnValue({ is: mockIs });
       const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
 
       vi.mocked(supabase.from).mockReturnValue({
@@ -234,6 +241,38 @@ describe('postRepository', () => {
       } as any);
 
       await expect(postRepository.getPost('p1')).rejects.toThrow('db error');
+    });
+  });
+
+  describe('subscribeToComments', () => {
+    it('loads only active comments for the post', async () => {
+      const queryChain: any = {
+        select: vi.fn(() => queryChain),
+        eq: vi.fn(() => queryChain),
+        is: vi.fn(() => queryChain),
+        order: vi.fn(() => queryChain),
+        limit: vi.fn(() => Promise.resolve({ data: [], error: null })),
+      };
+      vi.mocked(supabase.from).mockReturnValue(queryChain);
+
+      const channelChain: any = {
+        on: vi.fn(() => channelChain),
+        subscribe: vi.fn(() => channelChain),
+      };
+      vi.mocked(supabase.channel).mockReturnValue(channelChain);
+
+      const onUpdate = vi.fn();
+      const unsubscribe = postRepository.subscribeToComments('p1', onUpdate);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(supabase.from).toHaveBeenCalledWith('comments');
+      expect(queryChain.eq).toHaveBeenCalledWith('post_id', 'p1');
+      expect(queryChain.is).toHaveBeenCalledWith('deleted_at', null);
+      expect(queryChain.order).toHaveBeenCalledWith('created_at', { ascending: true });
+      expect(onUpdate).toHaveBeenCalledWith([]);
+
+      unsubscribe();
     });
   });
 

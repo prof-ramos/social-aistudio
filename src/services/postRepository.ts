@@ -2,6 +2,9 @@ import { supabase } from '../lib/supabase';
 import { Post, PostCategory, UserProfile, PostComment } from '../types';
 import { reactionRepository } from './reactionRepository';
 
+const POST_WITH_AUTHOR_SELECT = '*, users_public!author_id(name, role)';
+const COMMENT_WITH_AUTHOR_SELECT = '*, users_public!author_id(name, role)';
+
 const resolveJoinedUser = (users: { name: string; role: string } | { name: string; role: string }[] | null) => {
   if (Array.isArray(users)) return users[0];
   return users;
@@ -42,7 +45,8 @@ export const postRepository = {
 
     const { data, error } = await supabase
       .from('posts')
-      .select('*, users_public!author_id(name, role)')
+      .select(POST_WITH_AUTHOR_SELECT)
+      .is('deleted_at', null)
       .in('id', ids);
 
     if (error) {
@@ -57,7 +61,7 @@ export const postRepository = {
   getPostsByAuthor: async (authorId: string): Promise<Post[]> => {
     const { data, error } = await supabase
       .from('posts')
-      .select('*, users_public!author_id(name, role)')
+      .select(POST_WITH_AUTHOR_SELECT)
       .eq('author_id', authorId)
       .is('deleted_at', null)
       .order('created_at', { ascending: false });
@@ -76,7 +80,7 @@ export const postRepository = {
       try {
         const { data, error } = await supabase
           .from('posts')
-          .select('*, users_public!author_id(name, role)')
+          .select(POST_WITH_AUTHOR_SELECT)
           .is('deleted_at', null)
           .order('created_at', { ascending: false })
           .limit(limitCount);
@@ -131,7 +135,7 @@ export const postRepository = {
   fetchMorePosts: async (offset: number, pageSize: number = 10): Promise<{ posts: Post[]; hasMore: boolean }> => {
     const { data, error } = await supabase
       .from('posts')
-      .select('*, users_public!author_id(name, role)')
+      .select(POST_WITH_AUTHOR_SELECT)
       .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .order('id', { ascending: false })
@@ -162,7 +166,7 @@ export const postRepository = {
         author_id: profile.id,
         pinned: false,
       })
-      .select('*, users_public!author_id(name, role)')
+      .select(POST_WITH_AUTHOR_SELECT)
       .single();
 
     if (error) {
@@ -176,8 +180,9 @@ export const postRepository = {
   getPost: async (id: string): Promise<Post | null> => {
     const { data, error } = await supabase
       .from('posts')
-      .select('*, users_public!author_id(name, role)')
+      .select(POST_WITH_AUTHOR_SELECT)
       .eq('id', id)
+      .is('deleted_at', null)
       .single();
 
     if (error) {
@@ -231,8 +236,9 @@ export const postRepository = {
       try {
         const { data, error } = await supabase
           .from('comments')
-          .select('*, users_public!author_id(name, role)')
+          .select(COMMENT_WITH_AUTHOR_SELECT)
           .eq('post_id', postId)
+          .is('deleted_at', null)
           .order('created_at', { ascending: true })
           .limit(50);
 
@@ -275,7 +281,7 @@ export const postRepository = {
         body,
         author_id: profile.id,
       })
-      .select('*, users_public!author_id(name, role)')
+      .select(COMMENT_WITH_AUTHOR_SELECT)
       .single();
 
     if (error) {
@@ -313,7 +319,7 @@ export const postRepository = {
       .from('posts')
       .update({ title: data.title, body: data.body, category: data.category })
       .eq('id', postId)
-      .select('*, users_public!author_id(name, role)')
+      .select(POST_WITH_AUTHOR_SELECT)
       .single();
 
     if (error) {
