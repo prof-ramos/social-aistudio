@@ -320,6 +320,7 @@ describe('postRepository', () => {
     const setupFeedMocks = () => {
       const queryChain: any = {
         select: vi.fn(() => queryChain),
+        is: vi.fn(() => queryChain),
         order: vi.fn(() => queryChain),
         limit: vi.fn(() => Promise.resolve({ data: [], error: null })),
       };
@@ -347,6 +348,7 @@ describe('postRepository', () => {
 
       expect(handlers.length).toBe(1); // posts handler only (reactions are optimistic)
       expect(onUpdate).not.toHaveBeenCalled(); // no eager refetch
+      expect(vi.mocked(supabase.from)).not.toHaveBeenCalled();
       unsubscribe();
     });
 
@@ -364,6 +366,8 @@ describe('postRepository', () => {
 
       await vi.advanceTimersByTimeAsync(250);
       expect(onUpdate).toHaveBeenCalledTimes(1); // single refetch for the whole burst
+      expect(vi.mocked(supabase.from)).toHaveBeenCalledWith('posts');
+      expect((vi.mocked(supabase.from).mock.results[0].value as any).is).toHaveBeenCalledWith('deleted_at', null);
 
       unsubscribe();
       vi.useRealTimers();
@@ -388,6 +392,7 @@ describe('postRepository', () => {
     const buildQueryChain = (resolver: () => Promise<any>) => {
       const chain: any = {
         select: vi.fn().mockReturnThis(),
+        is: vi.fn().mockReturnThis(),
         order: vi.fn().mockReturnThis(),
         range: vi.fn().mockImplementation(() => resolver()),
       };
@@ -406,6 +411,7 @@ describe('postRepository', () => {
       const result = await postRepository.fetchMorePosts(10, 10);
 
       expect(chain.range).toHaveBeenCalledWith(10, 19);
+      expect(chain.is).toHaveBeenCalledWith('deleted_at', null);
       expect(result.posts).toHaveLength(2);
       expect(result.hasMore).toBe(false); // fewer rows than pageSize
     });

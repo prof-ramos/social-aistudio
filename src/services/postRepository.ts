@@ -77,6 +77,7 @@ export const postRepository = {
         const { data, error } = await supabase
           .from('posts')
           .select('*, users_public!author_id(name, role)')
+          .is('deleted_at', null)
           .order('created_at', { ascending: false })
           .limit(limitCount);
 
@@ -131,6 +132,7 @@ export const postRepository = {
     const { data, error } = await supabase
       .from('posts')
       .select('*, users_public!author_id(name, role)')
+      .is('deleted_at', null)
       .order('created_at', { ascending: false })
       .order('id', { ascending: false })
       .range(offset, offset + pageSize - 1);
