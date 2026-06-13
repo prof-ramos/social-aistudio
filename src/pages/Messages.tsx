@@ -1,51 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { UserProfile } from '../types';
-import { chatService } from '../services/chatService';
 import { ChevronLeft, Send, MessageSquare } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
 import { Button, Card, PageTitle, Input, Label, ScrollArea } from '../components/ui';
 import { PageContainer } from '../components/layout/PageContainer';
 import { useVisualViewportOffset } from '../hooks/useVisualViewportOffset';
 import { useChatList } from '../hooks/useChatList';
 import { useChatConversation } from '../hooks/useChatConversation';
+import { useActiveChat } from '../hooks/useActiveChat';
 
 export function Messages({ profile }: { profile: UserProfile }) {
-  const [activeChatId, setActiveChatId] = useState<string | null>(null);
-  const location = useLocation();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const keyboardOffset = useVisualViewportOffset();
-  const isCreatingChatRef = useRef(false);
-  const locationStateRef = useRef(location.state);
 
   const { chats } = useChatList(profile.id);
+  const { activeChatId, setActiveChatId } = useActiveChat(profile, chats);
   const { messages, newMessage, setNewMessage, sending, handleSendMessage, activeChat } = useChatConversation(activeChatId, profile.id, chats);
-
-  // Capture location.state once on mount to avoid re-triggering on chat updates
-  useEffect(() => {
-    locationStateRef.current = location.state;
-  }, [location.state]);
-
-  // Handle navigation from profile page (targetUserId in location.state)
-  useEffect(() => {
-    const state = locationStateRef.current as { targetUserId?: string; targetUserName?: string } | null;
-    if (!state?.targetUserId || state.targetUserId === profile.id || isCreatingChatRef.current) return;
-    const existingChat = chats.find((c) => c.participants.includes(state.targetUserId!));
-    if (existingChat) {
-      setActiveChatId(existingChat.id);
-      window.history.replaceState({}, document.title);
-      locationStateRef.current = null;
-    } else {
-      isCreatingChatRef.current = true;
-      chatService
-        .getOrCreateChat(profile.id, state.targetUserId, profile.name, state.targetUserName || 'Usuário')
-        .then((id) => {
-          setActiveChatId(id);
-          window.history.replaceState({}, document.title);
-          locationStateRef.current = null;
-        })
-        .finally(() => { isCreatingChatRef.current = false; });
-    }
-  }, [chats, profile.id, profile.name]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
