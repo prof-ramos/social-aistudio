@@ -3,6 +3,7 @@
 // (Vercel serverless). Keep it framework-free so both callers can use it.
 import { createClient, type VercelKV } from '@vercel/kv';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import nodemailer from 'nodemailer';
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 5;
@@ -126,6 +127,30 @@ export async function checkMemberRequest(
   }
 
   return { ok: true };
+}
+
+/**
+ * Send the access-request notification email to the admin inbox.
+ * SMTP config comes from env vars with the same defaults both callers
+ * (Express dev server + Vercel serverless function) previously inlined.
+ */
+export async function sendNotifyRequestEmail(fields: NotifyFields): Promise<void> {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+    port: Number(process.env.SMTP_PORT) || 465,
+    secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_SECURE === undefined,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.SMTP_FROM || '"Social-ASOF" <admin@asof.space>',
+    to: process.env.ADMIN_EMAIL || 'admin@asof.space',
+    subject: 'Nova solicitação de acesso - Social-ASOF',
+    text: `Uma nova solicitação foi recebida:\n\nNome: ${fields.name}\nE-mail: ${fields.email}\nMatrícula: ${fields.matricula}\n\nAcesse o painel para avaliar.`,
+  });
 }
 
 // Reset hook for tests (the rate-limit Map is module-level state).

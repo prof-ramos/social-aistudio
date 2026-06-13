@@ -1,6 +1,5 @@
 import { IncomingMessage, ServerResponse } from "http";
-import nodemailer from "nodemailer";
-import { checkRateLimit, validateNotifyRequest, checkMemberRequest } from "./_lib/notifyRequest";
+import { checkRateLimit, validateNotifyRequest, checkMemberRequest, sendNotifyRequestEmail } from "./_lib/notifyRequest";
 import { getSupabaseServerClient } from "./_lib/supabaseServer";
 
 function readBody(req: IncomingMessage): Promise<unknown> {
@@ -60,25 +59,7 @@ export default async function handler(
       return json(res, memberCheck.status, { error: memberCheck.error });
     }
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.hostinger.com",
-      port: Number(process.env.SMTP_PORT) || 465,
-      secure:
-        process.env.SMTP_SECURE === "true" ||
-        process.env.SMTP_SECURE === undefined,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from:
-        process.env.SMTP_FROM || '"Social-ASOF" <admin@asof.space>',
-      to: process.env.ADMIN_EMAIL || "admin@asof.space",
-      subject: "Nova solicitação de acesso - Social-ASOF",
-      text: `Uma nova solicitação foi recebida:\n\nNome: ${name}\nE-mail: ${email}\nMatrícula: ${matricula}\n\nAcesse o painel para avaliar.`,
-    });
+    await sendNotifyRequestEmail({ name, email, matricula });
 
     return json(res, 200, { success: true });
   } catch (error) {

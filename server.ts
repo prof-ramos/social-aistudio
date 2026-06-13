@@ -1,8 +1,7 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import nodemailer from "nodemailer";
-import { checkRateLimit, validateNotifyRequest, checkMemberRequest } from "./api/_lib/notifyRequest";
+import { checkRateLimit, validateNotifyRequest, checkMemberRequest, sendNotifyRequestEmail } from "./api/_lib/notifyRequest";
 import { getSupabaseServerClient } from "./api/_lib/supabaseServer";
 
 async function startServer() {
@@ -35,22 +34,7 @@ async function startServer() {
         return;
       }
 
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.hostinger.com',
-        port: Number(process.env.SMTP_PORT) || 465,
-        secure: process.env.SMTP_SECURE === 'true' || process.env.SMTP_SECURE === undefined,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
-
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM || '"Social-ASOF" <admin@asof.space>',
-        to: process.env.ADMIN_EMAIL || 'admin@asof.space',
-        subject: "Nova solicitação de acesso - Social-ASOF",
-        text: `Uma nova solicitação foi recebida:\n\nNome: ${name}\nE-mail: ${email}\nMatrícula: ${matricula}\n\nAcesse o painel para avaliar.`,
-      });
+      await sendNotifyRequestEmail({ name, email, matricula });
 
       res.json({ success: true });
     } catch (error) {
