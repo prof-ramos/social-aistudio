@@ -1,30 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
-import { postoService } from '../../services/postoService';
+import { useHighlightedPosto } from '../../hooks/useHighlightedPosto';
 
 export function PostoHighlightCard() {
-  const [posto, setPosto] = useState<{
-    name: string;
-    slug: string;
-    reviewCount: number;
-    averageRating: number | null;
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    postoService.getHighlightedPosto().then(data => {
-      if (!cancelled) {
-        setPosto(data);
-        setLoading(false);
-      }
-    }).catch(() => {
-      if (!cancelled) setLoading(false);
-    });
-
-    return () => { cancelled = true; };
-  }, []);
+  const { posto, loading } = useHighlightedPosto();
 
   if (loading) {
     return (

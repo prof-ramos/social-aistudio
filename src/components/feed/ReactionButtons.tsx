@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { ThumbsUp, Heart, AlertTriangle } from 'lucide-react';
-import { postService } from '../../services/postService';
+import { useReactions } from '../../hooks/useReactions';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface ReactionButtonsProps {
@@ -17,41 +17,13 @@ const POSITIVE_EMOJIS = [
 const REPORT_EMOJI = { emoji: '💡', label: 'Informar', Icon: AlertTriangle };
 
 export function ReactionButtons({ postId, reactions = {}, currentUserId }: ReactionButtonsProps) {
-  const [localReactions, setLocalReactions] = useState(reactions);
+  const { localReactions, toggle } = useReactions(postId, reactions, currentUserId);
 
-  useEffect(() => {
-    setLocalReactions(reactions);
-  }, [reactions]);
-
-  const handleReact = useCallback(async (e: React.MouseEvent, emoji: string) => {
+  const handleReact = (e: React.MouseEvent, emoji: string) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const prevReactions = { ...localReactions };
-    const userReacts = prevReactions[emoji] || [];
-    const hasReacted = userReacts.includes(currentUserId);
-
-    // Optimistic update
-    setLocalReactions(prev => {
-      const next = { ...prev };
-      const list = [...(next[emoji] || [])];
-      if (hasReacted) {
-        next[emoji] = list.filter(id => id !== currentUserId);
-      } else {
-        next[emoji] = [...list, currentUserId];
-      }
-      if (next[emoji].length === 0) delete next[emoji];
-      return next;
-    });
-
-    try {
-      await postService.toggleReaction(postId, emoji, currentUserId);
-    } catch (err) {
-      console.error('Failed to toggle reaction', err);
-      // Revert on error
-      setLocalReactions(prevReactions);
-    }
-  }, [localReactions, currentUserId, postId]);
+    toggle(emoji);
+  };
 
   const reportReacts = localReactions[REPORT_EMOJI.emoji] || [];
   const hasReported = reportReacts.includes(currentUserId);

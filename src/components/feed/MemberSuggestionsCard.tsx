@@ -1,36 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { UserProfile } from '../../types';
-import { userService } from '../../services/userService';
-import { UserPlus, UserCheck } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useMemberSuggestions } from '../../hooks/useMemberSuggestions';
 
 interface MemberSuggestionsCardProps {
   profile: UserProfile;
 }
 
 export function MemberSuggestionsCard({ profile }: MemberSuggestionsCardProps) {
-  const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      try {
-        setLoading(true);
-        const myPostos = profile.postos || [];
-        const matchedUsers = await userService.getUsersWithCommonPostos(profile.id, myPostos, 50);
-
-        // Take up to 3 random suggestions
-        const shuffled = matchedUsers.sort(() => 0.5 - Math.random());
-        setSuggestions(shuffled.slice(0, 3));
-      } catch (err) {
-        console.error('Error fetching suggestions:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSuggestions();
-  }, [profile.id, profile.postos]);
+  const { suggestions, loading } = useMemberSuggestions(profile);
 
   if (loading) {
     return (
