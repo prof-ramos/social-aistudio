@@ -2,13 +2,12 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Menu, User, LogOut, Bell, Shield, Search, MessageSquare, Compass, Home, Moon, Sun } from 'lucide-react';
 import { authService } from '../../services/authService';
 import { UserProfile } from '../../types';
-import React, { useState, useEffect, useRef } from 'react';
-import { notificationService } from '../../services/notificationService';
-import { adminService } from '../../services/adminService';
+import { useState, useEffect, useRef } from 'react';
 import { cn } from '../../lib/utils';
 import { useDarkMode } from '../../hooks/useDarkMode';
 import { useFocusTrap } from '../../hooks/useFocusTrap';
-import { useGlobalSearch } from '../../hooks/useGlobalSearch';
+import { useNavbarBadges } from '../../hooks/useNavbarBadges';
+import { useNavbarSearch } from '../../hooks/useNavbarSearch';
 import { NavbarBrand } from '../brand/NavbarBrand';
 import { BrandLockup } from '../brand/BrandLockup';
 import { GlobalSearchDropdown } from './GlobalSearchDropdown';
@@ -34,64 +33,11 @@ export function Navbar({ profile, isAdminView }: { profile: UserProfile, isAdmin
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const [pendingRequests, setPendingRequests] = useState(0);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const { query, setQuery, results, isSearching, clearQuery } = useGlobalSearch();
-
-  const searchRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const { unreadNotifications, pendingRequests } = useNavbarBadges(profile);
+  const { query, setQuery, results, isSearching, clearQuery, searchRef, searchInputRef } = useNavbarSearch();
   const mobileMenuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const unsubNotif = notificationService.subscribeToUnreadNotifications(
-      profile.id,
-      (count) => setUnreadNotifications(count)
-    );
-
-    let unsubAdmin = () => {};
-    if (profile.role === 'ADMIN') {
-      unsubAdmin = adminService.subscribeToPendingRequests(
-        (count) => setPendingRequests(count)
-      );
-    }
-
-    return () => {
-      unsubNotif();
-      unsubAdmin();
-    };
-  }, [profile.id, profile.role]);
-
-  // Clear search when clicking outside the search area
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        clearQuery();
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [clearQuery]);
-
-  // Clear search on navigation
-  useEffect(() => {
-    clearQuery();
-  }, [location.pathname, clearQuery]);
-
-  // Keyboard shortcut: / focuses search
-  useEffect(() => {
-    function handleSlash(event: KeyboardEvent) {
-      const target = event.target as HTMLElement;
-      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable;
-      if (event.key === '/' && !event.metaKey && !event.ctrlKey && !event.altKey && !isInput) {
-        event.preventDefault();
-        searchInputRef.current?.focus();
-      }
-    }
-    document.addEventListener('keydown', handleSlash);
-    return () => document.removeEventListener('keydown', handleSlash);
-  }, []);
 
   // Stable ref so the Escape handler doesn't re-register on every keystroke
   const queryRef = useRef(query);
