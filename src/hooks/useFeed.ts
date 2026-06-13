@@ -203,9 +203,9 @@ export function useFeed(profile: UserProfile) {
     handleCloseEditor,
     activeFilter,
     setActiveFilter,
-    postCount,
     loadMore,
     hasMore,
-    loadingMore
+    loadingMore,
+    postCount
   };
 }

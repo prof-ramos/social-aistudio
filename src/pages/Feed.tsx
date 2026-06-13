@@ -30,9 +30,9 @@ export function Feed({ profile }: { profile: UserProfile }) {
     editingPost,
     activeFilter,
     setActiveFilter,
-    postCount,
     loadMore,
-    hasMore
+    hasMore,
+    postCount
   } = useFeed(profile);
 
   const saved = useSavedPosts(profile.id, profile.savedPosts ?? []);
